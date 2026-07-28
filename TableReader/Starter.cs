@@ -6,6 +6,6 @@ class Program
     {
         var fs = new FileStream("data.xlsx", FileMode.Open, FileAccess.Read);
         TrainExtractor te = new TrainExtractor();
-        te.Extract(fs);
+        te.Extract(fs, "2607");
     }
 }

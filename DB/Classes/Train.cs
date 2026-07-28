@@ -21,7 +21,7 @@ public class Train
         get { return DayInRaise;}
         set
         {
-            if (value > 0 && value < 31) DayInRaise = value;
+            if (value >= 0 && value < 32) DayInRaise = value;
             else throw new ArgumentOutOfRangeException($"Неверное количество дней у поезда {this.Id} ({value})");
         }
     }
