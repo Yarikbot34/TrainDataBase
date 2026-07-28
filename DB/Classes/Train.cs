@@ -3,11 +3,12 @@ namespace DB;
 public class Train
 {
     public int Id { get; set; }
+    public string Period { get; set; }
     public string Number { get; set; }
     
     //Тех. Данные
-    public string StationFrom { get; set; }
-    public string StationTo { get; set; }
+    public Station StationFrom { get; set; }
+    public Station StationTo { get; set; }
     
     public int Distance { get; set; }
     public int RailcarCount { get; set; }
