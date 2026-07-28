@@ -8,7 +8,11 @@ public class Train
     
     //Тех. Данные
     public Station StationFrom { get; set; }
+    public Station StationMiddle { get; set; }
     public Station StationTo { get; set; }
+    
+    public TimeOnly TimeFrom { get; set; }
+    public TimeOnly TimeTo { get; set; }
     
     public int Distance { get; set; }
     public int RailcarCount { get; set; }
@@ -21,8 +25,8 @@ public class Train
             else throw new ArgumentOutOfRangeException($"Неверное количество дней у поезда {this.Id} ({value})");
         }
     }
-    public int RangePerDay { get; }
-    public int RangePerMonth { get; }
+    public int RangePerDay { get; set; }
+    public int RangePerMonth { get; set; }
     
     //Пассажиропоток
     public PasCategory Casual { get; set; }
@@ -30,7 +34,6 @@ public class Train
     public PasCategory FedBenefit { get; set; }
     public PasCategory RegBenefit { get; set; }
     public PasCategory Another { get; set; }
-    
     
     
 }
