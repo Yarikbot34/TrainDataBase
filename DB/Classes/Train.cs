@@ -28,21 +28,4 @@ public class Train
     }
     public int RangePerDay { get; set; }
     public int RangePerMonth { get; set; }
-    
-    //Пассажиропоток
-    public PasCategory Casual { get; set; }
-    public PasCategory Student { get; set; }
-    public PasCategory FedBenefit { get; set; }
-    public PasCategory RegBenefit { get; set; }
-    public PasCategory Another { get; set; }
-    
-    
-}
-
-public class PasCategory
-{
-    public int Count { get; set; }
-    public double Payment { get; set; }
-    public double WayLength { get; set; }
-    public double PaymentBySubject { get; set; }
 }

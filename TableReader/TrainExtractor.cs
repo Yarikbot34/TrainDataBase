@@ -22,13 +22,14 @@ class TrainExtractor
         var PaymentDataList = book.Worksheet(3);
         FirstRows[2] = GetFirstRowIndex(PaymentDataList);
 
-        Train[] trains = new Train[GetTrainCount(PassengerDataList, FirstRows[1])];
+        Train[] trains = new Train[GetTrainCount(TrainDataList, FirstRows[0])];
         for (int i = 0; i < trains.Length; i++) trains[i] = new Train();
         int counter = 0;
         int refCounter = 0;
+        //Достаем Поезда
         foreach (Train train in trains)
         {
-            if (IsDuplicate(counter+refCounter, TrainDataList)) refCounter++;
+
             
             train.Period = period;
             train.Number = TrainDataList.Cell(FirstRows[0]+counter+refCounter, 2).Value.ToString();
@@ -60,17 +61,19 @@ class TrainExtractor
             train.DayInRaise = Convert.ToInt32(TrainDataList.Cell(FirstRows[0] + counter + refCounter, 8).Value.ToString());
             train.RangePerMonth = Convert.ToInt32(TrainDataList.Cell(FirstRows[0] + counter + refCounter, 9).Value.ToString());
 
-            //2 Лист Пассажиры
-            train.Casual = GetCategoryData(counter, 0);
-            train.Student = GetCategoryData(counter, 1);
-            train.FedBenefit = GetCategoryData(counter, 2);
-            train.RegBenefit = GetCategoryData(counter, 3);
-            train.Another = GetCategoryData(counter, 4);
+           
             
-            Console.WriteLine($"{train.Number} | {train.Casual.Count} | {train.Casual.Payment}\t{counter}/{trains.Length}");
+            
+            Console.WriteLine($"{train.Number} | \t{counter}/{trains.Length}");
             counter++;
-            
         }
+        //Достаем маршруты
+        //if (IsDuplicate(counter+refCounter, TrainDataList)) refCounter++;
+        //train.Casual = GetCategoryData(counter, 0);
+        //train.Student = GetCategoryData(counter, 1);
+        //train.FedBenefit = GetCategoryData(counter, 2);
+        //train.RegBenefit = GetCategoryData(counter, 3);
+        //train.Another = GetCategoryData(counter, 4);
 
         PasCategory GetCategoryData(int row, int categoryNumber)
         {
@@ -110,13 +113,13 @@ class TrainExtractor
         int counter = TableStart;
         string value = "1";
         string id = "1";
-        while (int.TryParse(id, out _) && int.TryParse(value, out _))
+        while (id != "" || value != "")
         {
             counter++;
             id = worksheet.Cell(counter, 1).Value.ToString();
             value = worksheet.Cell(counter, 2).Value.ToString().Split('/')[0];
         }
-        return Convert.ToInt32(id)-1;
+        return counter-1-TableStart;
     }
 
     private bool IsDuplicate(int id, IXLWorksheet worksheet)
