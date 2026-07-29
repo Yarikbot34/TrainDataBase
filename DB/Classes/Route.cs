@@ -6,12 +6,13 @@ public class Route
     {
         get
         {
-            return Convert.ToInt32($"{Year}{Mouth}{train[0].Number}");
+            return Convert.ToInt32($"{Year}{Month}{RouteNumber.Split("/")[0]}");
         }
     }
-    public int Mouth;
+    public int Month;
     public int Year;
-    public Train[] train { get; set; }
+    public string RouteNumber { get; set; }
+    public List<Train> train { get; set; }
     
     //Пассажиропоток
     public PasCategory Casual { get; set; }

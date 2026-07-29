@@ -8,7 +8,7 @@ namespace TableReader;
 
 class TrainExtractor
 {
-    public void Extract(FileStream fs, string period)
+    public void Extract(FileStream fs, int year, int month)
     {
         using var book = new XLWorkbook(fs);
         
@@ -30,8 +30,7 @@ class TrainExtractor
         foreach (Train train in trains)
         {
 
-            
-            train.Period = period;
+            train.Period = $"{year}{month}";
             train.Number = TrainDataList.Cell(FirstRows[0]+counter+refCounter, 2).Value.ToString();
             
             //Станции
@@ -68,12 +67,28 @@ class TrainExtractor
             counter++;
         }
         //Достаем маршруты
-        //if (IsDuplicate(counter+refCounter, TrainDataList)) refCounter++;
-        //train.Casual = GetCategoryData(counter, 0);
-        //train.Student = GetCategoryData(counter, 1);
-        //train.FedBenefit = GetCategoryData(counter, 2);
-        //train.RegBenefit = GetCategoryData(counter, 3);
-        //train.Another = GetCategoryData(counter, 4);
+        Route[] routes = new Route[GetTrainCount(PassengerDataList, FirstRows[1])];
+        for (int i = 0; i < routes.Length; i++) routes[i] = new Route();
+        counter = 0;
+        foreach (Route route in routes)
+        {
+            route.Year = year;
+            route.Month = month;
+            
+            string number = PassengerDataList.Cell(FirstRows[1] + counter, 2).Value.ToString();
+            route.RouteNumber = number.ToLower().Contains("ручную") ? "0" : number;
+            
+            route.train = trains.Where(t => t.Number.Contains(route.RouteNumber)).ToList();
+            
+            route.Casual = GetCategoryData(counter, 0);
+            route.Student = GetCategoryData(counter, 1);
+            route.FedBenefit = GetCategoryData(counter, 2);
+            route.RegBenefit = GetCategoryData(counter, 3);
+            route.Another = GetCategoryData(counter, 4);
+            Console.WriteLine($"{route.RouteId} {route.Casual.Count}");
+            counter++;
+        }
+
 
         PasCategory GetCategoryData(int row, int categoryNumber)
         {
@@ -98,12 +113,12 @@ class TrainExtractor
     {
         int counter = 0;
         string IdValue = "";
-        string TimeCellValue = "";
-        while (IdValue != "1" || TimeCellValue == "4" )
+        string NextValue = "";
+        while (IdValue != "1" || NextValue == IdValue )
         {
             counter++;
             IdValue = worksheet.Cell(counter, 1).Value.ToString();
-            TimeCellValue = worksheet.Cell(counter, 4).Value.ToString();
+            NextValue = worksheet.Cell(counter+1, 1).Value.ToString();
         }
         return counter;
     }
