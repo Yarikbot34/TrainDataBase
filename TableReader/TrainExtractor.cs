@@ -49,7 +49,7 @@ class TrainExtractor
             }
             
             //Время
-            string[] Time = TrainDataList.Cell(FirstRows[0] + counter + refCounter, 4).Value.ToString().Split(new char[]{'–','-'});
+            string[] Time = TrainDataList.Cell(FirstRows[0] + counter + refCounter, 4).Value.ToString().Replace(".",":").Split(new char[]{'–','-'});
             train.TimeFrom = TimeOnly.Parse(Time[0]);
             train.TimeTo = TimeOnly.Parse(Time[1]);
             
@@ -68,10 +68,10 @@ class TrainExtractor
             {
                 pasCategories[i] = new PasCategory()
                 {
-                    Count = Convert.ToInt32(PassengerDataList.Cell(FirstRows[1] + counter, 3 + i).ToString()),
-                    WayLength = Convert.ToDouble(PassengerDataList.Cell(FirstRows[1] + counter, 8 + i).ToString()),
-                    Payment = Convert.ToDouble(PaymentDataList.Cell(FirstRows[2] + counter, 3 + i).ToString()),
-                    PaymentBySubject = Convert.ToDouble(PaymentDataList.Cell(FirstRows[2] + counter, 8 + i).ToString())
+                    Count = Convert.ToInt32(GetValueOrZero(PassengerDataList.Cell(FirstRows[1] + counter, 3 + i))),
+                    WayLength = Convert.ToDouble(GetValueOrZero(PassengerDataList.Cell(FirstRows[1] + counter, 8 + i))),
+                    Payment = Convert.ToDouble(GetValueOrZero(PaymentDataList.Cell(FirstRows[2] + counter, 3 + i))),
+                    PaymentBySubject = Convert.ToDouble(GetValueOrZero(PaymentDataList.Cell(FirstRows[2] + counter, 8 + i)))
                 };
             }
             
@@ -80,6 +80,12 @@ class TrainExtractor
             
         }
 
+    }
+    
+    private string GetValueOrZero(IXLCell cell)
+    {
+        string data = cell.Value.ToString().Replace("*", "").Trim();
+        return data == "" ?  "0" : data;
     }
 
     private int GetFirstRowIndex(IXLWorksheet worksheet)
