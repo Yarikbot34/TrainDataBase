@@ -16,12 +16,13 @@ public class Train
     
     public int Distance { get; set; }
     public int RailcarCount { get; set; }
+    private int _dayInRaise;
     public int DayInRaise
     {
-        get { return DayInRaise;}
+        get { return _dayInRaise;}
         set
         {
-            if (value >= 0 && value < 32) DayInRaise = value;
+            if (value >= 0 && value < 32) _dayInRaise = value;
             else throw new ArgumentOutOfRangeException($"Неверное количество дней у поезда {this.Id} ({value})");
         }
     }
