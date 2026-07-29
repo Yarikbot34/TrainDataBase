@@ -27,6 +27,8 @@ class TrainExtractor
         int counter = 0;
         foreach (Train train in trains)
         {
+            if (IsDuplicate(counter, TrainDataList)) counter++;
+            
             train.Period = period;
             train.Number = TrainDataList.Cell(FirstRows[0]+counter, 2).Value.ToString();
             
@@ -57,7 +59,7 @@ class TrainExtractor
             train.Distance = Convert.ToInt32(TrainDataList.Cell(FirstRows[0] + counter, 8).Value.ToString());
             train.RangePerMonth = Convert.ToInt32(TrainDataList.Cell(FirstRows[0] + counter, 9).Value.ToString());
 
-            Console.WriteLine($"{train.Number}|{train.Distance}|{train.StationFrom.Name}");
+            Console.WriteLine($"{train.Number}|{train.Distance}|{train.StationFrom.Name}|{train.StationTo.Name}");
             counter++;
             
         }
@@ -89,6 +91,17 @@ class TrainExtractor
             value = worksheet.Cell(counter, 2).Value.ToString().Split('/')[0];
         }
         return Convert.ToInt32(id)-1;
+    }
+
+    private bool IsDuplicate(int id, IXLWorksheet worksheet)
+    {
+        if (id < 2) return false;
+        
+        var previous = worksheet.Cell(id-1, 2).Value.ToString().Replace("*", "").Trim();
+        var now = worksheet.Cell(id, 2).Value.ToString().Replace("*", "").Trim();
+        
+        if (previous == now) return  true;
+        return false;
     }
 }
 
