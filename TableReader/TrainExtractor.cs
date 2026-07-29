@@ -28,7 +28,7 @@ class TrainExtractor
         int refCounter = 0;
         foreach (Train train in trains)
         {
-            if (IsDuplicate(counter, TrainDataList)) refCounter++;
+            if (IsDuplicate(counter+refCounter, TrainDataList)) refCounter++;
             
             train.Period = period;
             train.Number = TrainDataList.Cell(FirstRows[0]+counter+refCounter, 2).Value.ToString();
@@ -61,23 +61,26 @@ class TrainExtractor
             train.RangePerMonth = Convert.ToInt32(TrainDataList.Cell(FirstRows[0] + counter + refCounter, 9).Value.ToString());
 
             //2 Лист Пассажиры
-            PasCategory[] pasCategories = new PasCategory[5]
-                {train.Casual, train.Student, train.FedBenefit, train.RegBenefit, train.Another };
-
-            for (int i = 0; i < pasCategories.Length; i++)
-            {
-                pasCategories[i] = new PasCategory()
-                {
-                    Count = Convert.ToInt32(GetValueOrZero(PassengerDataList.Cell(FirstRows[1] + counter, 3 + i))),
-                    WayLength = Convert.ToDouble(GetValueOrZero(PassengerDataList.Cell(FirstRows[1] + counter, 8 + i))),
-                    Payment = Convert.ToDouble(GetValueOrZero(PaymentDataList.Cell(FirstRows[2] + counter, 3 + i))),
-                    PaymentBySubject = Convert.ToDouble(GetValueOrZero(PaymentDataList.Cell(FirstRows[2] + counter, 8 + i)))
-                };
-            }
+            train.Casual = GetCategoryData(counter, 0);
+            train.Student = GetCategoryData(counter, 1);
+            train.FedBenefit = GetCategoryData(counter, 2);
+            train.RegBenefit = GetCategoryData(counter, 3);
+            train.Another = GetCategoryData(counter, 4);
             
-            Console.WriteLine($"{train.Number} | {train.Casual.Count} | {train.Casual.Payment}");
+            Console.WriteLine($"{train.Number} | {train.Casual.Count} | {train.Casual.Payment}\t{counter}/{trains.Length}");
             counter++;
             
+        }
+
+        PasCategory GetCategoryData(int row, int categoryNumber)
+        {
+            return new PasCategory()
+            {
+                Count = Convert.ToInt32(GetValueOrZero(PassengerDataList.Cell(FirstRows[1] + counter, 3 + categoryNumber))),
+                WayLength = Convert.ToDouble(GetValueOrZero(PassengerDataList.Cell(FirstRows[1] + counter, 8 + categoryNumber))),
+                Payment = Convert.ToDouble(GetValueOrZero(PaymentDataList.Cell(FirstRows[2] + counter, 3 + categoryNumber))),
+                PaymentBySubject = Convert.ToDouble(GetValueOrZero(PaymentDataList.Cell(FirstRows[2] + counter, 8 + categoryNumber)))
+            };
         }
 
     }
