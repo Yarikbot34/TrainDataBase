@@ -32,7 +32,7 @@ class TrainExtractor
             
             //Станции
             //!!!!Добавить поиск Станции в БД и запрашивать её у пользователя, если таковой не нашлось
-            string[] Stations = TrainDataList.Cell(FirstRows[0] + counter, 3).Value.ToString().Split('-');
+            string[] Stations = TrainDataList.Cell(FirstRows[0] + counter, 3).Value.ToString().Split(new char[]{'–','-'});
             if (Stations.Length == 2)
             {
                 train.StationFrom = new Station(){Name =  Stations[0]};
@@ -46,7 +46,7 @@ class TrainExtractor
             }
             
             //Время
-            string[] Time = TrainDataList.Cell(FirstRows[0] + counter, 4).Value.ToString().Split('–');
+            string[] Time = TrainDataList.Cell(FirstRows[0] + counter, 4).Value.ToString().Split(new char[]{'–','-'});
             train.TimeFrom = TimeOnly.Parse(Time[0]);
             train.TimeFrom = TimeOnly.Parse(Time[1]);
             
@@ -57,7 +57,7 @@ class TrainExtractor
             train.Distance = Convert.ToInt32(TrainDataList.Cell(FirstRows[0] + counter, 8).Value.ToString());
             train.RangePerMonth = Convert.ToInt32(TrainDataList.Cell(FirstRows[0] + counter, 9).Value.ToString());
 
-            Console.WriteLine($"{train.Number}|{train.Distance}");
+            Console.WriteLine($"{train.Number}|{train.Distance}|{train.StationFrom.Name}");
             counter++;
             
         }
