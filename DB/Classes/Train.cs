@@ -42,7 +42,7 @@ public class Train
 public class PasCategory
 {
     public int Count { get; set; }
-    public int Payment { get; set; }
-    public int WayLength { get; set; }
-    public int PaymentBySubject { get; set; }
+    public double Payment { get; set; }
+    public double WayLength { get; set; }
+    public double PaymentBySubject { get; set; }
 }

@@ -85,12 +85,13 @@ class TrainExtractor
     private int GetFirstRowIndex(IXLWorksheet worksheet)
     {
         int counter = 0;
-        string value = "";
-        while (value != "1")
+        string IdValue = "";
+        string TimeCellValue = "";
+        while (IdValue != "1" || TimeCellValue == "4" )
         {
             counter++;
-            IXLCell cell = worksheet.Cell(counter, 1);
-            value = cell.Value.ToString();
+            IdValue = worksheet.Cell(counter, 1).Value.ToString();
+            TimeCellValue = worksheet.Cell(counter, 4).Value.ToString();
         }
         return counter;
     }
