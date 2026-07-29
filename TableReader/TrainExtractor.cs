@@ -25,16 +25,17 @@ class TrainExtractor
         Train[] trains = new Train[GetTrainCount(PassengerDataList, FirstRows[1])];
         for (int i = 0; i < trains.Length; i++) trains[i] = new Train();
         int counter = 0;
+        int refCounter = 0;
         foreach (Train train in trains)
         {
-            if (IsDuplicate(counter, TrainDataList)) counter++;
+            if (IsDuplicate(counter, TrainDataList)) refCounter++;
             
             train.Period = period;
-            train.Number = TrainDataList.Cell(FirstRows[0]+counter, 2).Value.ToString();
+            train.Number = TrainDataList.Cell(FirstRows[0]+counter+refCounter, 2).Value.ToString();
             
             //Станции
             //!!!!Добавить поиск Станции в БД и запрашивать её у пользователя, если таковой не нашлось
-            string[] Stations = TrainDataList.Cell(FirstRows[0] + counter, 3).Value.ToString().Split(new char[]{'–','-'});
+            string[] Stations = TrainDataList.Cell(FirstRows[0] + counter + refCounter, 3).Value.ToString().Split(new char[]{'–','-'});
             if (Stations.Length == 2)
             {
                 train.StationFrom = new Station(){Name =  Stations[0]};
@@ -48,18 +49,33 @@ class TrainExtractor
             }
             
             //Время
-            string[] Time = TrainDataList.Cell(FirstRows[0] + counter, 4).Value.ToString().Split(new char[]{'–','-'});
+            string[] Time = TrainDataList.Cell(FirstRows[0] + counter + refCounter, 4).Value.ToString().Split(new char[]{'–','-'});
             train.TimeFrom = TimeOnly.Parse(Time[0]);
-            train.TimeFrom = TimeOnly.Parse(Time[1]);
+            train.TimeTo = TimeOnly.Parse(Time[1]);
             
             //Метрики
-            train.Distance = Convert.ToInt32(TrainDataList.Cell(FirstRows[0] + counter, 5).Value.ToString());
-            train.RailcarCount = Convert.ToInt32(TrainDataList.Cell(FirstRows[0] + counter, 6).Value.ToString());
-            train.RangePerDay = Convert.ToInt32(TrainDataList.Cell(FirstRows[0] + counter, 7).Value.ToString());
-            train.Distance = Convert.ToInt32(TrainDataList.Cell(FirstRows[0] + counter, 8).Value.ToString());
-            train.RangePerMonth = Convert.ToInt32(TrainDataList.Cell(FirstRows[0] + counter, 9).Value.ToString());
+            train.Distance = Convert.ToInt32(TrainDataList.Cell(FirstRows[0] + counter + refCounter, 5).Value.ToString());
+            train.RailcarCount = Convert.ToInt32(TrainDataList.Cell(FirstRows[0] + counter + refCounter, 6).Value.ToString());
+            train.RangePerDay = Convert.ToInt32(TrainDataList.Cell(FirstRows[0] + counter + refCounter, 7).Value.ToString());
+            train.DayInRaise = Convert.ToInt32(TrainDataList.Cell(FirstRows[0] + counter + refCounter, 8).Value.ToString());
+            train.RangePerMonth = Convert.ToInt32(TrainDataList.Cell(FirstRows[0] + counter + refCounter, 9).Value.ToString());
 
-            Console.WriteLine($"{train.Number}|{train.Distance}|{train.StationFrom.Name}|{train.StationTo.Name}");
+            //2 Лист Пассажиры
+            PasCategory[] pasCategories = new PasCategory[5]
+                {train.Casual, train.Student, train.FedBenefit, train.RegBenefit, train.Another };
+
+            for (int i = 0; i < pasCategories.Length; i++)
+            {
+                pasCategories[i] = new PasCategory()
+                {
+                    Count = Convert.ToInt32(PassengerDataList.Cell(FirstRows[1] + counter, 3 + i).ToString()),
+                    WayLength = Convert.ToDouble(PassengerDataList.Cell(FirstRows[1] + counter, 8 + i).ToString()),
+                    Payment = Convert.ToDouble(PaymentDataList.Cell(FirstRows[2] + counter, 3 + i).ToString()),
+                    PaymentBySubject = Convert.ToDouble(PaymentDataList.Cell(FirstRows[2] + counter, 8 + i).ToString())
+                };
+            }
+            
+            Console.WriteLine($"{train.Number} | {train.Casual.Count} | {train.Casual.Payment}");
             counter++;
             
         }
