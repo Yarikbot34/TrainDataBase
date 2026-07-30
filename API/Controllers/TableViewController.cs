@@ -24,5 +24,16 @@ public class TableViewController : ControllerBase
         var answer = await _rawDataRepo.getRoutesAsync();
         return Ok(answer);
     }
+    [HttpGet("trains")]
+    public async Task<ActionResult> GetTrains()
+    {
+        var answer = await _rawDataRepo.getTrainsAsync();
+        return Ok(answer);
+    }[HttpGet("stations")]
+    public async Task<ActionResult> GetStations()
+    {
+        var answer = await _rawDataRepo.getStationsAsync();
+        return Ok(answer);
+    }
     
 }
