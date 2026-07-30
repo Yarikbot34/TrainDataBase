@@ -18,7 +18,7 @@ public class TrainExtractor : ITableReader
         using var book = new XLWorkbook(fs);
         
         if (book.Worksheets.Count != 3) throw new Exception("Wrong number of sheets");
-
+        
         int[] FirstRows = new int[3];
         var TrainDataList = book.Worksheet(1);
         FirstRows[0] = GetFirstRowIndex(TrainDataList);
@@ -27,6 +27,8 @@ public class TrainExtractor : ITableReader
         var PaymentDataList = book.Worksheet(3);
         FirstRows[2] = GetFirstRowIndex(PaymentDataList);
 
+        
+        List<Station> stations = new List<Station>();
         Train[] trains = new Train[GetTrainCount(TrainDataList, FirstRows[0])];
         for (int i = 0; i < trains.Length; i++) trains[i] = new Train();
         int counter = 0;
@@ -43,8 +45,8 @@ public class TrainExtractor : ITableReader
             string[] Stations = TrainDataList.Cell(FirstRows[0] + counter + refCounter, 3).Value.ToString().Split(new char[]{'–','-'});
             if (Stations.Length == 2)
             {
-                train.StationFrom = new Station(){Name =  Stations[0]};
-                train.StationTo = new Station(){Name =  Stations[1]};
+                train.StationFrom = GetStationOrNew(Stations[0]);
+                train.StationTo = GetStationOrNew(Stations[1]);
             }
             if (Stations.Length == 3)
             {
@@ -82,8 +84,10 @@ public class TrainExtractor : ITableReader
             
             string number = PassengerDataList.Cell(FirstRows[1] + counter, 2).Value.ToString();
             route.RouteNumber = number.ToLower().Contains("ручную") ? "0" : number;
-            
-            route.Trains = trains.Where(t => t.Number.Contains(route.RouteNumber)).ToList();
+
+            var RouteTrains = trains.Where(t => t.Number.Contains(route.RouteNumber)).ToList();
+            route.Trains = RouteTrains;
+            foreach (var train in RouteTrains) train.Route = route;
             
             route.Casual = GetCategoryData(counter, 0);
             route.Student = GetCategoryData(counter, 1);
@@ -96,6 +100,19 @@ public class TrainExtractor : ITableReader
         WriteToBase();
         return null;
 
+        Station GetStationOrNew(string stationName)
+        {
+            var s = stations.FirstOrDefault(s => s.Name == stationName);
+            Console.WriteLine(s);
+            if (s == null)
+            {
+                Station station = new Station() { Name = stationName}; 
+                stations.Add(station);
+                return station;
+            }
+            else return s;
+        }
+        
         PasCategory GetCategoryData(int row, int categoryNumber)
         {
             return new PasCategory()
@@ -110,8 +127,9 @@ public class TrainExtractor : ITableReader
         void WriteToBase()
         {
             using AppDbContext db = new AppDbContext();
+            Console.WriteLine($"Станций:{stations.Count}\nМаршрутов:{routes.Length}\nПоездов:{trains.Length}");
+            db.Stations.AddRange(stations);
             db.Routes.AddRange(routes);
-            db.Trains.AddRange(trains);
             db.SaveChanges();
         }
 
