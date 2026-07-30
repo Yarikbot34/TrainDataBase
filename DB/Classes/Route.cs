@@ -2,17 +2,17 @@ namespace DB;
 
 public class Route
 {
-    public int RouteId
-    {
-        get
-        {
-            return Convert.ToInt32($"{Year}{Month}{RouteNumber.Split("/")[0]}");
-        }
-    }
-    public int Month;
-    public int Year;
+    public int Id { get; set; }
+    
+    
+    [System.ComponentModel.DataAnnotations.Schema.NotMapped]
+    public int RouteId => Convert.ToInt32($"{Year}{Month}{RouteNumber?.Split("/")[0]}");
+
+    public int Month {get; set;}
+    public int Year {get; set;}
     public string RouteNumber { get; set; }
-    public List<Train> train { get; set; }
+    
+    public List<Train> Trains { get; set; } = new();
     
     //Пассажиропоток
     public PasCategory Casual { get; set; }

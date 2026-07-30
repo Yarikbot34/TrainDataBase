@@ -78,7 +78,7 @@ class TrainExtractor
             string number = PassengerDataList.Cell(FirstRows[1] + counter, 2).Value.ToString();
             route.RouteNumber = number.ToLower().Contains("ручную") ? "0" : number;
             
-            route.train = trains.Where(t => t.Number.Contains(route.RouteNumber)).ToList();
+            route.Trains = trains.Where(t => t.Number.Contains(route.RouteNumber)).ToList();
             
             route.Casual = GetCategoryData(counter, 0);
             route.Student = GetCategoryData(counter, 1);

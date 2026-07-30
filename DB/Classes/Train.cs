@@ -6,9 +6,17 @@ public class Train
     public string Period { get; set; }
     public string Number { get; set; }
     
+    public int RouteId { get; set; }
+    public Route Route { get; set; }
+    
     //Тех. Данные
+    public int StationFromId { get; set; }
     public Station StationFrom { get; set; }
+    
+    public int? StationMiddleId { get; set; }  
     public Station StationMiddle { get; set; }
+    
+    public int StationToId { get; set; }
     public Station StationTo { get; set; }
     
     public TimeOnly TimeFrom { get; set; }
