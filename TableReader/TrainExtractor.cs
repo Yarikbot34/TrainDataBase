@@ -50,9 +50,9 @@ public class TrainExtractor : ITableReader
             }
             if (Stations.Length == 3)
             {
-                train.StationFrom = new Station(){Name =  Stations[0]};
-                train.StationMiddle = new Station(){Name =  Stations[1]};
-                train.StationTo = new Station(){Name =  Stations[2]};
+                train.StationFrom = GetStationOrNew(Stations[0]);
+                train.StationMiddle = GetStationOrNew(Stations[1]);
+                train.StationTo = GetStationOrNew(Stations[2]);
             }
             
             //Время
@@ -102,8 +102,8 @@ public class TrainExtractor : ITableReader
 
         Station GetStationOrNew(string stationName)
         {
+            stationName = stationName.Trim();
             var s = stations.FirstOrDefault(s => s.Name == stationName);
-            Console.WriteLine(s);
             if (s == null)
             {
                 Station station = new Station() { Name = stationName}; 
