@@ -3,13 +3,13 @@ using DB;
 
 namespace DB;
 
-public class TrainDbContext : DbContext
+public class AppDbContext : DbContext
 {
     public DbSet<Station> Stations => Set<Station>();
     public DbSet<Route> Routes => Set<Route>();
     public DbSet<Train> Trains => Set<Train>();
 
-    public TrainDbContext(DbContextOptions<TrainDbContext> options) : base(options) { }
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
