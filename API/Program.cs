@@ -1,4 +1,5 @@
 using DB;
+using DB.Repositories;
 using TableReader;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,15 +8,25 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
 
+builder.Services.AddScoped<IRawDataRepo, RawDataRepo>();
 builder.Services.AddScoped<ITableReader, TrainExtractor>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddCors(options =>
+{ options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader();  
+    });
+});
+
 var app = builder.Build();
 
-
+app.UseCors("AllowAll");
 app.UseSwagger();
 app.UseSwaggerUI();
 app.MapControllers();
