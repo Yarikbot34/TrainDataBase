@@ -1,18 +1,23 @@
 ﻿using System.Runtime.InteropServices.ComTypes;
 using ClosedXML.Excel;
 using DB;
-using DocumentFormat.OpenXml.Spreadsheet;
 
 
 namespace TableReader;
 
-class TrainExtractor
+public class TrainExtractor : ITableReader
 {
-    public void Extract(FileStream fs, int year, int month)
+    private readonly AppDbContext _db;
+    public TrainExtractor(AppDbContext db)
+    {
+        _db = db;
+    }
+    
+    public Task ExtractFromFile(FileStream fs, int year, int month)
     {
         using var book = new XLWorkbook(fs);
         
-        if (book.Worksheets.Count != 3) return;
+        if (book.Worksheets.Count != 3) throw new Exception("Wrong number of sheets");
 
         int[] FirstRows = new int[3];
         var TrainDataList = book.Worksheet(1);
@@ -88,7 +93,8 @@ class TrainExtractor
             Console.WriteLine($"{route.RouteId} {route.Casual.Count}");
             counter++;
         }
-
+        WriteToBase();
+        return null;
 
         PasCategory GetCategoryData(int row, int categoryNumber)
         {
@@ -100,6 +106,18 @@ class TrainExtractor
                 PaymentBySubject = Convert.ToDouble(GetValueOrZero(PaymentDataList.Cell(FirstRows[2] + counter, 8 + categoryNumber)))
             };
         }
+
+        void WriteToBase()
+        {
+            using AppDbContext db = new AppDbContext();
+            db.Routes.AddRange(routes);
+            db.Trains.AddRange(trains);
+            db.SaveChanges();
+        }
+
+        
+
+
 
     }
     

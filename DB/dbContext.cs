@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using DB;
 
 namespace DB;
@@ -10,6 +11,26 @@ public class AppDbContext : DbContext
     public DbSet<Train> Trains => Set<Train>();
 
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+    
+    public AppDbContext()
+    {
+        Database.EnsureCreated();
+    }
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        if (!optionsBuilder.IsConfigured)
+        {
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: true)
+                .AddJsonFile("appsettings.Development.json", optional: true)
+                .Build();
+
+            var connectionString = configuration.GetConnectionString("DefaultConnection");
+            optionsBuilder.UseNpgsql(connectionString);
+        }
+    }
+    
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
