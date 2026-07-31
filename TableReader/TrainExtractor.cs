@@ -1,5 +1,4 @@
-﻿using System.Runtime.InteropServices.ComTypes;
-using ClosedXML.Excel;
+﻿using ClosedXML.Excel;
 using DB;
 
 
@@ -7,15 +6,18 @@ namespace TableReader;
 
 public class TrainExtractor : ITableReader
 {
-    private readonly AppDbContext _db;
+    private readonly AppDbContext ldb;
     public TrainExtractor(AppDbContext db)
     {
-        _db = db;
+        ldb = db;
     }
+    
     
     public Task ExtractFromFile(FileStream fs, int year, int month)
     {
         using var book = new XLWorkbook(fs);
+        
+        List<Station> existStations = ldb.Stations.ToList();
         
         if (book.Worksheets.Count != 3) throw new Exception("Wrong number of sheets");
         
@@ -103,7 +105,8 @@ public class TrainExtractor : ITableReader
         Station GetStationOrNew(string stationName)
         {
             stationName = stationName.Trim();
-            var s = stations.FirstOrDefault(s => s.Name == stationName);
+            var s = existStations.FirstOrDefault(s => s.Name == stationName);
+            s = s == null ? stations.FirstOrDefault(s => s.Name == stationName) : s;
             if (s == null)
             {
                 Station station = new Station() { Name = stationName}; 
@@ -126,11 +129,10 @@ public class TrainExtractor : ITableReader
 
         void WriteToBase()
         {
-            using AppDbContext db = new AppDbContext();
             Console.WriteLine($"Станций:{stations.Count}\nМаршрутов:{routes.Length}\nПоездов:{trains.Length}");
-            db.Stations.AddRange(stations);
-            db.Routes.AddRange(routes);
-            db.SaveChanges();
+            ldb.Stations.AddRange(stations);
+            ldb.Routes.AddRange(routes);
+            ldb.SaveChanges();
         }
 
         
