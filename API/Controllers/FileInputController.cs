@@ -16,25 +16,25 @@ public class InputFileController : ControllerBase
     }
 
     [HttpPost("input")]
-    public IActionResult InputDataFromFile(IFormFile file, int year, int month)
+    public async Task<IActionResult> InputDataFromFile(IFormFile file, int year, int month)
     {
         var path = Path.Combine(Directory.GetCurrentDirectory(), file.FileName);
         
         using (var stream = new FileStream(path, FileMode.Create))
         {
-            file.CopyTo(stream);
+            await file.CopyToAsync(stream);
         }
+        var fs = new FileStream(path, FileMode.Open, FileAccess.Read);
         try
         {
-            var fs = new FileStream(path, FileMode.Open, FileAccess.Read);
             _tableReader.ExtractFromFile(fs, year, month);
-            fs.Close();
         } catch (Exception ex)
         {
             return Content(ex.Message);
         }
         finally
         {
+            fs.Close();
             System.IO.File.Delete(path);
         }
         
