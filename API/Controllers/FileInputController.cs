@@ -5,7 +5,7 @@ namespace API.Controllers;
 
 
 [ApiController]
-[Route("api/v1/file/input")]
+[Route("api/v1/file")]
 public class InputFileController : ControllerBase
 {
     private readonly ITableReader _tableReader;
@@ -15,12 +15,30 @@ public class InputFileController : ControllerBase
         _tableReader = tableReader;
     }
 
-    [HttpGet]
-    public IActionResult GetFileData()
+    [HttpPost("input")]
+    public IActionResult InputDataFromFile(IFormFile file, int year, int month)
     {
-        var fs = new FileStream("dataTrue.xlsx", FileMode.Open, FileAccess.Read);
-        _tableReader.ExtractFromFile(fs, 26, 7);
-        return Ok("Тестовый ответ");
+        var path = Path.Combine(Directory.GetCurrentDirectory(), file.FileName);
+        
+        using (var stream = new FileStream(path, FileMode.Create))
+        {
+            file.CopyTo(stream);
+        }
+        try
+        {
+            var fs = new FileStream(path, FileMode.Open, FileAccess.Read);
+            _tableReader.ExtractFromFile(fs, year, month);
+            fs.Close();
+        } catch (Exception ex)
+        {
+            return Content(ex.Message);
+        }
+        finally
+        {
+            System.IO.File.Delete(path);
+        }
+        
+        return Ok("Запись прошла успешно");
     }
     
 }
