@@ -1,4 +1,4 @@
-namespace DB;
+namespace Domain.Classes;
 
 public class Station
 {

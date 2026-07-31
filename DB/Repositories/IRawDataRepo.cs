@@ -1,3 +1,5 @@
+using Domain.Classes;
+
 namespace DB.Repositories;
 
 public interface IRawDataRepo

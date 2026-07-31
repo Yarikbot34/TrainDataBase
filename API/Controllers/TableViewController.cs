@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using DB;
 using DB.Repositories;
-using Route = DB.Route;
+using Domain.Classes;
 
 namespace API.Controllers;
 
