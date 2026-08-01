@@ -21,6 +21,9 @@ public class Route
     public PasCategory RegBenefit { get; set; }
     public PasCategory Another { get; set; }
     
+    public int TransactionId { get; set; }
+    public Transaction Transaction { get; set; }
+    
     
 }
 

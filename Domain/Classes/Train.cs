@@ -36,4 +36,7 @@ public class Train
     }
     public int RangePerDay { get; set; }
     public int RangePerMonth { get; set; }
+    
+    public int TransactionId { get; set; }
+    public Transaction Transaction { get; set; }
 }

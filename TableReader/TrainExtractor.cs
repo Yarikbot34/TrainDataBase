@@ -16,6 +16,11 @@ public class TrainExtractor : ITableReader
     
     public Task ExtractFromFile(FileStream fs, int year, int month)
     {
+        Transaction note = new Transaction();
+        note.Year = year;
+        note.Month = month;
+        
+        
         using var book = new XLWorkbook(fs);
         
         List<Station> existStations = ldb.Stations.ToList();
@@ -39,7 +44,8 @@ public class TrainExtractor : ITableReader
         //Достаем Поезда
         foreach (Train train in trains)
         {
-
+            train.Transaction = note;
+            
             train.Period = $"{year}{month}";
             train.Number = TrainDataList.Cell(FirstRows[0]+counter+refCounter, 2).Value.ToString();
             
@@ -82,6 +88,8 @@ public class TrainExtractor : ITableReader
         counter = 0;
         foreach (Route route in routes)
         {
+            route.Transaction = note;
+            
             route.Year = year;
             route.Month = month;
             
@@ -110,7 +118,11 @@ public class TrainExtractor : ITableReader
             s = s == null ? stations.FirstOrDefault(s => s.Name == stationName) : s;
             if (s == null)
             {
-                Station station = new Station() { Name = stationName}; 
+                Station station = new Station()
+                {
+                    Name = stationName,
+                    Transaction = note
+                }; 
                 stations.Add(station);
                 return station;
             }
@@ -130,15 +142,11 @@ public class TrainExtractor : ITableReader
 
         void WriteToBase()
         {
-            Console.WriteLine($"Станций:{stations.Count}\nМаршрутов:{routes.Length}\nПоездов:{trains.Length}");
+            note.UnitsGet = stations.Count + trains.Length + routes.Length;
             ldb.Stations.AddRange(stations);
             ldb.Routes.AddRange(routes);
             ldb.SaveChanges();
         }
-
-        
-
-
 
     }
     
@@ -174,17 +182,6 @@ public class TrainExtractor : ITableReader
             value = worksheet.Cell(counter, 2).Value.ToString().Split('/')[0];
         }
         return counter-1-TableStart;
-    }
-
-    private bool IsDuplicate(int id, IXLWorksheet worksheet)
-    {
-        if (id < 2) return false;
-        
-        var previous = worksheet.Cell(id-1, 2).Value.ToString().Replace("*", "").Trim();
-        var now = worksheet.Cell(id, 2).Value.ToString().Replace("*", "").Trim();
-        
-        if (previous == now) return  true;
-        return false;
     }
 }
 
