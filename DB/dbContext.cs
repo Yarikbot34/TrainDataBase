@@ -9,6 +9,7 @@ public class AppDbContext : DbContext
     public DbSet<Station> Stations => Set<Station>();
     public DbSet<Route> Routes => Set<Route>();
     public DbSet<Train> Trains => Set<Train>();
+    public DbSet<Transaction> Transactions => Set<Transaction>();
 
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
     
@@ -40,6 +41,10 @@ public class AppDbContext : DbContext
             entity.HasKey(s => s.Id);
             entity.Property(s => s.Name).IsRequired().HasMaxLength(200);
             entity.Property(s => s.Class).HasMaxLength(50);
+            
+            entity.HasOne(t => t.Transaction)
+                .WithMany()
+                .HasForeignKey(t => t.TransactionId);
         });
 
         //Route
@@ -92,6 +97,10 @@ public class AppDbContext : DbContext
                 b.Property(p => p.WayLength).HasColumnName("Another_WayLength");
                 b.Property(p => p.PaymentBySubject).HasColumnName("Another_PaymentBySubject");
             });
+            
+            entity.HasOne(t => t.Transaction)
+                .WithMany()
+                .HasForeignKey(t => t.TransactionId);
         });
 
         //Train 
@@ -115,6 +124,18 @@ public class AppDbContext : DbContext
                   .WithMany()
                   .HasForeignKey(t => t.StationToId)
                   .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(t => t.Transaction)
+                .WithMany()
+                .HasForeignKey(t => t.TransactionId);
+        });
+
+        modelBuilder.Entity<Transaction>(entity =>
+        {
+            entity.HasKey(t => t.Id);
+            entity.Property(t => t.Year).IsRequired();
+            entity.Property(t => t.Month).IsRequired();
+            entity.Property(t => t.UnitsGet).IsRequired();
         });
     }
 }
