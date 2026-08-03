@@ -52,6 +52,16 @@ public class TrainExtractor : ITableReader
             
             train.Period = $"{year}{month}";
             train.Number = TrainDataList.Cell(FirstRows[0]+counter+refCounter, 2).Value.ToString();
+            if (train.Number.Contains("*"))
+            {
+                train.HasDesc =  true;
+                train.Number = train.Number.Replace("*", "");
+                train.Description = $"Описание для {train.Number}";
+            }
+            else
+            {
+                train.HasDesc = false;
+            }
             
             //Станции
             string[] Stations = TrainDataList.Cell(FirstRows[0] + counter + refCounter, 3).Value.ToString().Split(new char[]{'–','-'});

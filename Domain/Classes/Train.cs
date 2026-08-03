@@ -6,6 +6,9 @@ public class Train
     public string Period { get; set; }
     public string Number { get; set; }
     
+    public bool HasDesc { get; set; }
+    public string? Description { get; set; }
+    
     public int RouteId { get; set; }
     public Route Route { get; set; }
     
