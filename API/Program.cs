@@ -2,6 +2,7 @@ using DB;
 using DB.Repositories;
 using TableReader;
 using Microsoft.EntityFrameworkCore;
+using Services;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -10,6 +11,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddScoped<IRawDataRepo, RawDataRepo>();
 builder.Services.AddScoped<ITableReader, TrainExtractor>();
+builder.Services.AddScoped<ITrainRepo, TrainRepo>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
