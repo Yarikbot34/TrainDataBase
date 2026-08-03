@@ -22,8 +22,12 @@ public class TrainExtractor : ITableReader
         
         
         using var book = new XLWorkbook(fs);
+
+        List<Station> existStations = new List<Station>();
         
-        List<Station> existStations = ldb.Stations.ToList();
+        try { existStations = ldb.Stations.ToList(); }
+        catch (Exception e) { }
+        
         
         if (book.Worksheets.Count != 3) throw new Exception("Wrong number of sheets");
         
@@ -50,7 +54,6 @@ public class TrainExtractor : ITableReader
             train.Number = TrainDataList.Cell(FirstRows[0]+counter+refCounter, 2).Value.ToString();
             
             //Станции
-            //!!!!Добавить поиск Станции в БД и запрашивать её у пользователя, если таковой не нашлось
             string[] Stations = TrainDataList.Cell(FirstRows[0] + counter + refCounter, 3).Value.ToString().Split(new char[]{'–','-'});
             if (Stations.Length == 2)
             {
@@ -143,6 +146,7 @@ public class TrainExtractor : ITableReader
         void WriteToBase()
         {
             note.UnitsGet = stations.Count + trains.Length + routes.Length;
+            ldb.Transactions.Add(note);
             ldb.Stations.AddRange(stations);
             ldb.Routes.AddRange(routes);
             ldb.SaveChanges();
