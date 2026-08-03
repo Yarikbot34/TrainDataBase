@@ -1,6 +1,10 @@
+:root{
+    --sidebar-width: 260px;
+}
+
 .sidebar {
     --accent: #1769e0;
-    --sidebar-width: 260px;
+    
 
     position: fixed;
     z-index: 50;
@@ -14,6 +18,14 @@
     background: linear-gradient(180deg, #102a50 0%, #0b1d38 100%);
     box-shadow: 6px 0 24px rgba(8, 26, 54, 0.12);
 }
+.container {
+    width: 100%;
+    min-width: 0;
+    min-height: 100vh;
+    max-width: 100%;
+    padding-left: var(--sidebar-width);
+}
+
 
 .sidebar__toggle-input {
     position: absolute;
@@ -173,6 +185,11 @@ a.navigation-item.active::before {
         position: relative;
         width: 100%;
         min-height: auto;
+    }
+
+    .container {
+        width: 100%;
+        padding-left: 0;
     }
 
     .sidebar__toggle {

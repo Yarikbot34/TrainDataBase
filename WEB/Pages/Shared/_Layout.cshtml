@@ -14,7 +14,7 @@
     @{
     var currentPath = Context.Request.Path.Value?.ToLowerInvariant() ?? "/";
     var isHomeActive = currentPath == "/";
-    var isRoutesActive = currentPath.StartsWith("/routes");
+    var isRoutesActive = currentPath.StartsWith("/TableView/Routes");
     var isImportActive = currentPath.StartsWith("/import");
 }
 
@@ -58,7 +58,7 @@
         </a>
 
         <a class="navigation-item @(isRoutesActive ? "active" : "")"
-           href="/Routes">
+           href="/TableView/Routes">
             <svg viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zm0-10v2h14V7H7z" />
             </svg>
