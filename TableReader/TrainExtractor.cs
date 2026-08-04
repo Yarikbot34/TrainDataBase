@@ -78,21 +78,28 @@ public class TrainExtractor : ITableReader
             }
             
             //Время
-            string[] Time = TrainDataList.Cell(FirstRows[0] + counter + refCounter, 4).Value.ToString().Replace(".",":").Split(new char[]{'–','-'});
+            string[] Time = TrainDataList.Cell(FirstRows[0] + counter + refCounter, 4).Value.ToString().Replace(".",":").Split(new char[]{'–','-','-'});
+            Console.WriteLine($"{train.Number} | {Time[0]}");
+            Console.WriteLine($"{counter} | {trains.Length}");
             train.TimeFrom = TimeOnly.Parse(Time[0]);
             train.TimeTo = TimeOnly.Parse(Time[1]);
             
             //Метрики
-            train.Distance = Convert.ToInt32(TrainDataList.Cell(FirstRows[0] + counter + refCounter, 5).Value.ToString());
-            train.RailcarCount = Convert.ToInt32(TrainDataList.Cell(FirstRows[0] + counter + refCounter, 6).Value.ToString());
-            train.RangePerDay = Convert.ToInt32(TrainDataList.Cell(FirstRows[0] + counter + refCounter, 7).Value.ToString());
-            train.DayInRaise = Convert.ToInt32(TrainDataList.Cell(FirstRows[0] + counter + refCounter, 8).Value.ToString());
-            train.RangePerMonth = Convert.ToInt32(TrainDataList.Cell(FirstRows[0] + counter + refCounter, 9).Value.ToString());
+            train.Distance = GetClearInt(TrainDataList.Cell(FirstRows[0] + counter + refCounter, 5).Value.ToString());
+            train.RailcarCount = GetClearInt(TrainDataList.Cell(FirstRows[0] + counter + refCounter, 6).Value.ToString());
+            train.RangePerDay = GetClearInt(TrainDataList.Cell(FirstRows[0] + counter + refCounter, 7).Value.ToString());
+            train.DayInRaise = GetClearInt(TrainDataList.Cell(FirstRows[0] + counter + refCounter, 8).Value.ToString());
+            train.RangePerMonth = GetClearInt(TrainDataList.Cell(FirstRows[0] + counter + refCounter, 9).Value.ToString());
 
            
+            int GetClearInt(string value)
+            {
+                train.HasDesc = value.Contains("*") || train.HasDesc;
+                value = value.Trim().Replace("*", "");
+                return Convert.ToInt32(value);
+            }
             
             
-            Console.WriteLine($"{train.Number} | \t{counter}/{trains.Length}");
             counter++;
         }
         //Достаем маршруты
@@ -161,7 +168,7 @@ public class TrainExtractor : ITableReader
             ldb.Routes.AddRange(routes);
             ldb.SaveChanges();
         }
-
+        
     }
     
     private string GetValueOrZero(IXLCell cell)
@@ -189,11 +196,11 @@ public class TrainExtractor : ITableReader
         int counter = TableStart;
         string value = "1";
         string id = "1";
-        while (id != "" || value != "")
+        while (id != "" || (value != "" && int.TryParse(value, out _)))
         {
             counter++;
             id = worksheet.Cell(counter, 1).Value.ToString();
-            value = worksheet.Cell(counter, 2).Value.ToString().Split('/')[0];
+            value = worksheet.Cell(counter, 2).Value.ToString().Split('/')[0].Replace("*", "");
         }
         return counter-1-TableStart;
     }
