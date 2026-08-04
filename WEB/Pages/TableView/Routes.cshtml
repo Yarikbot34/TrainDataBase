@@ -103,17 +103,18 @@
                     <div class="table-information__accent"></div>
                     <span>
                         Для просмотра всех столбцов используйте горизонтальную прокрутку.
-                        Нажмите на номер поезда, чтобы открыть подробные данные справа.
+                        Нажмите на номер поезда, чтобы открыть список поездов.
                     </span>
                 </div>
             </div>
         </section>
 
-        <aside class="workspace__details" id="detailsPanel" aria-label="Детали маршрута">
+        <aside class="workspace__details" id="detailsPanel" aria-label="Данные по поездам">
             <div class="details-panel__header">
                 <div>
-                    <span class="details-panel__caption">Выбранный маршрут</span>
-                    <h2 id="selectedRouteTitle">Маршрут не выбран</h2>
+                    <span class="details-panel__caption">Данные по поездам</span>
+                    <h2 id="selectedRouteTitle">Поезда не выбраны</h2>
+                    <p class="details-panel__counter" id="trainsCounter">Выберите номер поезда в верхней таблице</p>
                 </div>
 
                 <button class="icon-button"
@@ -127,29 +128,29 @@
                 </button>
             </div>
 
-            <div class="details-panel__content">
-                <div class="details-placeholder">
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9H9V9h10v2zm-4 4H9v-2h6v2zm4-8H9V5h10v2H9V5z" />
-                    </svg>
+            <div class="trains-table-container">
+                <table class="trains-table">
+                    <thead>
+                        <tr>
+                            <th>№ поезда</th>
+                            <th>Станция отправления — станция назначения</th>
+                            <th>Время отправления и прибытия по конечным станциям</th>
+                            <th>Расстояние между станциями, км</th>
+                            <th>Количество вагонов, ед.</th>
+                            <th>Вагоно-километры в сутки</th>
+                            <th>Количество дней курсирования</th>
+                            <th>Вагоно-километры в месяц</th>
+                        </tr>
+                    </thead>
 
-                    <h3>Область второй таблицы</h3>
-                    <p>
-                        Здесь позднее будет отображаться детальная таблица
-                        для выбранного номера поезда.
-                    </p>
-
-                    <dl class="selected-route-info">
-                        <div>
-                            <dt>Номер поезда</dt>
-                            <dd id="selectedRouteNumber">—</dd>
-                        </div>
-                        <div>
-                            <dt>Период</dt>
-                            <dd id="selectedRoutePeriod">—</dd>
-                        </div>
-                    </dl>
-                </div>
+                    <tbody id="trainsTableBody">
+                        <tr>
+                            <td class="trains-state-cell" colspan="8">
+                                Выберите номер поезда в верхней таблице.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </aside>
     </div>

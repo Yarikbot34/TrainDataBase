@@ -682,6 +682,162 @@ button {
   }
 }
 
+.details-panel__counter {
+  margin: 6px 0 0;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.trains-table-container {
+  min-height: 0;
+  flex: 1;
+  overflow: auto;
+  background: var(--surface);
+  scrollbar-color: #aeb9c8 #edf1f6;
+  scrollbar-width: thin;
+}
+
+.trains-table-container::-webkit-scrollbar {
+  width: 11px;
+  height: 11px;
+}
+
+.trains-table-container::-webkit-scrollbar-track {
+  background: #edf1f6;
+}
+
+.trains-table-container::-webkit-scrollbar-thumb {
+  border: 2px solid #edf1f6;
+  border-radius: 8px;
+  background: #aeb9c8;
+}
+
+.trains-table {
+  width: 100%;
+  min-width: 1050px;
+  border-spacing: 0;
+  border-collapse: separate;
+  color: #172033;
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-size: 13px;
+}
+
+.trains-table th,
+.trains-table td {
+  padding: 10px 12px;
+  border-right: 1px solid var(--table-border);
+  border-bottom: 1px solid var(--table-border);
+  background: #ffffff;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.trains-table tr > *:last-child {
+  border-right: 0;
+}
+
+.trains-table thead {
+  position: sticky;
+  z-index: 10;
+  top: 0;
+}
+
+.trains-table thead th {
+  color: #1a2940;
+  background: #dfebff;
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1.35;
+  white-space: normal;
+}
+
+.trains-table th:nth-child(1) {
+  width: 110px;
+  min-width: 110px;
+}
+
+.trains-table th:nth-child(2) {
+  width: 360px;
+  min-width: 300px;
+}
+
+.trains-table th:nth-child(3) {
+  width: 200px;
+  min-width: 180px;
+}
+
+.trains-table th:nth-child(4) {
+  width: 145px;
+  min-width: 145px;
+}
+
+.trains-table th:nth-child(5) {
+  width: 135px;
+  min-width: 135px;
+}
+
+.trains-table th:nth-child(6) {
+  width: 150px;
+  min-width: 150px;
+}
+
+.trains-table th:nth-child(7) {
+  width: 165px;
+  min-width: 165px;
+}
+
+.trains-table th:nth-child(8) {
+  width: 160px;
+  min-width: 160px;
+}
+
+.trains-table tbody tr:nth-child(even) td {
+  background: #f9fbfd;
+}
+
+.trains-table tbody tr:hover td {
+  background: #edf5ff;
+}
+
+.trains-table td.numeric-cell {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.train-number-cell {
+  color: var(--accent-dark);
+  font-weight: 700;
+}
+
+.train-stations-cell {
+  min-width: 300px;
+  text-align: left !important;
+  white-space: normal;
+}
+
+.train-time-cell {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.trains-state-cell {
+  height: 150px;
+  color: var(--text-secondary);
+  background: #ffffff !important;
+  text-align: center !important;
+}
+
+@media (max-width: 600px) {
+  .details-panel__counter {
+    font-size: 12px;
+  }
+
+  .trains-table th,
+  .trains-table td {
+    padding: 8px 10px;
+  }
+}
+
 @media (max-width: 600px) {
   :root {
     --year-width: 65px;

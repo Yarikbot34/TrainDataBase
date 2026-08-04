@@ -1,17 +1,23 @@
 "use strict";
 
-const apiUrl = "http://localhost:5286/api/v1/TableView/routes";
-const columnCount = 22;
+const routesApiUrl = "http://localhost:5286/api/v1/TableView/routes";
+const trainsApiBaseUrl = "http://localhost:5286/api/v1/TableView/trains";
+
+const routesColumnCount = 22;
+const trainsColumnCount = 8;
 
 const workspace = document.getElementById("workspace");
+
 const tableBody = document.getElementById("routesTableBody");
 const recordsCounter = document.getElementById("recordsCounter");
 const searchInput = document.getElementById("searchInput");
 const refreshButton = document.getElementById("refreshButton");
-const closeDetailsButton = document.getElementById("closeDetailsButton");
+
+const trainsTableBody = document.getElementById("trainsTableBody");
+const trainsCounter = document.getElementById("trainsCounter");
 const selectedRouteTitle = document.getElementById("selectedRouteTitle");
-const selectedRouteNumber = document.getElementById("selectedRouteNumber");
-const selectedRoutePeriod = document.getElementById("selectedRoutePeriod");
+const closeDetailsButton = document.getElementById("closeDetailsButton");
+
 const notification = document.getElementById("notification");
 
 const integerFormatter = new Intl.NumberFormat("ru-RU", {
@@ -30,6 +36,7 @@ const moneyFormatter = new Intl.NumberFormat("ru-RU", {
 
 let routes = [];
 let notificationTimer = null;
+let selectedRouteRequestId = 0;
 
 function toNumber(value) {
     const number = Number(value);
@@ -46,8 +53,16 @@ function formatYear(year) {
     return String(numericYear);
 }
 
+function getApiYear(year) {
+    return String(year ?? "");
+}
+
 function formatMonth(month) {
     return String(toNumber(month)).padStart(2, "0");
+}
+
+function getApiMonth(month) {
+    return String(toNumber(month));
 }
 
 function formatInteger(value) {
@@ -62,6 +77,14 @@ function formatMoney(value) {
     return moneyFormatter.format(toNumber(value));
 }
 
+function formatTime(value) {
+    if (!value) {
+        return "—";
+    }
+
+    return String(value).slice(0, 5);
+}
+
 function getCategory(route, categoryName) {
     const category = route?.[categoryName];
 
@@ -73,7 +96,7 @@ function getCategory(route, categoryName) {
     };
 }
 
-function extractRoutes(payload) {
+function extractItems(payload) {
     if (Array.isArray(payload)) {
         return payload;
     }
@@ -138,7 +161,7 @@ function createRouteButton(route) {
     button.type = "button";
     button.className = "route-link";
     button.textContent = route.routeNumber ?? "—";
-    button.title = "Открыть подробные данные по маршруту";
+    button.title = "Открыть данные по поездам маршрута";
 
     button.addEventListener("click", () => {
         openDetailsPanel(route);
@@ -197,7 +220,7 @@ function renderRoutes(items) {
         const row = document.createElement("tr");
         const cell = document.createElement("td");
 
-        cell.colSpan = columnCount;
+        cell.colSpan = routesColumnCount;
         cell.className = "state-cell";
         cell.textContent = "Маршруты не найдены";
 
@@ -216,7 +239,7 @@ function renderRoutes(items) {
     tableBody.append(fragment);
 }
 
-function updateCounter(visibleCount, totalCount = routes.length) {
+function updateRoutesCounter(visibleCount, totalCount = routes.length) {
     if (visibleCount === totalCount) {
         recordsCounter.textContent =
             `Всего записей: ${integerFormatter.format(totalCount)}`;
@@ -232,7 +255,7 @@ function filterRoutes() {
 
     if (!query) {
         renderRoutes(routes);
-        updateCounter(routes.length);
+        updateRoutesCounter(routes.length);
         return;
     }
 
@@ -251,13 +274,13 @@ function filterRoutes() {
     });
 
     renderRoutes(filteredRoutes);
-    updateCounter(filteredRoutes.length, routes.length);
+    updateRoutesCounter(filteredRoutes.length, routes.length);
 }
 
-function showLoadingState() {
+function showRoutesLoadingState() {
     tableBody.innerHTML = `
         <tr>
-            <td class="state-cell" colspan="${columnCount}">
+            <td class="state-cell" colspan="${routesColumnCount}">
                 <div class="loading-state">
                     <span class="spinner" aria-hidden="true"></span>
                     <span>Загрузка маршрутов…</span>
@@ -269,10 +292,10 @@ function showLoadingState() {
     recordsCounter.textContent = "Загрузка данных…";
 }
 
-function showErrorState(message) {
+function showRoutesErrorState(message) {
     tableBody.innerHTML = `
         <tr>
-            <td class="state-cell" colspan="${columnCount}">
+            <td class="state-cell" colspan="${routesColumnCount}">
                 <div class="error-state">
                     <strong>Не удалось загрузить данные</strong>
                     <span>${message}</span>
@@ -288,6 +311,135 @@ function showErrorState(message) {
         ?.addEventListener("click", loadRoutes);
 }
 
+function getStationName(station) {
+    if (!station) {
+        return null;
+    }
+
+    if (typeof station === "string") {
+        return station;
+    }
+
+    return station.name ??
+        station.stationName ??
+        station.title ??
+        station.fullName ??
+        null;
+}
+
+function formatStations(train) {
+    const from = getStationName(train.stationFrom);
+    const middle = getStationName(train.stationMiddle);
+    const to = getStationName(train.stationTo);
+
+    if (from && middle && to) {
+        return `${from} — ${middle} — ${to}`;
+    }
+
+    if (from && to) {
+        return `${from} — ${to}`;
+    }
+
+    if (from) {
+        return `${from} — станция назначения не указана`;
+    }
+
+    if (to) {
+        return `Станция отправления не указана — ${to}`;
+    }
+
+    return "Станции не указаны";
+}
+
+function formatTrainTimes(train) {
+    const from = formatTime(train.timeFrom);
+    const to = formatTime(train.timeTo);
+
+    if (from === "—" && to === "—") {
+        return "Время не указано";
+    }
+
+    return `${from} — ${to}`;
+}
+
+function createTrainRow(train) {
+    const row = document.createElement("tr");
+
+    row.append(
+        createCell(train.number ?? "—", "train-number-cell"),
+        createCell(formatStations(train), "train-stations-cell"),
+        createCell(formatTrainTimes(train), "train-time-cell"),
+        createCell(formatDecimal(train.distance), "numeric-cell"),
+        createCell(formatInteger(train.railcarCount), "numeric-cell"),
+        createCell(formatInteger(train.rangePerDay), "numeric-cell"),
+        createCell(formatInteger(train.dayInRaise), "numeric-cell"),
+        createCell(formatInteger(train.rangePerMonth), "numeric-cell")
+    );
+
+    return row;
+}
+
+function renderTrains(items) {
+    trainsTableBody.replaceChildren();
+
+    if (items.length === 0) {
+        const row = document.createElement("tr");
+        const cell = document.createElement("td");
+
+        cell.colSpan = trainsColumnCount;
+        cell.className = "trains-state-cell";
+        cell.textContent = "По выбранному номеру поезда данные не найдены.";
+
+        row.append(cell);
+        trainsTableBody.append(row);
+
+        return;
+    }
+
+    const fragment = document.createDocumentFragment();
+
+    items.forEach((train) => {
+        fragment.append(createTrainRow(train));
+    });
+
+    trainsTableBody.append(fragment);
+}
+
+function showTrainsLoadingState() {
+    trainsTableBody.innerHTML = `
+        <tr>
+            <td class="trains-state-cell" colspan="${trainsColumnCount}">
+                <div class="loading-state">
+                    <span class="spinner" aria-hidden="true"></span>
+                    <span>Загрузка данных по поездам…</span>
+                </div>
+            </td>
+        </tr>
+    `;
+
+    trainsCounter.textContent = "Загрузка данных…";
+}
+
+function showTrainsErrorState(message) {
+    trainsTableBody.innerHTML = `
+        <tr>
+            <td class="trains-state-cell" colspan="${trainsColumnCount}">
+                <div class="error-state">
+                    <strong>Не удалось загрузить данные по поездам</strong>
+                    <span>${message}</span>
+                </div>
+            </td>
+        </tr>
+    `;
+
+    trainsCounter.textContent = "Ошибка загрузки";
+}
+
+function updateTrainsCounter(count) {
+    trainsCounter.textContent =
+        `Найдено поездов: ${integerFormatter.format(count)}`;
+}
+
 function showNotification(message, type = "success") {
     clearTimeout(notificationTimer);
 
@@ -300,33 +452,25 @@ function showNotification(message, type = "success") {
     }, 3200);
 }
 
-function openDetailsPanel(route) {
-    const routeNumber = route.routeNumber ?? "—";
-    const period = `${formatMonth(route.month)}.${formatYear(route.year)}`;
+async function loadTrains(route) {
+    const requestId = ++selectedRouteRequestId;
 
-    selectedRouteTitle.textContent = `Поезд № ${routeNumber}`;
-    selectedRouteNumber.textContent = routeNumber;
-    selectedRoutePeriod.textContent = period;
+    const year = getApiYear(route.year);
+    const month = getApiMonth(route.month);
+    const number = String(route.routeNumber ?? "");
 
-    workspace.classList.add("is-split");
-}
+    if (!year || !month || !number) {
+        showTrainsErrorState("Не удалось сформировать параметры запроса.");
+        return;
+    }
 
-function closeDetailsPanel() {
-    workspace.classList.remove("is-split");
+    const requestUrl =
+        `${trainsApiBaseUrl}/${encodeURIComponent(year)}/${encodeURIComponent(month)}/${encodeURIComponent(number)}`;
 
-    selectedRouteTitle.textContent = "Маршрут не выбран";
-    selectedRouteNumber.textContent = "—";
-    selectedRoutePeriod.textContent = "—";
-}
-
-async function loadRoutes() {
-    showLoadingState();
-
-    refreshButton.disabled = true;
-    refreshButton.classList.add("is-loading");
+    showTrainsLoadingState();
 
     try {
-        const response = await fetch(apiUrl, {
+        const response = await fetch(requestUrl, {
             method: "GET",
             headers: {
                 Accept: "application/json"
@@ -341,7 +485,81 @@ async function loadRoutes() {
 
         const payload = await response.json();
 
-        routes = sortRoutes(extractRoutes(payload));
+        if (requestId !== selectedRouteRequestId) {
+            return;
+        }
+
+        const trains = extractItems(payload);
+
+        renderTrains(trains);
+        updateTrainsCounter(trains.length);
+    } catch (error) {
+        if (requestId !== selectedRouteRequestId) {
+            return;
+        }
+
+        console.error("Ошибка загрузки поездов:", error);
+
+        const message = error instanceof Error
+            ? error.message
+            : "Неизвестная ошибка.";
+
+        showTrainsErrorState(message);
+        showNotification("Не удалось загрузить данные по поездам.", "error");
+    }
+}
+
+function openDetailsPanel(route) {
+    const routeNumber = route.routeNumber ?? "—";
+    const period = `${formatMonth(route.month)}.${formatYear(route.year)}`;
+
+    selectedRouteTitle.textContent = `Поезда маршрута ${routeNumber} за ${period}`;
+
+    workspace.classList.add("is-split");
+
+    loadTrains(route);
+}
+
+function closeDetailsPanel() {
+    selectedRouteRequestId += 1;
+
+    workspace.classList.remove("is-split");
+
+    selectedRouteTitle.textContent = "Поезда не выбраны";
+    trainsCounter.textContent = "Выберите номер поезда в верхней таблице";
+
+    trainsTableBody.innerHTML = `
+        <tr>
+            <td class="trains-state-cell" colspan="${trainsColumnCount}">
+                Выберите номер поезда в верхней таблице.
+            </td>
+        </tr>
+    `;
+}
+
+async function loadRoutes() {
+    showRoutesLoadingState();
+
+    refreshButton.disabled = true;
+    refreshButton.classList.add("is-loading");
+
+    try {
+        const response = await fetch(routesApiUrl, {
+            method: "GET",
+            headers: {
+                Accept: "application/json"
+            },
+            credentials: "same-origin",
+            cache: "no-store"
+        });
+
+        if (!response.ok) {
+            throw new Error(`Сервер вернул ошибку ${response.status}.`);
+        }
+
+        const payload = await response.json();
+
+        routes = sortRoutes(extractItems(payload));
 
         filterRoutes();
 
@@ -355,7 +573,7 @@ async function loadRoutes() {
             ? error.message
             : "Неизвестная ошибка.";
 
-        showErrorState(message);
+        showRoutesErrorState(message);
         showNotification("Не удалось загрузить маршруты.", "error");
     } finally {
         refreshButton.disabled = false;
