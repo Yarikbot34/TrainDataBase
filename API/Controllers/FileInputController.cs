@@ -27,7 +27,9 @@ public class InputFileController : ControllerBase
         var fs = new FileStream(path, FileMode.Open, FileAccess.Read);
         try
         {
-            _tableReader.ExtractFromFile(fs, year, month);
+            var trainWithNoDesc = await _tableReader.ExtractFromFile(fs, year, month);
+            return Ok(trainWithNoDesc);
+            
         } catch (Exception ex)
         {
             return Content(ex.Message);
@@ -38,7 +40,7 @@ public class InputFileController : ControllerBase
             System.IO.File.Delete(path);
         }
         
-        return Ok("Запись прошла успешно");
+        
     }
     
 }

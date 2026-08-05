@@ -1,6 +1,7 @@
 ﻿using ClosedXML.Excel;
 using Domain.Classes;
 using DB;
+using Domain.DTO;
 
 
 namespace TableReader;
@@ -14,7 +15,7 @@ public class TrainExtractor : ITableReader
     }
     
     
-    public Task ExtractFromFile(FileStream fs, int year, int month)
+    public Task<List<TrainDto>> ExtractFromFile(FileStream fs, int year, int month)
     {
         Transaction note = new Transaction();
         note.Year = year;
@@ -22,11 +23,6 @@ public class TrainExtractor : ITableReader
         
         
         using var book = new XLWorkbook(fs);
-
-        List<Station> existStations = new List<Station>();
-        
-        try { existStations = ldb.Stations.ToList(); }
-        catch (Exception e) { }
         
         
         if (book.Worksheets.Count != 3) throw new Exception("Wrong number of sheets");
@@ -39,8 +35,13 @@ public class TrainExtractor : ITableReader
         var PaymentDataList = book.Worksheet(3);
         FirstRows[2] = GetFirstRowIndex(PaymentDataList);
 
+        List<Station> existStations = new List<Station>();
+        
+        try { existStations = ldb.Stations.ToList(); }
+        catch (Exception e) { }
         
         List<Station> stations = new List<Station>();
+        List<TrainDto> trainWithDesc = new List<TrainDto>();
         Train[] trains = new Train[GetTrainCount(TrainDataList, FirstRows[0])];
         for (int i = 0; i < trains.Length; i++) trains[i] = new Train();
         int counter = 0;
@@ -91,14 +92,16 @@ public class TrainExtractor : ITableReader
             train.DayInRaise = GetClearInt(TrainDataList.Cell(FirstRows[0] + counter + refCounter, 8).Value.ToString());
             train.RangePerMonth = GetClearInt(TrainDataList.Cell(FirstRows[0] + counter + refCounter, 9).Value.ToString());
 
-           
+            if (train.HasDesc) trainWithDesc.Add(new TrainDto(train));
+            
+            
+            
             int GetClearInt(string value)
             {
                 train.HasDesc = value.Contains("*") || train.HasDesc;
                 value = value.Trim().Replace("*", "");
                 return Convert.ToInt32(value);
             }
-            
             
             counter++;
         }
@@ -129,7 +132,7 @@ public class TrainExtractor : ITableReader
             counter++;
         }
         WriteToBase();
-        return null;
+        return Task.FromResult(trainWithDesc);
 
         Station GetStationOrNew(string stationName)
         {

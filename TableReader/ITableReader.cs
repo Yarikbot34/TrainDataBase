@@ -1,6 +1,9 @@
+using Domain.Classes;
+using Domain.DTO;
+
 namespace TableReader;
 
 public interface ITableReader
 {
-    Task ExtractFromFile(FileStream fs, int year, int month);
+    Task<List<TrainDto>> ExtractFromFile(FileStream fs, int year, int month);
 }
