@@ -4,11 +4,10 @@ namespace Domain.DTO;
 
 public class TrainDto
 {
+    public int Id { get; set; }
     public string Period { get; set; }
     public string Number { get; set; }
-    
-    public bool HasDesc { get; set; }
-    public string? Description { get; set; }
+    public string Description { get; set; }
     
     //Тех. Данные
     public Station StationFrom { get; set; }
@@ -30,9 +29,9 @@ public class TrainDto
 
     public TrainDto(Train train)
     {
+        Id = train.Id;
         Period = train.Period;
         Number = train.Number;
-        HasDesc = train.HasDesc;
         Description = train.Description;
         StationFrom = train.StationFrom;
         StationMiddle = train.StationMiddle;
