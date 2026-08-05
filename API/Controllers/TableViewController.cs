@@ -38,7 +38,8 @@ public class TableViewController : ControllerBase
     [HttpGet("trains/{year}/{month}/{number}")]
     public async Task<ActionResult> GetTrains(int year, int month, string number)
     {
-        var answer = await _trainRepo.GetTrainsByPeriodAndNumber(year, month, number);
+        string clearNumber = Uri.UnescapeDataString(number);
+        var answer = await _trainRepo.GetTrainsByPeriodAndNumber(year, month, clearNumber);
         return Ok(answer);
     }
     
