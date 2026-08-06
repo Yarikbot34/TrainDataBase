@@ -5,16 +5,21 @@ namespace DB.Repositories;
 
 public class RawDataRepo : IRawDataRepo
 {
+    private AppDbContext _db;
+    
+    public RawDataRepo(AppDbContext db)
+    {
+        _db = db;
+    }
+    
     public async Task<List<Route>> getRoutesAsync()
     {
-        using AppDbContext db = new AppDbContext();
-        return db.Routes.ToList();
+        return _db.Routes.ToList();
     }
     
     public async Task<List<Train>> getTrainsAsync()
     {
-        using AppDbContext db = new AppDbContext();
-        var answ = db.Trains
+        var answ = _db.Trains
             .Include(t => t.StationFrom)
             .Include(t => t.StationTo)
             .Include(t => t.StationMiddle)
@@ -22,11 +27,15 @@ public class RawDataRepo : IRawDataRepo
 
         return answ;
     }
+
+    public async Task<Train> getTrainByIdAsync(int id)
+    {
+        return _db.Trains.FirstOrDefault(t => t.Id == id);
+    }
     
     public async Task<List<Station>> getStationsAsync()
     {
-        using AppDbContext db = new AppDbContext();
-        return db.Stations.ToList();
+        return _db.Stations.ToList();
     }
     
 }
