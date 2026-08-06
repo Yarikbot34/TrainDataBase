@@ -1,4 +1,6 @@
+using Domain.DTO;
 using Microsoft.AspNetCore.Mvc;
+using Services;
 using TableReader;
 
 namespace API.Controllers;
@@ -9,10 +11,12 @@ namespace API.Controllers;
 public class InputFileController : ControllerBase
 {
     private readonly ITableReader _tableReader;
+    private readonly ITrainRepo _trainRepo;
     
-    public InputFileController(ITableReader tableReader)
+    public InputFileController(ITableReader tableReader, ITrainRepo trainRepo)
     {
         _tableReader = tableReader;
+        _trainRepo = trainRepo;
     }
 
     [HttpPost("input")]
@@ -39,8 +43,13 @@ public class InputFileController : ControllerBase
             fs.Close();
             System.IO.File.Delete(path);
         }
-        
-        
+    }
+
+    [HttpPatch("input/addDesc/{id}")]
+    public async Task<IActionResult> UpdateTrainDesc(int id, TrainDto dto)
+    {
+        _trainRepo.AddTrainDescById(id, dto);
+        return Ok();
     }
     
 }

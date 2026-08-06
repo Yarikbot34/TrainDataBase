@@ -11,11 +11,11 @@ public class TrainDto
     public string Description { get; set; }
     
     //Тех. Данные
-    public Station StationFrom { get; set; }
+    public string StationFrom { get; set; }
     
-    public Station StationMiddle { get; set; }
+    public string StationMiddle { get; set; }
     
-    public Station StationTo { get; set; }
+    public string StationTo { get; set; }
     
     public TimeOnly TimeFrom { get; set; }
     public TimeOnly TimeTo { get; set; }
@@ -37,9 +37,9 @@ public class TrainDto
         Period = train.Period;
         Number = train.Number;
         Description = train.Description;
-        StationFrom = train.StationFrom;
-        StationMiddle = train.StationMiddle;
-        StationTo = train.StationTo;
+        StationFrom = train.StationFrom.Name;
+        StationMiddle = StationMiddle == null ? "" : train.StationMiddle.Name;
+        StationTo = train.StationTo.Name;
         TimeFrom = train.TimeFrom;
         TimeTo = train.TimeTo;
         Distance = train.Distance;
