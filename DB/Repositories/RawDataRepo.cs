@@ -32,6 +32,13 @@ public class RawDataRepo : IRawDataRepo
     {
         return _db.Trains.FirstOrDefault(t => t.Id == id);
     }
+
+    public async Task PatchTrainAsync(Train train)
+    {
+        _db.Trains.Update(train);
+        await _db.SaveChangesAsync();
+    }
+    
     
     public async Task<List<Station>> getStationsAsync()
     {
