@@ -1,0 +1,300 @@
+@page
+@{
+    ViewData["Title"] = "Загрузка файлов";
+}
+
+
+
+<div class="file-input-page">
+    <header class="page-header">
+        <div>
+            <div class="breadcrumbs">
+                <span>База данных маршрутов</span>
+                <span aria-hidden="true">/</span>
+                <strong>Загрузка файлов</strong>
+            </div>
+
+            <h1>Загрузка файлов</h1>
+            <p>Импорт маршрутных данных из файла Microsoft Excel</p>
+        </div>
+    </header>
+
+    <section class="upload-card" aria-labelledby="uploadTitle">
+        <div class="upload-card__header">
+            <div class="upload-card__header-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6Zm1 3.5L18.5 9H15V5.5ZM12 18a1 1 0 0 1-1-1v-4.59l-1.3 1.3-1.4-1.42 3-3a1 1 0 0 1 1.4 0l3 3-1.4 1.42-1.3-1.3V17a1 1 0 0 1-1 1Z" />
+                </svg>
+            </div>
+
+            <div>
+                <h2 id="uploadTitle">Импорт данных</h2>
+                <p>
+                    Выберите отчётный период и прикрепите один файл
+                    формата XLSX.
+                </p>
+            </div>
+        </div>
+
+        <form class="upload-form" id="uploadForm" novalidate>
+            <div class="period-fields">
+                <div class="form-field">
+                    <label for="yearInput">Год</label>
+
+                    <input id="yearInput"
+                           name="year"
+                           type="number"
+                           min="0"
+                           max="99"
+                           step="1"
+                           inputmode="numeric"
+                           placeholder="Например, 26"
+                           required />
+
+                    <span class="form-field__description">
+                        Укажите последние две цифры года, например: 26.
+                    </span>
+                </div>
+
+                <div class="form-field">
+                    <label for="monthInput">Месяц</label>
+
+                    <select id="monthInput" name="month" required>
+                        <option value="">Выберите месяц</option>
+                        <option value="1">01 — Январь</option>
+                        <option value="2">02 — Февраль</option>
+                        <option value="3">03 — Март</option>
+                        <option value="4">04 — Апрель</option>
+                        <option value="5">05 — Май</option>
+                        <option value="6">06 — Июнь</option>
+                        <option value="7">07 — Июль</option>
+                        <option value="8">08 — Август</option>
+                        <option value="9">09 — Сентябрь</option>
+                        <option value="10">10 — Октябрь</option>
+                        <option value="11">11 — Ноябрь</option>
+                        <option value="12">12 — Декабрь</option>
+                    </select>
+
+                    <span class="form-field__description">
+                        Период, за который загружаются данные.
+                    </span>
+                </div>
+            </div>
+
+            <div class="form-field">
+                <label for="fileInput">Файл XLSX</label>
+
+                <div class="file-drop-zone"
+                     id="fileDropZone"
+                     role="button"
+                     tabindex="0"
+                     aria-controls="fileInput"
+                     aria-describedby="fileHelp">
+                    <input class="visually-hidden"
+                           id="fileInput"
+                           name="file"
+                           type="file"
+                           accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                           required />
+
+                    <div class="file-drop-zone__icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M19.35 10.04A7.49 7.49 0 0 0 5.5 8a6 6 0 0 0 .5 12h13a5 5 0 0 0 .35-9.96ZM13 13v4h-2v-4H8l4-4 4 4h-3Z" />
+                        </svg>
+                    </div>
+
+                    <div class="file-drop-zone__content">
+                        <strong id="fileZoneTitle">Перетащите XLSX-файл сюда</strong>
+                        <span>или нажмите, чтобы выбрать файл</span>
+                    </div>
+
+                    <span class="file-select-button">Выбрать файл</span>
+                </div>
+
+                <div class="selected-file" id="selectedFile" hidden>
+                    <div class="selected-file__icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6Zm1 3.5L18.5 9H15V5.5ZM8 13h8v2H8v-2Zm0 4h8v2H8v-2Z" />
+                        </svg>
+                    </div>
+
+                    <div class="selected-file__information">
+                        <strong id="selectedFileName"></strong>
+                        <span id="selectedFileSize"></span>
+                    </div>
+
+                    <button class="selected-file__remove"
+                            id="removeFileButton"
+                            type="button"
+                            aria-label="Удалить выбранный файл"
+                            title="Удалить выбранный файл">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12Zm3.46-7.12 1.41-1.41L12 11.59l1.12-1.12 1.41 1.41L13.41 13l1.12 1.12-1.41 1.41L12 14.41l-1.12 1.12-1.41-1.41L10.59 13l-1.13-1.12ZM15.5 4l-1-1h-5l-1 1H5v2h14V4h-3.5Z" />
+                        </svg>
+                    </button>
+                </div>
+
+                <span class="form-field__description" id="fileHelp">
+                    Поддерживается строго один файл с расширением <strong>.xlsx</strong>.
+                </span>
+            </div>
+
+            <div class="validation-message"
+                 id="validationMessage"
+                 role="alert"
+                 hidden></div>
+
+            <div class="upload-form__actions">
+                <button class="upload-button"
+                        id="uploadButton"
+                        type="submit">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M12 2 6.5 7.5l1.42 1.42L11 5.84V16h2V5.84l3.08 3.08 1.42-1.42L12 2ZM5 18v3h14v-3h2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-3h2Z" />
+                    </svg>
+
+                    <span class="upload-button__text">Загрузить файл</span>
+
+                    <span class="upload-button__loading" aria-hidden="true">
+                        <span class="spinner"></span>
+                        Загрузка…
+                    </span>
+                </button>
+
+                <button class="reset-button"
+                        id="resetButton"
+                        type="reset">
+                    Очистить
+                </button>
+            </div>
+        </form>
+    </section>
+
+    <section class="server-result"
+             id="serverResult"
+             aria-labelledby="serverResultTitle"
+             aria-live="polite"
+             hidden>
+        <div class="server-result__icon" aria-hidden="true">
+            <svg class="server-result__success-icon" viewBox="0 0 24 24">
+                <path d="m9 16.17-3.88-3.88L3.7 13.7 9 19 20.3 7.7l-1.42-1.41L9 16.17Z" />
+            </svg>
+
+            <svg class="server-result__error-icon" viewBox="0 0 24 24">
+                <path d="M11 15h2v2h-2v-2Zm0-8h2v6h-2V7Zm1-5a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16Z" />
+            </svg>
+        </div>
+
+        <div class="server-result__content">
+            <h2 id="serverResultTitle">Ответ сервера</h2>
+            <p id="serverResultMessage"></p>
+        </div>
+
+        <button class="server-result__close"
+                id="closeResultButton"
+                type="button"
+                aria-label="Закрыть сообщение"
+                title="Закрыть сообщение">
+            ×
+        </button>
+    </section>
+</div>
+
+<div class="description-modal"
+     id="descriptionModal"
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="descriptionModalTitle"
+     hidden>
+    <div class="description-modal__backdrop"></div>
+
+    <div class="description-modal__dialog">
+        <div class="description-modal__header">
+            <div>
+                <span class="description-modal__caption">Описание маршрута</span>
+                <h2 id="descriptionModalTitle">Добавление описания</h2>
+                <p id="descriptionProgress">Запись 1 из 1</p>
+            </div>
+
+            <button class="description-modal__close"
+                    id="skipDescriptionButton"
+                    type="button"
+                    title="Пропустить запись"
+                    aria-label="Пропустить запись">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M18.3 5.71 16.89 4.3 12 9.17 7.11 4.3 5.7 5.71 10.59 10.59 5.7 15.48l1.41 1.41L12 12l4.89 4.89 1.41-1.41-4.89-4.89 4.89-4.88z" />
+                </svg>
+            </button>
+        </div>
+
+        <div class="description-modal__body">
+            <dl class="description-record-info">
+                <div>
+                    <dt>Номер поезда</dt>
+                    <dd id="descriptionTrainNumber">—</dd>
+                </div>
+
+                <div>
+                    <dt>Период</dt>
+                    <dd id="descriptionPeriod">—</dd>
+                </div>
+
+                <div>
+                    <dt>Маршрут</dt>
+                    <dd id="descriptionStations">—</dd>
+                </div>
+            </dl>
+
+            <div class="form-field">
+                <label for="descriptionInput">Описание</label>
+
+                <textarea id="descriptionInput"
+                          rows="5"
+                          maxlength="4000"
+                          placeholder="Введите описание для записи"></textarea>
+
+                <span class="form-field__description">
+                    Для отправки будет использована исходная запись,
+                    изменится только поле «Описание».
+                </span>
+            </div>
+
+            <div class="description-modal__error"
+                 id="descriptionModalError"
+                 role="alert"
+                 hidden></div>
+        </div>
+
+        <div class="description-modal__actions">
+            <button class="clipboard-button"
+                    id="pasteDescriptionButton"
+                    type="button">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M19 3h-4.18A3 3 0 0 0 12 1a3 3 0 0 0-2.82 2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2Zm-7-1a1 1 0 0 1 1 1h-2a1 1 0 0 1 1-1Zm5 17H7V5h2v1h6V5h2v14Z" />
+                </svg>
+                Вставить из буфера обмена
+            </button>
+
+            <div class="description-modal__main-actions">
+                <button class="skip-button"
+                        id="skipDescriptionTextButton"
+                        type="button">
+                    Пропустить
+                </button>
+
+                <button class="submit-description-button"
+                        id="submitDescriptionButton"
+                        type="button">
+                    <span class="submit-description-button__text">Отправить</span>
+                    <span class="submit-description-button__loading" aria-hidden="true">
+                        <span class="spinner"></span>
+                        Отправка…
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/fileInput.js" asp-append-version="true"></script>
+}
