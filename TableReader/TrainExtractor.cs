@@ -41,7 +41,7 @@ public class TrainExtractor : ITableReader
         catch (Exception e) { }
         
         List<Station> stations = new List<Station>();
-        List<TrainDto> trainWithDesc = new List<TrainDto>();
+        List<Train> trainWithDesc = new List<Train>();
         Train[] trains = new Train[GetTrainCount(TrainDataList, FirstRows[0])];
         for (int i = 0; i < trains.Length; i++) trains[i] = new Train();
         int counter = 0;
@@ -92,7 +92,7 @@ public class TrainExtractor : ITableReader
             train.DayInRaise = GetClearInt(TrainDataList.Cell(FirstRows[0] + counter + refCounter, 8).Value.ToString());
             train.RangePerMonth = GetClearInt(TrainDataList.Cell(FirstRows[0] + counter + refCounter, 9).Value.ToString());
 
-            if (train.HasDesc) trainWithDesc.Add(new TrainDto(train));
+            if (train.HasDesc) trainWithDesc.Add(train);
             
             
             
@@ -132,7 +132,10 @@ public class TrainExtractor : ITableReader
             counter++;
         }
         WriteToBase();
-        return Task.FromResult(trainWithDesc);
+
+        var dtoWithNoDesc = writeDto();
+        
+        return Task.FromResult(dtoWithNoDesc);
 
         Station GetStationOrNew(string stationName)
         {
@@ -170,6 +173,16 @@ public class TrainExtractor : ITableReader
             ldb.Stations.AddRange(stations);
             ldb.Routes.AddRange(routes);
             ldb.SaveChanges();
+        }
+
+        List<TrainDto> writeDto()
+        {
+            List<TrainDto> dtos = new List<TrainDto>();
+            foreach (var train in trainWithDesc)
+            {
+                dtos.Add(new TrainDto(train));
+            }
+            return dtos;
         }
         
     }
