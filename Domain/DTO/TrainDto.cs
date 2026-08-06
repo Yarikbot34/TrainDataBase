@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Domain.Classes;
 
 namespace Domain.DTO;
@@ -27,6 +28,9 @@ public class TrainDto
     
     public int TransactionId { get; set; }
 
+    [JsonConstructor]
+    private TrainDto() { }
+    
     public TrainDto(Train train)
     {
         Id = train.Id;
