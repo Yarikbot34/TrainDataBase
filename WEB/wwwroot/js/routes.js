@@ -373,7 +373,8 @@ function createTrainRow(train) {
         createCell(formatInteger(train.railcarCount), "numeric-cell"),
         createCell(formatInteger(train.rangePerDay), "numeric-cell"),
         createCell(formatInteger(train.dayInRaise), "numeric-cell"),
-        createCell(formatInteger(train.rangePerMonth), "numeric-cell")
+        createCell(formatInteger(train.rangePerMonth), "numeric-cell"),
+        createCell(train.description, "train-stations-cell")
     );
 
     return row;
