@@ -1,4 +1,5 @@
-﻿using ClosedXML.Excel;
+﻿using System.Globalization;
+using ClosedXML.Excel;
 using Domain.Classes;
 using DB;
 using Domain.DTO;
@@ -35,13 +36,20 @@ public class TrainExtractor : ITableReader
         
         if (book.Worksheets.Count != 3) throw new Exception("Wrong number of sheets");
         
-        int[] FirstRows = new int[3];
+        int[][] Columns = new int[2][]; //Номера столбцов подлежащих записи (нужно только для запси routes)
+        
+        int[] FirstRows = new int[3]; // Первые строки каждого из 3 листов
+        
         var TrainDataList = book.Worksheet(1);
         FirstRows[0] = GetFirstRowIndex(TrainDataList);
+        
         var PassengerDataList = book.Worksheet(2);
         FirstRows[1] = GetFirstRowIndex(PassengerDataList);
+        Columns[0] = GetNumeredColumns(FirstRows[1], PassengerDataList);
+        
         var PaymentDataList = book.Worksheet(3);
         FirstRows[2] = GetFirstRowIndex(PaymentDataList);
+        Columns[1] = GetNumeredColumns(FirstRows[2], PaymentDataList);
 
         List<Station> existStations = new List<Station>();
         
@@ -88,8 +96,6 @@ public class TrainExtractor : ITableReader
             
             //Время
             string[] Time = TrainDataList.Cell(FirstRows[0] + counter + refCounter, 4).Value.ToString().Replace(".",":").Split(new char[]{'–','-','-'});
-            Console.WriteLine($"{train.Number} | {Time[0]}");
-            Console.WriteLine($"{counter} | {trains.Length}");
             train.TimeFrom = TimeOnly.Parse(Time[0]);
             train.TimeTo = TimeOnly.Parse(Time[1]);
             
@@ -131,15 +137,23 @@ public class TrainExtractor : ITableReader
             route.Trains = RouteTrains;
             foreach (var train in RouteTrains) train.Route = route;
             
-            route.Casual = GetCategoryData(counter, 0);
-            route.Student = GetCategoryData(counter, 1);
-            route.FedBenefit = GetCategoryData(counter, 2);
-            route.RegBenefit = GetCategoryData(counter, 3);
-            route.Another = GetCategoryData(counter, 4);
-            Console.WriteLine($"{route.RouteId} {route.Casual.Count}");
+            route.Casual = GetCategoryData(0);
+            route.Student = GetCategoryData(1);
+            route.FedBenefit = GetCategoryData(2);
+            route.RegBenefit = GetCategoryData(3);
+            route.Another = GetCategoryData(4);
             counter++;
         }
         WriteToBase();
+        foreach (var c in Columns)
+        {
+            foreach (var n in c)
+            {
+                Console.WriteLine(n);
+                Console.WriteLine(c);
+            }
+            Console.WriteLine();
+        }
 
         var dtoWithNoDesc = writeDto();
         
@@ -163,15 +177,28 @@ public class TrainExtractor : ITableReader
             else return s;
         }
         
-        PasCategory GetCategoryData(int row, int categoryNumber)
+        PasCategory GetCategoryData(int categoryNumber)
         {
-            return new PasCategory()
-            {
-                Count = Convert.ToInt32(GetValueOrZero(PassengerDataList.Cell(FirstRows[1] + counter, 3 + categoryNumber))),
-                WayLength = Convert.ToDouble(GetValueOrZero(PassengerDataList.Cell(FirstRows[1] + counter, 8 + categoryNumber))),
-                Payment = Convert.ToDouble(GetValueOrZero(PaymentDataList.Cell(FirstRows[2] + counter, 3 + categoryNumber))),
-                PaymentBySubject = Convert.ToDouble(GetValueOrZero(PaymentDataList.Cell(FirstRows[2] + counter, 8 + categoryNumber)))
-            };
+            Console.WriteLine(categoryNumber);
+            var Pcat = new PasCategory();
+            
+            Console.WriteLine($"{FirstRows[1]+counter} | {Columns[0][3 + categoryNumber]}");
+            Pcat.Count = Convert.ToInt32(
+                GetValueOrZero(PassengerDataList.Cell(FirstRows[1] + counter, Columns[0][3 + categoryNumber])));
+            Pcat.WayLength = double.Parse(
+                GetValueOrZero(PassengerDataList.Cell(FirstRows[1] + counter, Columns[0][8 + categoryNumber])),
+                CultureInfo.InvariantCulture);
+            Pcat.Payment = double.Parse(
+                GetValueOrZero(PaymentDataList.Cell(FirstRows[2] + counter, Columns[1][3 + categoryNumber])),
+                CultureInfo.InvariantCulture);
+            
+            
+            if (categoryNumber != 0)
+                Pcat.PaymentBySubject =
+                    double.Parse(GetValueOrZero(PaymentDataList.Cell(FirstRows[2] + counter,
+                        Columns[1][7 + categoryNumber])), CultureInfo.InvariantCulture);
+            else Pcat.PaymentBySubject = 0;
+            return Pcat;
         }
 
         void WriteToBase()
@@ -197,7 +224,11 @@ public class TrainExtractor : ITableReader
     
     private string GetValueOrZero(IXLCell cell)
     {
-        string data = cell.Value.ToString().Replace("*", "").Trim();
+        string data = cell.Value
+            .ToString()
+            .Replace("*", "")
+            .Replace(",", ".")
+            .Trim();
         return data == "" ?  "0" : data;
     }
 
@@ -213,6 +244,37 @@ public class TrainExtractor : ITableReader
             NextValue = worksheet.Cell(counter+1, 1).Value.ToString();
         }
         return counter;
+    }
+
+    private int[] GetNumeredColumns(int firstRow, IXLWorksheet worksheet)
+    {
+        int row = firstRow - 1; //Переходим на строку с нумерацией
+        List<int> columns = new List<int>();
+        columns.Add(0);
+        int colCounter = 1;
+        int referenceNumber = 1;
+        int nullCells = 0;
+        while (columns.Count <= 12)
+        {
+            if (worksheet.Cell(row, colCounter).Value.ToString() == referenceNumber.ToString())
+            {
+                nullCells = 0;
+                referenceNumber++;
+                columns.Add(colCounter);
+                Console.Write($"{colCounter} ");
+                colCounter++;
+            }
+            else
+            {
+                colCounter++;
+                nullCells++;
+                if (nullCells > 2) break;
+            }
+        }
+
+        Console.WriteLine();
+        return columns.ToArray();
+
     }
 
     private int GetTrainCount(IXLWorksheet worksheet, int TableStart)

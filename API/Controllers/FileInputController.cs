@@ -39,9 +39,6 @@ public class InputFileController : ControllerBase
             var trainWithNoDesc = await _tableReader.ExtractFromFile(fs, year, month);
             return Ok(trainWithNoDesc);
             
-        } catch (Exception ex)
-        {
-            return Conflict(ex.Message);
         }
         finally
         {
