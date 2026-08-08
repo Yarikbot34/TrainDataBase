@@ -1,6 +1,6 @@
 namespace Domain.DTO;
 
-public class MonthDataDto
+public class MonthPaymentDataDto
 {
     public int year { get; set; }
     public int month { get; set; }

@@ -13,16 +13,16 @@ public class SummaryDataRepo : ISummaryDataRepo
         ldb = db;
     }
     
-    public async Task<List<MonthDataDto>> GetYearDataInMonthAsync(int year)
+    public async Task<List<MonthPaymentDataDto>> GetYearPaymentDataInMonthAsync(int year)
     {
         var AllRoutes = ldb.Routes.Where(r => r.Year == year).Include(r => r.Trains).ToList();
-        List <MonthDataDto> dtoList = new List<MonthDataDto>();
+        List <MonthPaymentDataDto> dtoList = new List<MonthPaymentDataDto>();
         for (int i = 1; i < DateTime.Today.Month; i++)
         {
             var routes = AllRoutes.Where(r => r.Month == i).ToList();
             if (routes.Count != 0)
             {
-                MonthDataDto dto = new MonthDataDto();
+                MonthPaymentDataDto dto = new MonthPaymentDataDto();
                 dto.year = year;
                 dto.month = i;
 
