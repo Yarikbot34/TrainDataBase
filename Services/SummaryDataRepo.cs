@@ -20,8 +20,11 @@ public class SummaryDataRepo : ISummaryDataRepo
             .Include(r => r.Trains)
             .ToList();
 
+        var months = year == DateTime.Today.Year % 1000 ? getLastYearMonth() : Enumerable.Range(1, 12);
+        
         List<MonthPaymentDataDto> payDtoList = new List<MonthPaymentDataDto>();
-        foreach (var i in getLastYearMonth())
+        
+        foreach (var i in months)
         {
             var routes = AllRoutes.Where(r => r.Month == i).ToList();
             if (routes.Count != 0)
@@ -75,7 +78,10 @@ public class SummaryDataRepo : ISummaryDataRepo
             .ToList();
 
         List<MonthPassengerDataDto> passDtoList = new List<MonthPassengerDataDto>();
-        foreach (int i in getLastYearMonth())
+
+        var months = year == DateTime.Today.Year % 1000 ? getLastYearMonth() : Enumerable.Range(1, 12);
+        
+        foreach (int i in months)
         {
             var routes = AllRoutes.Where(r => r.Month == i).ToList();
             if (routes.Count != 0)
