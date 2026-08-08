@@ -10,6 +10,8 @@ public class MonthDataDto
     public int FedBenefitPayment { get; set; }
     public int RegBenefitPayment { get; set; }
     
+    public int AnotherPayment { get; set; }
+    
     public int TrainKmPerMonth { get; set; }
     
 }
