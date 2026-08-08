@@ -15,11 +15,11 @@ public class StatisticsController : ControllerBase
         _summaryRepo = SummaryRepo;
     }
     
-    [HttpGet("summaryPerYear/{year:int}")]
-    public async Task<IActionResult> GetSummaryPerYear(int year)
+    [HttpGet("summaryPerYearInMonth/{year:int}")]
+    public async Task<IActionResult> GetSummaryPerYearInMonth(int year)
     {
         int y = year > 100 ? DateTime.Now.Year % 100 : year;
-        var answ = await _summaryRepo.GetYearDataAsync(y);
+        var answ = await _summaryRepo.GetYearDataInMonthAsync(y);
         return Ok(answ);
     }
 }

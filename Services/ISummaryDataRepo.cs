@@ -4,5 +4,5 @@ namespace Services;
 
 public interface ISummaryDataRepo
 {
-    Task<List<MonthDataDto>> GetYearDataAsync(int year); 
+    Task<List<MonthDataDto>> GetYearDataInMonthAsync(int year); 
 }
