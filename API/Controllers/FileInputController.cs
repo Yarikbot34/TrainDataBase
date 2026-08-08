@@ -22,12 +22,13 @@ public class InputFileController : ControllerBase
     [HttpPost("input")]
     public async Task<IActionResult> InputDataFromFile(IFormFile file, int year, int month)
     {
-        if (year > DateTime.Today.Year || month > DateTime.Today.Month)
+        int yearlng = year + 2000;
+        if (yearlng > DateTime.Today.Year || month > DateTime.Today.Month)
         {
             return BadRequest("Этот период ещё не прожит");
         }
-        var path = Path.Combine(Directory.GetCurrentDirectory(), file.FileName);
         
+        var path = Path.Combine(Directory.GetCurrentDirectory(), file.FileName);
         using (var stream = new FileStream(path, FileMode.Create))
         {
             await file.CopyToAsync(stream);
@@ -40,7 +41,7 @@ public class InputFileController : ControllerBase
             
         } catch (Exception ex)
         {
-            return Content(ex.Message);
+            return Conflict(ex.Message);
         }
         finally
         {

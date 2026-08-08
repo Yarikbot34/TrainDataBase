@@ -17,6 +17,14 @@ public class TrainExtractor : ITableReader
     
     public Task<List<TrainDto>> ExtractFromFile(FileStream fs, int year, int month)
     {
+        Transaction tr = ldb.Transactions.ToList().FirstOrDefault(t => t.Year == year &&  t.Month == month);
+        if (tr != null)
+        {
+            throw new Exception(
+                "В базе данных уже есть записи датированные данным периодом, во избежание конфликта запись отклонена.");
+        }
+        
+        
         Transaction note = new Transaction();
         note.Year = year;
         note.Month = month;
