@@ -38,6 +38,8 @@ public class SummaryDataRepo : ISummaryDataRepo
                     StudentP += Convert.ToInt32(r.Student.Payment);
                     FedBenefitP += Convert.ToInt32(r.FedBenefit.Payment);
                     RegBenefitP += Convert.ToInt32(r.RegBenefit.Payment);
+                    AnotherP += Convert.ToInt32(r.Another.Payment);
+                    Console.WriteLine(r.Another.Payment);
                     
                     foreach (var t in r.Trains)
                     {
@@ -50,6 +52,7 @@ public class SummaryDataRepo : ISummaryDataRepo
                 dto.RegBenefitPayment = RegBenefitP;
                 dto.FedBenefitPayment = FedBenefitP;
                 dto.TrainKmPerMonth = TrainKmPerMonth;
+                dto.AnotherPayment = AnotherP;
                 dtoList.Add(dto);
             }
         }
