@@ -87,12 +87,13 @@ public class TrainExtractor : ITableReader
                 train.StationFrom = GetStationOrNew(Stations[0]);
                 train.StationTo = GetStationOrNew(Stations[1]);
             }
-            if (Stations.Length == 3)
+            else if (Stations.Length == 3)
             {
                 train.StationFrom = GetStationOrNew(Stations[0]);
                 train.StationMiddle = GetStationOrNew(Stations[1]);
                 train.StationTo = GetStationOrNew(Stations[2]);
             }
+            else if (Stations.Length > 3 ) throw  new Exception($"Не получилось получить станции в строке {counter + FirstRows[0] + refCounter}. Проверьте количество тире в названии станции.");
             
             //Время
             string[] Time = TrainDataList.Cell(FirstRows[0] + counter + refCounter, 4).Value.ToString().Replace(".",":").Split(new char[]{'–','-','-'});
