@@ -22,4 +22,12 @@ public class StatisticsController : ControllerBase
         var answ = await _summaryRepo.GetYearPaymentDataInMonthAsync(y);
         return Ok(answ);
     }
+
+    [HttpGet("passengers/byYearInMonth/{year:int}")]
+    public async Task<IActionResult> GetPassengerPaymentPerYearInMonth(int year)
+    {
+        int y = year > 100 ? DateTime.Now.Year % 100 : year;
+        var answ = await _summaryRepo.GetYearPassengerDataInMonthAsync(y);
+        return Ok(answ);
+    }
 }
