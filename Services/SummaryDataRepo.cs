@@ -20,7 +20,14 @@ public class SummaryDataRepo : ISummaryDataRepo
             .Include(r => r.Trains)
             .ToList();
 
-        var months = year == DateTime.Today.Year % 1000 ? getLastYearMonth() : Enumerable.Range(1, 12);
+        bool isTodayYear = false;
+        int[] months;
+        if (year == DateTime.Today.Year % 1000)
+        {
+            months = getLastYearMonth();
+            isTodayYear = true;
+        }
+        else months = Enumerable.Range(1, 12).ToArray();
         
         List<MonthPaymentDataDto> payDtoList = new List<MonthPaymentDataDto>();
         
@@ -30,7 +37,14 @@ public class SummaryDataRepo : ISummaryDataRepo
             if (routes.Count != 0)
             {
                 MonthPaymentDataDto dto = new MonthPaymentDataDto();
-                dto.year = year;
+                if (isTodayYear)
+                {
+                    dto.year = i > DateTime.Today.Month ? year - 1 : year;
+                }
+                else
+                {
+                    dto.year = year;
+                }
                 dto.month = i;
 
                 int CasualP = 0;
@@ -73,13 +87,20 @@ public class SummaryDataRepo : ISummaryDataRepo
     public async Task<List<MonthPassengerDataDto>> GetYearPassengerDataInMonthAsync(int year)
     {
         var AllRoutes = ldb.Routes
-            .Where(r => r.Year == year)
+            .Where(r => r.Year == year || r.Year == year - 1)
             .Include(r => r.Trains)
             .ToList();
 
         List<MonthPassengerDataDto> passDtoList = new List<MonthPassengerDataDto>();
 
-        var months = year == DateTime.Today.Year % 1000 ? getLastYearMonth() : Enumerable.Range(1, 12);
+        bool isTodayYear = false;
+        int[] months;
+        if (year == DateTime.Today.Year % 1000)
+        {
+            months = getLastYearMonth();
+            isTodayYear = true;
+        }
+        else months = Enumerable.Range(1, 12).ToArray();
         
         foreach (int i in months)
         {
@@ -87,7 +108,14 @@ public class SummaryDataRepo : ISummaryDataRepo
             if (routes.Count != 0)
             {
                 MonthPassengerDataDto dto = new MonthPassengerDataDto();
-                dto.year = year;
+                if (isTodayYear)
+                {
+                    dto.year = i > DateTime.Today.Month ? year - 1 : year;
+                }
+                else
+                {
+                    dto.year = year;
+                }
                 dto.month = i;
                 
                 int CasualPass = 0;
