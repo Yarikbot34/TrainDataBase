@@ -16,3 +16,13 @@ public class IndexModel : PageModel
     {
     }
 }
+public class StatisticsModel : PageModel
+{
+    /// <summary>Текущий год в двухзначном формате (как хранит БД: 26, 25...)</summary>
+    public int DefaultYear { get; private set; }
+
+    public void OnGet()
+    {
+        DefaultYear = DateTime.Today.Year % 100;
+    }
+}
