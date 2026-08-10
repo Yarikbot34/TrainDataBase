@@ -1,7 +1,7 @@
 "use strict";
 
-const routesApiUrl = "http://localhost:5286/api/v1/TableView/routes";
-const trainsApiBaseUrl = "http://localhost:5286/api/v1/TableView/trains";
+const routesApiUrl = "/api/v1/TableView/routes";
+const trainsApiBaseUrl = "/api/v1/TableView/trains";
 
 const routesColumnCount = 22;
 const trainsColumnCount = 8;

@@ -1,9 +1,7 @@
 "use strict";
 
-const apiBaseUrl = "http://localhost:5286";
-
-const fileInputApiUrl = `${apiBaseUrl}/api/v1/file/input`;
-const addDescriptionApiUrl = `${apiBaseUrl}/api/v1/file/input/addDesc`;
+const fileInputApiUrl = `/api/v1/file/input`;
+const addDescriptionApiUrl = `/api/v1/file/input/addDesc`;
 
 const uploadForm = document.getElementById("uploadForm");
 const yearInput = document.getElementById("yearInput");

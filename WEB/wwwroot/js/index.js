@@ -3,12 +3,10 @@
 
     const MONTHS_SHORT = ['янв', 'фев', 'мар', 'апр', 'май', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
     
-    const serverurl = 'http://localhost:5286';
-    
     const API = {
-        years: serverurl + '/api/v1/content/writedYears',
-        passengers: (year) => `${serverurl}/api/v1/statistics/passengers/byYearInMonth/${year}`,
-        payment: (year) => `${serverurl}/api/v1/statistics/payment/byYearInMonth/${year}`
+        years: '/api/v1/content/writedYears',
+        passengers: (year) => `/api/v1/statistics/passengers/byYearInMonth/${year}`,
+        payment: (year) => `/api/v1/statistics/payment/byYearInMonth/${year}`
     };
 
     const KINDS = ['passengers', 'payment'];
