@@ -13,6 +13,7 @@ builder.Services.AddScoped<IRawDataRepo, RawDataRepo>();
 builder.Services.AddScoped<ITableReader, TrainExtractor>();
 builder.Services.AddScoped<ITrainRepo, TrainRepo>();
 builder.Services.AddScoped<ISummaryDataRepo, SummaryDataRepo>();
+builder.Services.AddScoped<IdbContentRepo, DbContentRepo>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
