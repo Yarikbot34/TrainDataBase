@@ -23,7 +23,7 @@ public class InputFileController : ControllerBase
     public async Task<IActionResult> InputDataFromFile(IFormFile file, int year, int month)
     {
         int yearlng = year + 2000;
-        if (yearlng > DateTime.Today.Year || month > DateTime.Today.Month)
+        if (yearlng > DateTime.Today.Year || (yearlng == DateTime.Today.Year && month > DateTime.Today.Month))
         {
             return BadRequest("Этот период ещё не прожит");
         }
