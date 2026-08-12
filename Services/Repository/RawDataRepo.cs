@@ -1,5 +1,6 @@
 using DB;
 using Domain.Classes;
+using Domain.DTO;
 using Microsoft.EntityFrameworkCore;
 
 namespace Services;
@@ -13,10 +14,11 @@ public class RawDataRepo : IRawDataRepo
         _db = db;
     }
     
-    public async Task<List<Route>> getRoutesAsync(int[] years)
+    public async Task<List<RouteDto>> getRoutesAsync(int[] years)
     {
         var answ = _db.Routes
             .Where(t => years.Contains(t.Year))
+            .Select(r => new RouteDto(r))
             .ToList();
         return answ;
     }

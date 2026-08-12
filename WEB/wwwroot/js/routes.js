@@ -263,14 +263,10 @@ function filterRoutes() {
         const routeNumber = String(route.routeNumber ?? "").toLocaleLowerCase("ru");
         const year = formatYear(route.year);
         const month = formatMonth(route.month);
-        const routeId = String(route.routeId ?? "");
-        const id = String(route.id ?? "");
 
         return routeNumber.includes(query) ||
             year.includes(query) ||
-            month.includes(query) ||
-            routeId.includes(query) ||
-            id.includes(query);
+            month.includes(query);
     });
 
     renderRoutes(filteredRoutes);
