@@ -32,8 +32,12 @@ public class TrainRepo : ITrainRepo
     {
         string description = dto.Description;
         Train train = ldb.Trains.FirstOrDefault(t => t.Id == id);
-        train.Description = description;
-        ldb.Trains.Update(train);
-        ldb.SaveChanges();
+        if (train != null)
+        {
+            train.Description = description;
+            ldb.Trains.Update(train);
+            await ldb.SaveChangesAsync();
+        }
+        else throw new Exception("Поезд с таким номером не найден");
     }
 }
