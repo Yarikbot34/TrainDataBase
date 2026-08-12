@@ -1,3 +1,4 @@
+using ClosedXML.Excel;
 using Microsoft.AspNetCore.Mvc;
 using DB;
 using Domain.Classes;
@@ -20,10 +21,11 @@ public class TableViewController : ControllerBase
         _trainRepo = trainRepo;
     }
     
-    [HttpGet("routes")]
-    public async Task<ActionResult> GetRoutes()
+    [HttpGet("routes/{years?}")]
+    public async Task<ActionResult> GetRoutes(int[]? years = null)
     {
-        var answer = await _rawDataRepo.getRoutesAsync();
+        if (years == null ) years = new []{DateTime.Now.Year % 1000};
+        var answer = await _rawDataRepo.getRoutesAsync(years);
         return Ok(answer);
     }
     

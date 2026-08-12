@@ -13,9 +13,12 @@ public class RawDataRepo : IRawDataRepo
         _db = db;
     }
     
-    public async Task<List<Route>> getRoutesAsync()
+    public async Task<List<Route>> getRoutesAsync(int[] years)
     {
-        return _db.Routes.ToList();
+        var answ = _db.Routes
+            .Where(t => years.Contains(t.Year))
+            .ToList();
+        return answ;
     }
     
     public async Task<List<Train>> getTrainsAsync()
