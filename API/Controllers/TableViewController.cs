@@ -2,6 +2,7 @@ using ClosedXML.Excel;
 using Microsoft.AspNetCore.Mvc;
 using DB;
 using Domain.Classes;
+using Domain.DTO;
 using Services;
 
 namespace API.Controllers;
@@ -11,14 +12,15 @@ namespace API.Controllers;
 [Route("api/v1/TableView")]
 public class TableViewController : ControllerBase
 {
-    IRawDataRepo _rawDataRepo;
-    ITrainRepo _trainRepo;
-    
+    private readonly IRawDataRepo _rawDataRepo;
+    private readonly ITrainRepo _trainRepo;
+    private readonly IRouteRepo _routeRepo;
 
-    public TableViewController(IRawDataRepo rawDataRepo,  ITrainRepo trainRepo)
+    public TableViewController(IRawDataRepo rawDataRepo,  ITrainRepo trainRepo, IRouteRepo routeRepo)
     {
         _rawDataRepo = rawDataRepo;
         _trainRepo = trainRepo;
+        _routeRepo = routeRepo;
     }
     
     [HttpGet("routes/{years?}")]
@@ -27,6 +29,13 @@ public class TableViewController : ControllerBase
         if (years == null ) years = new []{DateTime.Now.Year % 1000};
         var answer = await _rawDataRepo.getRoutesAsync(years);
         return Ok(answer);
+    }
+
+    [HttpGet("routes/filter")]
+    public async Task<ActionResult> GetRoutesFilter([FromQuery] RouteFilterDto filter)
+    {
+        var answ = _routeRepo.GetRoutesByFilter(filter);
+        return Ok(answ);
     }
     
     [HttpGet("trains")]
