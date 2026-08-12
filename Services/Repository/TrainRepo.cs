@@ -18,9 +18,13 @@ public class TrainRepo : ITrainRepo
     {
         number = number.Replace("*", "").Trim();
         string period = $"{year}{month}";
-        var answ = await ldb.Trains.ToListAsync();
-        answ = answ.Where(t => t.Period == period && t.Number.Contains(number)).ToList();
-        Console.WriteLine(answ.Count);
+        var answ = await ldb.Trains
+            .Where(t => t.Period == period && t.Number.Contains(number))
+            .Include(t => t.StationFrom)
+            .Include(t => t.StationMiddle)
+            .Include(t => t.StationTo)
+            .OrderBy(t => t.HasDesc)
+            .ToListAsync();
         return answ;
     }
 
