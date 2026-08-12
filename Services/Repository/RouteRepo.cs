@@ -13,6 +13,15 @@ public class RouteRepo : IRouteRepo
     {
         this.ldb = ldb;
     }
+
+    public async Task<List<RouteDto>> GetRoutesAsync(int[] years)
+    {
+        var answ = ldb.Routes
+            .Where(t => years.Contains(t.Year))
+            .Select(r => new RouteDto(r))
+            .ToList();
+        return answ;
+    }
     
     public async Task<List<RouteDto>> GetRoutesByFilter(RouteFilterDto filter)
     {

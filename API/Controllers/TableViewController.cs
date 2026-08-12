@@ -12,13 +12,13 @@ namespace API.Controllers;
 [Route("api/v1/TableView")]
 public class TableViewController : ControllerBase
 {
-    private readonly IRawDataRepo _rawDataRepo;
+    private readonly IStationRepo _stationRepo;
     private readonly ITrainRepo _trainRepo;
     private readonly IRouteRepo _routeRepo;
 
-    public TableViewController(IRawDataRepo rawDataRepo,  ITrainRepo trainRepo, IRouteRepo routeRepo)
+    public TableViewController(ITrainRepo trainRepo, IRouteRepo routeRepo, IStationRepo stationRepo)
     {
-        _rawDataRepo = rawDataRepo;
+        _stationRepo = stationRepo;
         _trainRepo = trainRepo;
         _routeRepo = routeRepo;
     }
@@ -27,7 +27,7 @@ public class TableViewController : ControllerBase
     public async Task<ActionResult> GetRoutes(int[]? years = null)
     {
         if (years == null ) years = new []{DateTime.Now.Year % 1000};
-        var answer = await _rawDataRepo.getRoutesAsync(years);
+        var answer = await _routeRepo.GetRoutesAsync(years);
         return Ok(answer);
     }
 
@@ -41,7 +41,7 @@ public class TableViewController : ControllerBase
     [HttpGet("trains")]
     public async Task<ActionResult> GetTrains()
     {
-        var answer = await _rawDataRepo.getTrainsAsync();
+        var answer = await _trainRepo.GetTrainsAsync();
         return Ok(answer);
     }
 
@@ -56,7 +56,7 @@ public class TableViewController : ControllerBase
     [HttpGet("stations")]
     public async Task<ActionResult> GetStations()
     {
-        var answer = await _rawDataRepo.getStationsAsync();
+        var answer = await _stationRepo.GetStationsAsync();
         return Ok(answer);
     }
     

@@ -8,7 +8,6 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
 
-builder.Services.AddScoped<IRawDataRepo, RawDataRepo>();
 builder.Services.AddScoped<ITableReader, TrainExtractor>();
 builder.Services.AddScoped<ITrainRepo, TrainRepo>();
 builder.Services.AddScoped<ISummaryDataRepo, SummaryDataRepo>();

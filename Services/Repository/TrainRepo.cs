@@ -14,6 +14,18 @@ public class TrainRepo : ITrainRepo
         ldb = db;
     }
     
+    public async Task<List<TrainDto>> GetTrainsAsync()
+    {
+        var answ = ldb.Trains
+            .Include(t => t.StationFrom)
+            .Include(t => t.StationTo)
+            .Include(t => t.StationMiddle)
+            .Select(t => new TrainDto(t))
+            .ToList();
+
+        return answ;
+    }
+    
     public async Task<List<Train>> GetTrainsByPeriodAndNumber(int year, int month, string number)
     {
         number = number.Replace("*", "").Trim();
