@@ -1,6 +1,6 @@
 using Domain.Classes;
 
-namespace DB.Repositories;
+namespace Services;
 
 public interface IRawDataRepo
 {

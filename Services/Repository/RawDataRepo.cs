@@ -1,7 +1,8 @@
+using DB;
 using Domain.Classes;
 using Microsoft.EntityFrameworkCore;
 
-namespace DB.Repositories;
+namespace Services;
 
 public class RawDataRepo : IRawDataRepo
 {
