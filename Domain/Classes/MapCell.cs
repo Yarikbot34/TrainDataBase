@@ -6,8 +6,10 @@ public class MapCell
 {
     [JsonIgnore]
     public int Id { get; set; }
+    [JsonIgnore]
     public int SchemaId { get; set; }
-    public MapSchema Schema { get; set; }
+    [JsonIgnore]
+    public MapSchema? Schema { get; set; }
     [JsonPropertyName("id")]
     public string CellId { get; set; }
     public string Shape { get; set; }
