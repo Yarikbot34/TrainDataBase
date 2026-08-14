@@ -47,13 +47,20 @@ public class MapRepo : IMapRepo
 
         void GetStationsForCells(List<MapCell> mapCells)
         {
+            mapCells = mapCells.OrderByDescending(c => c.Type == "node").ToList();
             foreach (var mapCell in mapCells)
             {
                 if (mapCell.Type == "node")
                 {
                     var stat = ldb.Stations.First(s => s.Name == mapCell.Data.Label);
-                    mapCell.Id = stat.Id;
                     mapCell.Station = stat;
+                }
+                else if (mapCell.Type == "edge")
+                {
+                    var statFrom = mapCells.First(c => c.CellId == mapCell.Source.Cell).Station;
+                    var statTo = mapCells.First(c => c.CellId == mapCell.Target.Cell).Station;
+                    mapCell.SourceStation = statFrom;
+                    mapCell.TargetStation = statTo;
                 }
             }
         }

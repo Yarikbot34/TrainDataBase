@@ -11,10 +11,21 @@ public class MapCell
     [JsonIgnore]
     public MapSchema? Schema { get; set; }
     
+    //Node
     [JsonIgnore]
     public int? StationId { get; set; }
     [JsonIgnore]
     public Station? Station { get; set; }
+    
+    //Edge
+    [JsonIgnore]
+    public int? SourceStationId { get; set; }
+    [JsonIgnore]
+    public Station? SourceStation { get; set; }
+    [JsonIgnore]
+    public int? TargetStationId { get; set; }
+    [JsonIgnore]
+    public Station? TargetStation { get; set; }
     
     [JsonPropertyName("id")]
     public string CellId { get; set; }

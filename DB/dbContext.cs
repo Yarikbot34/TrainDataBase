@@ -161,6 +161,14 @@ public class AppDbContext : DbContext
                     .WithMany()
                     .HasForeignKey(c => c.StationId);
                 
+                entity.HasOne(c => c.SourceStation)
+                    .WithMany()
+                    .HasForeignKey(c => c.SourceStationId);
+                
+                entity.HasOne(c => c.TargetStation)
+                    .WithMany()
+                    .HasForeignKey(c => c.TargetStationId);
+                
                 entity.OwnsOne(c => c.Data, cd =>
                 {
                     cd.Property(cd => cd.Label).HasColumnName("Label");
