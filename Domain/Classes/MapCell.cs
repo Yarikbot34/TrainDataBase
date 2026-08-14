@@ -10,6 +10,12 @@ public class MapCell
     public int SchemaId { get; set; }
     [JsonIgnore]
     public MapSchema? Schema { get; set; }
+    
+    [JsonIgnore]
+    public int? StationId { get; set; }
+    [JsonIgnore]
+    public Station? Station { get; set; }
+    
     [JsonPropertyName("id")]
     public string CellId { get; set; }
     public string Shape { get; set; }

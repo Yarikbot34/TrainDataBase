@@ -41,6 +41,7 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Station>(entity =>
         {
             entity.HasKey(s => s.Id);
+            entity.HasAlternateKey(s => s.Name);
             entity.Property(s => s.Name).IsRequired().HasMaxLength(200);
             entity.Property(s => s.Class).HasMaxLength(50);
             
@@ -54,7 +55,6 @@ public class AppDbContext : DbContext
         {
             entity.HasKey(r => r.Id);
             entity.Property(r => r.RouteNumber).IsRequired().HasMaxLength(50);
-            
             entity.HasMany(r => r.Trains)
                   .WithOne(t => t.Route)
                   .HasForeignKey(t => t.RouteId)
@@ -157,6 +157,10 @@ public class AppDbContext : DbContext
                     .WithMany(s => s.MapCells)
                     .HasForeignKey(c => c.SchemaId);
 
+                entity.HasOne(c => c.Station)
+                    .WithMany()
+                    .HasForeignKey(c => c.StationId);
+                
                 entity.OwnsOne(c => c.Data, cd =>
                 {
                     cd.Property(cd => cd.Label).HasColumnName("Label");

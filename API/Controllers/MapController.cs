@@ -8,17 +8,17 @@ namespace API.Controllers;
 [Route("api/v1/map")]
 public class MapController : ControllerBase
 {
-    private readonly IMapService mapService;
+    private readonly IMapRepo _mapRepo;
     
-    public MapController(IMapService mapService)
+    public MapController(IMapRepo mapRepo)
     {
-        this.mapService = mapService;
+        this._mapRepo = mapRepo;
     }
 
     [HttpPost("uploadSchema")]
     public async Task<IActionResult> UploadSchema(MapSchema schema)
     {
-        await mapService.UploadMapSchemaAsync(schema);
+        await _mapRepo.UploadMapSchemaAsync(schema);
         return Ok();
     }
 }

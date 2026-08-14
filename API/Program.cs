@@ -14,7 +14,7 @@ builder.Services.AddScoped<ISummaryDataRepo, SummaryDataRepo>();
 builder.Services.AddScoped<IdbContentRepo, DbContentRepo>();
 builder.Services.AddScoped<IRouteRepo, RouteRepo>();
 builder.Services.AddScoped<IStationRepo, StationRepo>();
-builder.Services.AddScoped<IMapService, MapService>();
+builder.Services.AddScoped<IMapRepo, MapRepo>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

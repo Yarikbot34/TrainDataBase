@@ -2,7 +2,7 @@ using Domain.Classes;
 
 namespace Services;
 
-public interface IMapService
+public interface IMapRepo
 {
     Task UploadMapSchemaAsync(MapSchema schema);
 }

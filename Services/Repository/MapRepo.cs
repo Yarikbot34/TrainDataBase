@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Services;
 
-public class MapService : IMapService
+public class MapRepo : IMapRepo
 {
     private readonly AppDbContext ldb;
     
-    public  MapService(AppDbContext db)
+    public  MapRepo(AppDbContext db)
     {
         ldb = db;
     }
@@ -19,8 +19,8 @@ public class MapService : IMapService
         var writedSchemas = ldb.MapSchemas.Select(s => s.Name).ToList();
         if (!writedSchemas.Contains(schema.Name))
         {
+            GetStationsForCells(cells);
             ldb.MapSchemas.Add(schema);
-            ldb.MapCells.AddRange(cells);
         }
         else
         {
@@ -33,23 +33,31 @@ public class MapService : IMapService
             var oldCells = oldSchema.MapCells.ToList();
             ldb.MapCells.RemoveRange(oldCells);
             oldSchema.MapCells.Clear();
-
-            foreach (var cell in schema.MapCells ?? new List<MapCell>())
+            
+            GetStationsForCells(schema.MapCells);
+            
+            foreach (var cell in schema.MapCells)
             {
                 cell.Id = 0;
                 cell.SchemaId = oldSchema.Id;
                 oldSchema.MapCells.Add(cell);
             }
-            ldb.SaveChanges();
             
         }
-        
-        
 
+        void GetStationsForCells(List<MapCell> mapCells)
+        {
+            foreach (var mapCell in mapCells)
+            {
+                if (mapCell.Type == "node")
+                {
+                    var stat = ldb.Stations.First(s => s.Name == mapCell.Data.Label);
+                    mapCell.Id = stat.Id;
+                    mapCell.Station = stat;
+                }
+            }
+        }
         
-        
-        ldb.MapSchemas.Add(schema);
-        ldb.MapCells.AddRange(cells);
         await ldb.SaveChangesAsync();
     }
 }
