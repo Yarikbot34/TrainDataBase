@@ -6,7 +6,8 @@ public class MapCell
 {
     [JsonIgnore]
     public int Id { get; set; }
-    public string SchemaId { get; set; }
+    public int SchemaId { get; set; }
+    public MapSchema Schema { get; set; }
     [JsonPropertyName("id")]
     public string CellId { get; set; }
     public string Shape { get; set; }
@@ -24,19 +25,19 @@ public class MapCell
 
 }
 
-public struct Data
+public class Data
 {
     public int? Load {get; set;}
     public string? Label {get; set;}
 }
 
-public struct Coords
+public class Coords
 {
     public int X { get; set; }
     public int Y { get; set; }
 }
 
-public struct CellReference
+public class CellReference
 {
     public string Cell { get; set; }
 }

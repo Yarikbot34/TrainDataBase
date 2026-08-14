@@ -10,6 +10,8 @@ public class AppDbContext : DbContext
     public DbSet<Route> Routes => Set<Route>();
     public DbSet<Train> Trains => Set<Train>();
     public DbSet<Transaction> Transactions => Set<Transaction>();
+    public DbSet<MapSchema> MapSchemas => Set<MapSchema>();
+    public DbSet<MapCell> MapCells => Set<MapCell>();
 
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
     
@@ -137,5 +139,47 @@ public class AppDbContext : DbContext
             entity.Property(t => t.Month).IsRequired();
             entity.Property(t => t.UnitsGet).IsRequired();
         });
+        
+        //Map Schema
+        modelBuilder.Entity<MapSchema>(entity =>
+        {
+            entity.HasKey(s => s.Id);
+            entity.HasMany(s => s.MapCells)
+                .WithOne(c => c.Schema)
+                .HasForeignKey(c => c.SchemaId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<MapCell>(entity =>
+            {
+                entity.HasKey(c => c.Id);
+                entity.HasOne(c => c.Schema)
+                    .WithMany(s => s.MapCells)
+                    .HasForeignKey(c => c.SchemaId);
+
+                entity.OwnsOne(c => c.Data, cd =>
+                {
+                    cd.Property(cd => cd.Label).HasColumnName("Label");
+                    cd.Property(cd => cd.Load).HasColumnName("Load");
+                });
+
+                entity.OwnsOne(c => c.Position, cp =>
+                {
+                    cp.Property(cp => cp.X).HasColumnName("x");
+                    cp.Property(cp => cp.Y).HasColumnName("y");
+                });
+
+                entity.OwnsOne(c => c.Source, cs =>
+                {
+                    cs.Property(cs => cs.Cell).HasColumnName("Source");
+                });
+
+                entity.OwnsOne(c => c.Target, ct =>
+                {
+                    ct.Property(ct => ct.Cell).HasColumnName("Target");
+                });
+
+            }
+        );
     }
 }
