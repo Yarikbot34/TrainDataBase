@@ -3,7 +3,8 @@ namespace Domain.Classes;
 public class Train
 {
     public int Id { get; set; }
-    public string Period { get; set; }
+    public int year {get; set;}
+    public int month {get; set;}
     public string Number { get; set; }
     
     public bool HasDesc { get; set; }

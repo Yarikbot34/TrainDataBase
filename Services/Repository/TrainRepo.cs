@@ -29,9 +29,8 @@ public class TrainRepo : ITrainRepo
     public async Task<List<Train>> GetTrainsByPeriodAndNumber(int year, int month, string number)
     {
         number = number.Replace("*", "").Trim();
-        string period = $"{year}{month}";
         var answ = await ldb.Trains
-            .Where(t => t.Period == period && t.Number.Contains(number))
+            .Where(t => t.year == year && t.month == month && t.Number.Contains(number))
             .Include(t => t.StationFrom)
             .Include(t => t.StationMiddle)
             .Include(t => t.StationTo)

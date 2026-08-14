@@ -67,7 +67,8 @@ public class TrainExtractor : ITableReader
         {
             train.Transaction = note;
             
-            train.Period = $"{year}{month}";
+            train.year = year;
+            train.month = month;
             train.Number = TrainDataList.Cell(FirstRows[0]+counter+refCounter, 2).Value.ToString();
             if (train.Number.Contains("*"))
             {

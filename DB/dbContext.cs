@@ -110,7 +110,6 @@ public class AppDbContext : DbContext
         {
             entity.HasKey(t => t.Id);
             entity.Property(t => t.Number).IsRequired().HasMaxLength(50);
-            entity.Property(t => t.Period).HasMaxLength(50);
             
             entity.HasOne(t => t.StationFrom)
                   .WithMany()

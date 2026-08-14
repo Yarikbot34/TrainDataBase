@@ -6,7 +6,8 @@ namespace Domain.DTO;
 public class TrainDto
 {
     public int Id { get; set; }
-    public string Period { get; set; }
+    public int Year { get; set; }
+    public int Month { get; set; }
     public string Number { get; set; }
     public string Description { get; set; }
     
@@ -34,7 +35,8 @@ public class TrainDto
     public TrainDto(Train train)
     {
         Id = train.Id;
-        Period = train.Period;
+        Year = train.year;
+        Month = train.month;
         Number = train.Number;
         Description = train.Description;
         StationFrom = train.StationFrom.Name;
