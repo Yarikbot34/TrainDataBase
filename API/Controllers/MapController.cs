@@ -1,4 +1,5 @@
 using Domain.Classes;
+using Domain.DTO;
 using Microsoft.AspNetCore.Mvc;
 using Services;
 
@@ -20,5 +21,12 @@ public class MapController : ControllerBase
     {
         await _mapRepo.UploadMapSchemaAsync(schema);
         return Ok();
+    }
+
+    [HttpPost("getSchema/{schemaName}")]
+    public async Task<IActionResult> GetSchemaAsync(MapRequestDto req)
+    {
+        var asnw = await _mapRepo.GetMapSchemaAsync(req.schemaName,req.years, req.months);
+        return Ok(asnw);
     }
 }
