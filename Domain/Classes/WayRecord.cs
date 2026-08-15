@@ -13,6 +13,7 @@ public class WayRecord
     public int StationToId { get; set; }
     public Station StationTo { get; set; }
     
+    public List<int> StationIdsInWay  { get; set; } = new List<int>();
     public int wayLength { get; set; }
 
     public bool ContainTrain(Train train)
