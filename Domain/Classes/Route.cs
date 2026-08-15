@@ -23,8 +23,13 @@ public class Route
     
     public int TransactionId { get; set; }
     public Transaction Transaction { get; set; }
-    
-    
+
+
+
+    public int GetPassSum()
+    {
+        return Casual.Count + Student.Count + FedBenefit.Count + RegBenefit.Count + Another.Count;
+    }
 }
 
 public class PasCategory

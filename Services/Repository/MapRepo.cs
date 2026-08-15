@@ -103,8 +103,9 @@ public class MapRepo : IMapRepo
                 if (map.ContainsKey(train.StationFrom) && map.ContainsKey(train.StationTo) &&
                     train.StationMiddle == null)
                 {
-                    var way = GetWay(train.StationFrom, train.StationTo, map);
-                    foreach (var cell in cells.Where(c => way.Contains(c.SourceStation) && way.Contains(c.TargetStation)))
+                    var way = GetWay(train.StationFrom, train.StationTo, map).ToHashSet();
+                    
+                    foreach (var cell in cells.Where(c => isCellOnWay(c, way)))
                     {
                         DtoDict[cell].CellData.trainLoad += train.DayInRaise;
                         DtoDict[cell].CellData.trains.Add(train.Number);
@@ -115,23 +116,22 @@ public class MapRepo : IMapRepo
                 {
                     var way = GetWay(train.StationFrom, train.StationMiddle, map).ToHashSet();
                     way.ExceptWith(GetWay(train.StationMiddle, train.StationTo, map).ToHashSet());
-                    foreach (var cell in cells.Where(c => isEdgeOnWay(c, way)))
+                    
+                    foreach (var cell in cells.Where(c => isCellOnWay(c, way)))
                     {
                         DtoDict[cell].CellData.trainLoad += train.DayInRaise;
                         DtoDict[cell].CellData.trains.Add(train.Number);
                     }
-                        
-                        
-                    
                 }
             }
             return new MapSchemaDto(schema, DtoDict.Values.ToList());
             
         }
 
-        bool isEdgeOnWay(MapCell cell, HashSet<Station> way)
+        bool isCellOnWay(MapCell cell, HashSet<Station> way)
         {
-            return (way.Contains(cell.SourceStation) &&  way.Contains(cell.TargetStation));
+            return (way.Contains(cell.SourceStation) &&  way.Contains(cell.TargetStation)) || 
+                   (way.Contains(cell.Station) && cell.Data.Label != null);
         }
         
         List<Station> GetWay(Station start, Station finish, Dictionary<Station, List<Station>> map)
