@@ -7,7 +7,9 @@ public class Train
     public int month {get; set;}
     public string Number { get; set; }
     
+    public bool IsCanceled { get; set; }
     public bool HasDesc { get; set; }
+    
     public string? Description { get; set; }
     
     public int RouteId { get; set; }

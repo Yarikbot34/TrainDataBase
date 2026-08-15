@@ -107,7 +107,8 @@ public class TrainExtractor : ITableReader
             train.RangePerDay = GetClearInt(TrainDataList.Cell(FirstRows[0] + counter + refCounter, 7).Value.ToString());
             train.DayInRaise = GetClearInt(TrainDataList.Cell(FirstRows[0] + counter + refCounter, 8).Value.ToString());
             train.RangePerMonth = GetClearInt(TrainDataList.Cell(FirstRows[0] + counter + refCounter, 9).Value.ToString());
-
+            
+            if (train.Distance == 0 || train.RangePerDay == 0) train.IsCanceled = true;
             if (train.HasDesc) trainWithDesc.Add(train);
             
             
@@ -147,15 +148,6 @@ public class TrainExtractor : ITableReader
             counter++;
         }
         WriteToBase();
-        foreach (var c in Columns)
-        {
-            foreach (var n in c)
-            {
-                Console.WriteLine(n);
-                Console.WriteLine(c);
-            }
-            Console.WriteLine();
-        }
 
         var dtoWithNoDesc = writeDto();
         
@@ -181,7 +173,6 @@ public class TrainExtractor : ITableReader
         
         PasCategory GetCategoryData(int categoryNumber)
         {
-            Console.WriteLine(categoryNumber);
             var Pcat = new PasCategory();
             
             Console.WriteLine($"{FirstRows[1]+counter} | {Columns[0][3 + categoryNumber]}");
@@ -263,7 +254,6 @@ public class TrainExtractor : ITableReader
                 nullCells = 0;
                 referenceNumber++;
                 columns.Add(colCounter);
-                Console.Write($"{colCounter} ");
                 colCounter++;
             }
             else
@@ -273,8 +263,6 @@ public class TrainExtractor : ITableReader
                 if (nullCells > 2) break;
             }
         }
-
-        Console.WriteLine();
         return columns.ToArray();
 
     }
