@@ -26,9 +26,9 @@ public class MapCellDto
             passengerLoad = 0,
             trains = new HashSet<string>()
         };
-        if (Position != null)
+        if (cell.Position != null)
         {
-            Position = new Coords(){x = cell.Position.X,y = cell.Position.Y};
+            Position = new Coords(){x = cell.Position.X ,y = cell.Position.Y};
         }
         if (cell.Source != null && cell.Target != null)
         {
