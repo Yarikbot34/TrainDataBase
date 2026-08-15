@@ -101,7 +101,7 @@ public class MapRepo : IMapRepo
             foreach (var train in trains)
             {
                 if (map.ContainsKey(train.StationFrom) && map.ContainsKey(train.StationTo) &&
-                    train.StationMiddle == null)
+                    train.StationMiddle == null && !train.IsCanceled)
                 {
                     var way = GetWay(train.StationFrom, train.StationTo, map).ToHashSet();
                     
