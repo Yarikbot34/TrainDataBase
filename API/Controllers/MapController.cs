@@ -23,7 +23,7 @@ public class MapController : ControllerBase
         return Ok();
     }
 
-    [HttpPost("getSchema/{schemaName}")]
+    [HttpPost("getSchema")]
     public async Task<IActionResult> GetSchemaAsync(MapRequestDto req)
     {
         var asnw = await _mapRepo.GetMapSchemaAsync(req.schemaName,req.years, req.months);

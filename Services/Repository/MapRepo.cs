@@ -111,7 +111,7 @@ public class MapRepo : IMapRepo
                         DtoDict[cell].CellData.trains.Add(train.Number);
                     }
                 }
-                else if (map.ContainsKey(train.StationFrom) && map.ContainsKey(train.StationTo) &&
+                else if (!train.IsCanceled && map.ContainsKey(train.StationFrom) && map.ContainsKey(train.StationTo) &&
                          map.ContainsKey(train.StationMiddle))
                 {
                     var way = GetWay(train.StationFrom, train.StationMiddle, map).ToHashSet();
