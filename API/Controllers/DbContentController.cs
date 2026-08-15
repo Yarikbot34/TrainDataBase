@@ -42,4 +42,11 @@ public class DbContentController : ControllerBase
         var answ = await _contentRepo.GetRecordedStationsAsync();
         return Ok(answ);
     }
+
+    [HttpGet("writedSchemas")]
+    public async Task<IActionResult> GetWritedSchemasAsync()
+    {
+        var answ = await _contentRepo.GetRecordedSchemasAsync();
+        return Ok(answ);
+    }
 }

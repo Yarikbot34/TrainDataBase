@@ -35,4 +35,10 @@ public class DbContentRepo : IdbContentRepo
         HashSet<string> stations = ldb.Stations.Select(s => s.Name).ToHashSet();
         return stations.ToList();
     }
+
+    public async Task<List<string>> GetRecordedSchemasAsync()
+    {
+        HashSet<string> schemas = ldb.MapSchemas.Select(s => s.Name).ToHashSet();
+        return schemas.ToList();
+    }
 }
