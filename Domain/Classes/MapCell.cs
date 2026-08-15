@@ -59,5 +59,6 @@ public class Coords
 public class CellReference
 {
     public string Cell { get; set; }
+    public string? Port { get; set; }
 }
 

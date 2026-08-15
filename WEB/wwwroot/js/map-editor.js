@@ -274,13 +274,21 @@
                 position: { x: Math.round(pos.x), y: Math.round(pos.y) },
             };
         }
-
+        
+        const source = cell.getSource() || {};
+        const target = cell.getTarget() || {};
 
         return {
             ...base,
             data: { load: cell.getData()?.load ?? 0 },
-            source: { cell: cell.getSourceCellId() },
-            target: { cell: cell.getTargetCellId() },
+            source: {
+                cell: source.cell,
+                port: source.port ?? null,
+            },
+            target: {
+                cell: target.cell,
+                port: target.port ?? null,
+            },
         };
     }
 

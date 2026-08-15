@@ -90,10 +90,6 @@ public class MapRepo : IMapRepo
         if (schema != null)
         {
             var cells = schema.MapCells;
-            var nodesList = cells
-                .Where(c => c.Station != null)
-                .Select(c => c.Station)
-                .ToList();
             Dictionary<Station, List<Station>> map = CreateConnectionMap(cells);
             foreach (var train in trains)
             {

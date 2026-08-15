@@ -183,11 +183,13 @@ public class AppDbContext : DbContext
                 entity.OwnsOne(c => c.Source, cs =>
                 {
                     cs.Property(cs => cs.Cell).HasColumnName("Source");
+                    cs.Property(cs => cs.Port).HasColumnName("SourcePort");
                 });
 
                 entity.OwnsOne(c => c.Target, ct =>
                 {
                     ct.Property(ct => ct.Cell).HasColumnName("Target");
+                    ct.Property(ct => ct.Port).HasColumnName("TargetPort");
                 });
 
             }
