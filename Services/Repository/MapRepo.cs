@@ -87,7 +87,6 @@ public class MapRepo : IMapRepo
             .Where(t => years.Contains(t.year) && months.Contains(t.month))
             .ToList();
             
-            
         if (schema != null)
         {
             var cells = schema.MapCells;
@@ -107,7 +106,8 @@ public class MapRepo : IMapRepo
                     var way = GetWay(train.StationFrom, train.StationTo, map);
                     foreach (var cell in cells.Where(c => way.Contains(c.SourceStation) && way.Contains(c.TargetStation)))
                     {
-                        DtoDict[cell].CellData.trainLoad = train.DayInRaise;
+                        DtoDict[cell].CellData.trainLoad += train.DayInRaise;
+                        DtoDict[cell].CellData.trains.Add(train.Number);
                     }
                 }
                 else if (map.ContainsKey(train.StationFrom) && map.ContainsKey(train.StationTo) &&
@@ -117,7 +117,8 @@ public class MapRepo : IMapRepo
                     way.ExceptWith(GetWay(train.StationMiddle, train.StationTo, map).ToHashSet());
                     foreach (var cell in cells.Where(c => isEdgeOnWay(c, way)))
                     {
-                        DtoDict[cell].CellData.trainLoad = train.DayInRaise;
+                        DtoDict[cell].CellData.trainLoad += train.DayInRaise;
+                        DtoDict[cell].CellData.trains.Add(train.Number);
                     }
                         
                         
