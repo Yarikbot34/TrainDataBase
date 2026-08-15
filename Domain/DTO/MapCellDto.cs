@@ -26,9 +26,15 @@ public class MapCellDto
             passengerLoad = 0,
             trains = new HashSet<string>()
         };
-        Position = new Coords(){x = cell.Position.X,y = cell.Position.Y};
-        Source = new CellReference() { Cell = cell.Source.Cell };
-        Target = new CellReference() { Cell = cell.Target.Cell };
+        if (Position != null)
+        {
+            Position = new Coords(){x = cell.Position.X,y = cell.Position.Y};
+        }
+        if (cell.Source != null && cell.Target != null)
+        {
+            Source = new CellReference() { Cell = cell.Source.Cell, Port = cell.Source.Port };
+            Target = new CellReference() { Cell = cell.Target.Cell,  Port = cell.Target.Port };
+        }
     }
     
 }

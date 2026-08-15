@@ -1,9 +1,10 @@
 using Domain.Classes;
+using Domain.DTO;
 
 namespace Services;
 
 public interface IMapRepo
 {
     Task UploadMapSchemaAsync(MapSchema schema);
-    Task<List<MapCell>> GetMapSchemaAsync(string schemaName, int[] years, int[] months);
+    Task<MapSchemaDto> GetMapSchemaAsync(string schemaName, int[] years, int[] months);
 }

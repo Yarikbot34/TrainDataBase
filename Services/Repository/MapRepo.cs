@@ -1,5 +1,6 @@
 using DB;
 using Domain.Classes;
+using Domain.DTO;
 using Microsoft.EntityFrameworkCore;
 
 namespace Services;
@@ -68,7 +69,7 @@ public class MapRepo : IMapRepo
         await ldb.SaveChangesAsync();
     }
 
-    public async Task<List<MapCell>> GetMapSchemaAsync(string schemaName, int[] years, int[] months)
+    public async Task<MapSchemaDto> GetMapSchemaAsync(string schemaName, int[] years, int[] months)
     {
         var schema = ldb.MapSchemas
             .Include(sm=> sm.MapCells)
@@ -90,6 +91,13 @@ public class MapRepo : IMapRepo
         if (schema != null)
         {
             var cells = schema.MapCells;
+            
+            Dictionary<MapCell, MapCellDto> DtoDict =   new Dictionary<MapCell, MapCellDto>();
+            foreach (var cell in cells)
+            {
+                DtoDict[cell] = new MapCellDto(cell);
+            }
+            
             Dictionary<Station, List<Station>> map = CreateConnectionMap(cells);
             foreach (var train in trains)
             {
@@ -99,7 +107,7 @@ public class MapRepo : IMapRepo
                     var way = GetWay(train.StationFrom, train.StationTo, map);
                     foreach (var cell in cells.Where(c => way.Contains(c.SourceStation) && way.Contains(c.TargetStation)))
                     {
-                        cell.Data.Load += train.DayInRaise;
+                        DtoDict[cell].CellData.trainLoad = train.DayInRaise;
                     }
                 }
                 else if (map.ContainsKey(train.StationFrom) && map.ContainsKey(train.StationTo) &&
@@ -107,15 +115,24 @@ public class MapRepo : IMapRepo
                 {
                     var way = GetWay(train.StationFrom, train.StationMiddle, map).ToHashSet();
                     way.ExceptWith(GetWay(train.StationMiddle, train.StationTo, map).ToHashSet());
-                    cells.Where(c => way.Contains(c.SourceStation) && way.Contains(c.TargetStation))
-                        .Select(c => c.Data.Load += 1);
+                    foreach (var cell in cells.Where(c => isEdgeOnWay(c, way)))
+                    {
+                        DtoDict[cell].CellData.trainLoad = train.DayInRaise;
+                    }
+                        
+                        
                     
                 }
             }
-            return cells;
+            return new MapSchemaDto(schema, DtoDict.Values.ToList());
             
         }
 
+        bool isEdgeOnWay(MapCell cell, HashSet<Station> way)
+        {
+            return (way.Contains(cell.SourceStation) &&  way.Contains(cell.TargetStation));
+        }
+        
         List<Station> GetWay(Station start, Station finish, Dictionary<Station, List<Station>> map)
         {
             if (start is null || finish is null)
