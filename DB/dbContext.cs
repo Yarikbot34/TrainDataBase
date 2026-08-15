@@ -12,6 +12,7 @@ public class AppDbContext : DbContext
     public DbSet<Transaction> Transactions => Set<Transaction>();
     public DbSet<MapSchema> MapSchemas => Set<MapSchema>();
     public DbSet<MapCell> MapCells => Set<MapCell>();
+    public DbSet<WayRecord> WayRecords => Set<WayRecord>();
 
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
     
@@ -192,6 +193,23 @@ public class AppDbContext : DbContext
                     ct.Property(ct => ct.Port).HasColumnName("TargetPort");
                 });
 
+            }
+        );
+        modelBuilder.Entity<WayRecord>(entity =>
+            {
+                entity.HasKey(w => w.Id);
+
+                entity.HasOne(w => w.StationFrom)
+                    .WithMany()
+                    .HasForeignKey(w => w.StationFromId);
+
+                entity.HasOne(w => w.StationMiddle)
+                    .WithMany()
+                    .HasForeignKey(w => w.StationMiddleId);
+
+                entity.HasOne(w => w.StationTo)
+                    .WithMany()
+                    .HasForeignKey(w => w.StationToId);
             }
         );
     }
