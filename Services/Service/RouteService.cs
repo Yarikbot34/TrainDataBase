@@ -8,12 +8,10 @@ namespace Services;
 
 public class RouteService : IRouteService
 {
-    private readonly AppDbContext ldb;
     private readonly IRouteRepo _routeRepo;
     
-    public RouteService(AppDbContext db, IRouteRepo routeRepo)
+    public RouteService(IRouteRepo routeRepo)
     {
-        ldb = db;
         _routeRepo = routeRepo;
     }
 

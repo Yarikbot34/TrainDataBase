@@ -10,6 +10,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
 
 builder.Services.AddScoped<IRouteRepo, RouteRepo>();
+builder.Services.AddScoped<ITrainRepo, TrainRepo>();
 
 builder.Services.AddScoped<ITableReader, TrainExtractor>();
 builder.Services.AddScoped<ITrainService, TrainService>();
