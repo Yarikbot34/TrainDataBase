@@ -9,16 +9,17 @@ namespace Services;
 public class RouteService : IRouteService
 {
     private readonly AppDbContext ldb;
+    private readonly IRouteRepo _routeRepo;
     
-    public RouteService(AppDbContext db)
+    public RouteService(AppDbContext db, IRouteRepo routeRepo)
     {
         ldb = db;
+        _routeRepo = routeRepo;
     }
 
     public async Task<List<RouteDto>> GetRoutesAsync(List<int> years)
     {
-        var answ = ldb.Routes
-            .Where(t => years.Contains(t.Year))
+        var answ = _routeRepo.GetRoutesByYearListAsync(years).Result
             .Select(r => new RouteDto(r))
             .ToList();
         return answ;
@@ -26,17 +27,12 @@ public class RouteService : IRouteService
     
     public async Task<List<RouteDto>> GetRoutesByFilter(RouteFilterDto filter)
     {
-        var routeList = ldb.Routes
-            .Include(r => r.Trains)
-            .ThenInclude(t => t.StationFrom)
-            .Include(r => r.Trains)
-            .ThenInclude(t => t.StationTo)
-            .AsQueryable();
+        var routeList = _routeRepo.GetAllRoutesWithTrainsAsync()
+            .Result.AsQueryable();
         
         routeList = ApplyFilter(filter, routeList);  
         
         var answ = routeList.Select(r => new RouteDto(r)).ToList();
-
         return answ;
 
         IQueryable<Route> ApplyFilter(RouteFilterDto filter, IQueryable<Route> query)

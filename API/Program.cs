@@ -1,4 +1,5 @@
 using DB;
+using DB.Repositories;
 using TableReader;
 using Microsoft.EntityFrameworkCore;
 using Services;
@@ -7,6 +8,8 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
+
+builder.Services.AddScoped<IRouteRepo, RouteRepo>();
 
 builder.Services.AddScoped<ITableReader, TrainExtractor>();
 builder.Services.AddScoped<ITrainService, TrainService>();

@@ -1,3 +1,4 @@
+using DB.Repositories;
 using DB;
 
 namespace Services;
@@ -5,10 +6,12 @@ namespace Services;
 public class DbContentService : IdbContentService
 {
     private readonly AppDbContext ldb;
+    private readonly IRouteRepo routeRepo;
 
-    public DbContentService(AppDbContext db)
+    public DbContentService(AppDbContext db,  IRouteRepo route)
     {
         ldb = db;
+        routeRepo = route;
     }
     
     
@@ -26,7 +29,8 @@ public class DbContentService : IdbContentService
 
     public async Task<List<string>> GetRecordedNumbersAsync()
     {
-        HashSet<string> routes = ldb.Routes.Select(r => r.RouteNumber).ToHashSet();
+        var rawroutes = await routeRepo.GetAllRoutesAsync();
+        HashSet<string> routes = rawroutes.Select(r => r.RouteNumber).ToHashSet();
         return routes.ToList();
     }
 

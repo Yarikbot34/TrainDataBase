@@ -1,32 +1,39 @@
 using DB;
+using DB.Repositories;
 using Domain.DTO;
+using Domain.Classes;
 using Microsoft.EntityFrameworkCore;
 
 namespace Services;
 
 public class SummaryDataService : ISummaryDataService
 {
-    private readonly AppDbContext ldb;
+    private readonly IRouteRepo _routeRepo;
 
-    public SummaryDataService(AppDbContext db)
+    public SummaryDataService(IRouteRepo routeRepo)
     {
-        ldb = db;
+        _routeRepo = routeRepo;
     }
 
     public async Task<List<MonthPaymentDataDto>> GetYearPaymentDataInMonthAsync(int year)
     {
-        var AllRoutes = ldb.Routes
-            .Where(r => r.Year == year || r.Year == year - 1)
-            .Include(r => r.Trains)
-            .ToList();
-
-        bool isTodayYear = false;
-        int[] months;
+        bool isTodayYear;
+        List<Route> AllRoutes;
         if (year == DateTime.Today.Year % 1000)
         {
-            months = getLastYearMonth();
+            AllRoutes = await _routeRepo
+                .GetRoutesByYearListAsync(new List<int> { year,  year - 1 });
             isTodayYear = true;
         }
+        else
+        {
+            AllRoutes = await _routeRepo
+                .GetRoutesByYearListAsync(new List<int> { year });
+            isTodayYear = false;
+        }
+        
+        int[] months;
+        if (isTodayYear) months = getLastYearMonth();
         else months = Enumerable.Range(1, 12).ToArray();
         
         List<MonthPaymentDataDto> payDtoList = new List<MonthPaymentDataDto>();
@@ -86,20 +93,25 @@ public class SummaryDataService : ISummaryDataService
 
     public async Task<List<MonthPassengerDataDto>> GetYearPassengerDataInMonthAsync(int year)
     {
-        var AllRoutes = ldb.Routes
-            .Where(r => r.Year == year || r.Year == year - 1)
-            .Include(r => r.Trains)
-            .ToList();
-
-        List<MonthPassengerDataDto> passDtoList = new List<MonthPassengerDataDto>();
-
-        bool isTodayYear = false;
-        int[] months;
+        bool isTodayYear;
+        List<Route> AllRoutes;
         if (year == DateTime.Today.Year % 1000)
         {
-            months = getLastYearMonth();
+            AllRoutes = await _routeRepo
+                .GetRoutesByYearListAsync(new List<int> { year,  year - 1 });
             isTodayYear = true;
         }
+        else
+        {
+            AllRoutes = await _routeRepo
+                .GetRoutesByYearListAsync(new List<int> { year });
+            isTodayYear = false;
+        }
+
+        List<MonthPassengerDataDto> passDtoList = new List<MonthPassengerDataDto>();
+        
+        int[] months;
+        if (year == DateTime.Today.Year % 1000) months = getLastYearMonth();
         else months = Enumerable.Range(1, 12).ToArray();
         
         foreach (int i in months)
