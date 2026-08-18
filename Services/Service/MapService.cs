@@ -1,4 +1,5 @@
 using DB;
+using DB.Repositories;
 using Domain.Classes;
 using Domain.DTO;
 using Microsoft.EntityFrameworkCore;
@@ -8,27 +9,27 @@ namespace Services;
 public class MapService : IMapService
 {
     private readonly AppDbContext ldb;
+    private readonly IMapSchemaRepo _mapSchemaRepo;
+    private readonly ITrainRepo _trainRepo;
     
-    public  MapService(AppDbContext db)
+    public  MapService(AppDbContext db,  IMapSchemaRepo mapSchemaRepo,  ITrainRepo trainRepo)
     {
         ldb = db;
+        _mapSchemaRepo = mapSchemaRepo;
+        _trainRepo = trainRepo;
     }
 
     public async Task UploadMapSchemaAsync(MapSchema schema)
-    {
+    {  
         var cells = schema.MapCells;
-        var writedSchemas = ldb.MapSchemas.Select(s => s.Name).ToList();
-        if (!writedSchemas.Contains(schema.Name))
+        var oldSchema = await _mapSchemaRepo.GetSchemaByNameAsync(schema.Name);
+        if (oldSchema is null)
         {
             GetStationsForCells(cells);
-            ldb.MapSchemas.Add(schema);
+            await _mapSchemaRepo.WriteSchemaAsync(schema);
         }
         else
         {
-            MapSchema? oldSchema = ldb.MapSchemas
-                .Include(s => s.MapCells)
-                .FirstOrDefault(s => s.Name == schema.Name);
-            
             oldSchema.Description = schema.Description;
 
             var oldCells = oldSchema.MapCells.ToList();
@@ -71,62 +72,55 @@ public class MapService : IMapService
 
     public async Task<MapSchemaDto> GetMapSchemaAsync(string schemaName, int[] years, int[] months)
     {
-        var schema = ldb.MapSchemas
-            .Include(sm=> sm.MapCells)
-            .ThenInclude(mc => mc.Station)
-            .Include(sm=> sm.MapCells)
-            .ThenInclude(mc => mc.TargetStation)
-            .Include(sm=> sm.MapCells)
-            .ThenInclude(mc => mc.SourceStation)
-            .FirstOrDefault(s => s.Name == schemaName);
-        
-        var trains = ldb.Trains
-            .Include(t => t.StationFrom)
-            .Include(t => t.StationMiddle)
-            .Include(t => t.StationTo)
+        var schema = await _mapSchemaRepo.GetSchemaByNameAsync(schemaName);
+        if (schema is null)
+        {
+            throw  new Exception($"Схема {schemaName} не найдена в базе");
+        }
+
+        var trains = await _trainRepo.GetAllTrainsAsync();
+        trains = trains
             .Where(t => years.Contains(t.year) && months.Contains(t.month))
             .ToList();
-            
-        if (schema != null)
+        
+        var cells = schema.MapCells;
+        
+        Dictionary<MapCell, MapCellDto> DtoDict =   new Dictionary<MapCell, MapCellDto>();
+        foreach (var cell in cells)
         {
-            var cells = schema.MapCells;
-            
-            Dictionary<MapCell, MapCellDto> DtoDict =   new Dictionary<MapCell, MapCellDto>();
-            foreach (var cell in cells)
-            {
-                DtoDict[cell] = new MapCellDto(cell);
-            }
-            
-            Dictionary<Station, List<Station>> map = CreateConnectionMap(cells);
-            foreach (var train in trains)
-            {
-                if (map.ContainsKey(train.StationFrom) && map.ContainsKey(train.StationTo) &&
-                    train.StationMiddle == null && !train.IsCanceled)
-                {
-                    var way = GetWay(train.StationFrom, train.StationTo, map).ToHashSet();
-                    
-                    foreach (var cell in cells.Where(c => isCellOnWay(c, way)))
-                    {
-                        DtoDict[cell].CellData.trainLoad += train.DayInRaise;
-                        DtoDict[cell].CellData.trains.Add(train.Number);
-                    }
-                }
-                else if (!train.IsCanceled && map.ContainsKey(train.StationFrom) && map.ContainsKey(train.StationTo) &&
-                         map.ContainsKey(train.StationMiddle))
-                {
-                    var way = GetWay(train.StationFrom, train.StationMiddle, map).ToHashSet();
-                    way.ExceptWith(GetWay(train.StationMiddle, train.StationTo, map).ToHashSet());
-                    
-                    foreach (var cell in cells.Where(c => isCellOnWay(c, way)))
-                    {
-                        DtoDict[cell].CellData.trainLoad += train.DayInRaise;
-                        DtoDict[cell].CellData.trains.Add(train.Number);
-                    }
-                }
-            }
-            return new MapSchemaDto(schema, DtoDict.Values.ToList());
-            
+            DtoDict[cell] = new MapCellDto(cell);
         }
+        
+        Dictionary<Station, List<Station>> map = CreateConnectionMap(cells);
+        foreach (var train in trains)
+        {
+            if (map.ContainsKey(train.StationFrom) && map.ContainsKey(train.StationTo) &&
+                train.StationMiddle == null && !train.IsCanceled)
+            {
+                var way = GetWay(train.StationFrom, train.StationTo, map).ToHashSet();
+                
+                foreach (var cell in cells.Where(c => isCellOnWay(c, way)))
+                {
+                    DtoDict[cell].CellData.trainLoad += train.DayInRaise;
+                    DtoDict[cell].CellData.trains.Add(train.Number);
+                }
+            }
+            else if (!train.IsCanceled && map.ContainsKey(train.StationFrom) && map.ContainsKey(train.StationTo) &&
+                     map.ContainsKey(train.StationMiddle))
+            {
+                var way = GetWay(train.StationFrom, train.StationMiddle, map).ToHashSet();
+                way.ExceptWith(GetWay(train.StationMiddle, train.StationTo, map).ToHashSet());
+                
+                foreach (var cell in cells.Where(c => isCellOnWay(c, way)))
+                {
+                    DtoDict[cell].CellData.trainLoad += train.DayInRaise;
+                    DtoDict[cell].CellData.trains.Add(train.Number);
+                }
+            }
+        }
+        return new MapSchemaDto(schema, DtoDict.Values.ToList());
+            
+        
 
         bool isCellOnWay(MapCell cell, HashSet<Station> way)
         {
