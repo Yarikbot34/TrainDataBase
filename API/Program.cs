@@ -14,6 +14,7 @@ builder.Services.AddScoped<ITrainRepo, TrainRepo>();
 builder.Services.AddScoped<IStationRepo, StationRepo>();
 builder.Services.AddScoped<ITransactionRepo, TransactionRepo>();
 builder.Services.AddScoped<IMapSchemaRepo, MapSchemaRepo>();
+builder.Services.AddScoped<IMapCellRepo, MapCellRepo>();
 
 builder.Services.AddScoped<IFileWorker, FileWorker.FileWorker>();
 
