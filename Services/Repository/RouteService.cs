@@ -1,4 +1,5 @@
 using DB;
+using DB.Repositories;
 using Domain.Classes;
 using Domain.DTO;
 using Microsoft.EntityFrameworkCore;
@@ -9,12 +10,12 @@ public class RouteService : IRouteService
 {
     private readonly AppDbContext ldb;
     
-    public RouteService(AppDbContext ldb)
+    public RouteService(AppDbContext db)
     {
-        this.ldb = ldb;
+        ldb = db;
     }
 
-    public async Task<List<RouteDto>> GetRoutesAsync(int[] years)
+    public async Task<List<RouteDto>> GetRoutesAsync(List<int> years)
     {
         var answ = ldb.Routes
             .Where(t => years.Contains(t.Year))

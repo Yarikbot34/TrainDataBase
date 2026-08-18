@@ -24,9 +24,9 @@ public class TableViewController : ControllerBase
     }
     
     [HttpGet("routes/{years?}")]
-    public async Task<ActionResult> GetRoutes(int[]? years = null)
+    public async Task<ActionResult> GetRoutes(List<int>? years = null)
     {
-        if (years == null ) years = new []{DateTime.Now.Year % 1000};
+        if (years == null ) years = new List<int>{DateTime.Now.Year % 1000};
         var answer = await _routeService.GetRoutesAsync(years);
         return Ok(answer);
     }
