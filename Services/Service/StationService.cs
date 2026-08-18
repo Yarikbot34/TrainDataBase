@@ -1,20 +1,21 @@
 using DB;
+using DB.Repositories;
 using Domain.Classes;
 using Domain.DTO;
 namespace Services;
 
 public class StationService : IStationService
 {
-    private readonly AppDbContext ldb;
+    private readonly IStationRepo _stationRepo;
 
-    public StationService(AppDbContext db)
+    public StationService(AppDbContext db, IStationRepo stationRepo)
     {
-        ldb = db;
+        _stationRepo = stationRepo;
     }
     
     
     public async Task<List<Station>> GetStationsAsync()
     {
-        return ldb.Stations.ToList();
+        return await _stationRepo.GetAllStationsAsync();
     }
 }

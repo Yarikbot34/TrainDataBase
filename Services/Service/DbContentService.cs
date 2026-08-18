@@ -6,12 +6,14 @@ namespace Services;
 public class DbContentService : IdbContentService
 {
     private readonly AppDbContext ldb;
-    private readonly IRouteRepo routeRepo;
+    private readonly IRouteRepo _routeRepo;
+    private readonly IStationRepo _stationRepo;
 
-    public DbContentService(AppDbContext db,  IRouteRepo route)
+    public DbContentService(AppDbContext db,  IRouteRepo route,  IStationRepo stationRepo)
     {
         ldb = db;
-        routeRepo = route;
+        _routeRepo = route;
+        _stationRepo = stationRepo;
     }
     
     
@@ -29,14 +31,15 @@ public class DbContentService : IdbContentService
 
     public async Task<List<string>> GetRecordedNumbersAsync()
     {
-        var rawroutes = await routeRepo.GetAllRoutesAsync();
+        var rawroutes = await _routeRepo.GetAllRoutesAsync();
         HashSet<string> routes = rawroutes.Select(r => r.RouteNumber).ToHashSet();
         return routes.ToList();
     }
 
     public async Task<List<string>> GetRecordedStationsAsync()
     {
-        HashSet<string> stations = ldb.Stations.Select(s => s.Name).ToHashSet();
+        var stationsRaw = await _stationRepo.GetAllStationsAsync();
+        HashSet<string> stations = stationsRaw.Select(s => s.Name).ToHashSet();
         return stations.ToList();
     }
 
