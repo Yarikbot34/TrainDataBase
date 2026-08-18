@@ -8,15 +8,18 @@ namespace Services;
 
 public class MapService : IMapService
 {
-    private readonly AppDbContext ldb;
+    private readonly IStationRepo _stationRepo;
     private readonly IMapSchemaRepo _mapSchemaRepo;
     private readonly ITrainRepo _trainRepo;
+    private readonly IMapCellRepo _mapCellRepo;
     
-    public  MapService(AppDbContext db,  IMapSchemaRepo mapSchemaRepo,  ITrainRepo trainRepo)
+    public  MapService(IMapSchemaRepo mapSchemaRepo,  ITrainRepo trainRepo, 
+        IStationRepo stationRepo,  IMapCellRepo mapCellRepo)
     {
-        ldb = db;
         _mapSchemaRepo = mapSchemaRepo;
         _trainRepo = trainRepo;
+        _stationRepo = stationRepo;
+        _mapCellRepo = mapCellRepo;
     }
 
     public async Task UploadMapSchemaAsync(MapSchema schema)
@@ -33,7 +36,7 @@ public class MapService : IMapService
             oldSchema.Description = schema.Description;
 
             var oldCells = oldSchema.MapCells.ToList();
-            ldb.MapCells.RemoveRange(oldCells);
+            await _mapCellRepo.RemoveCells(oldCells);
             oldSchema.MapCells.Clear();
             
             GetStationsForCells(schema.MapCells);
@@ -47,14 +50,14 @@ public class MapService : IMapService
             
         }
 
-        void GetStationsForCells(List<MapCell> mapCells)
+        async void GetStationsForCells(List<MapCell> mapCells)
         {
             mapCells = mapCells.OrderByDescending(c => c.Type == "node").ToList();
             foreach (var mapCell in mapCells)
             {
                 if (mapCell.Type == "node")
                 {
-                    var stat = ldb.Stations.First(s => s.Name == mapCell.Data.Label);
+                    var stat = await _stationRepo.GetStationByNameAsync(mapCell.Data.Label);
                     mapCell.Station = stat;
                 }
                 else if (mapCell.Type == "edge")
@@ -66,8 +69,6 @@ public class MapService : IMapService
                 }
             }
         }
-        
-        await ldb.SaveChangesAsync();
     }
 
     public async Task<MapSchemaDto> GetMapSchemaAsync(string schemaName, int[] years, int[] months)

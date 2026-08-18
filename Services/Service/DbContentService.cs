@@ -5,18 +5,18 @@ namespace Services;
 
 public class DbContentService : IdbContentService
 {
-    private readonly AppDbContext ldb;
     private readonly ITransactionRepo _transactionRepo;
     private readonly IRouteRepo _routeRepo;
     private readonly IStationRepo _stationRepo;
+    private readonly IMapSchemaRepo _mapSchemaRepo;
 
     public DbContentService
-        (AppDbContext db,  IRouteRepo route,  IStationRepo stationRepo, ITransactionRepo transactionRepo)
+        (IRouteRepo route,  IStationRepo stationRepo, ITransactionRepo transactionRepo, IMapSchemaRepo mapSchemaRepo)
     {
-        ldb = db;
         _routeRepo = route;
         _stationRepo = stationRepo;
         _transactionRepo = transactionRepo;   
+        _mapSchemaRepo = mapSchemaRepo;
     }
     
     
@@ -50,7 +50,8 @@ public class DbContentService : IdbContentService
 
     public async Task<List<string>> GetRecordedSchemasAsync()
     {
-        HashSet<string> schemas = ldb.MapSchemas.Select(s => s.Name).ToHashSet();
+        var schemasRaw =  await _mapSchemaRepo.GetAllSchemasAsync();
+        HashSet<string> schemas = schemasRaw.Select(s => s.Name).ToHashSet();
         return schemas.ToList();
     }
 }
