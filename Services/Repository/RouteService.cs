@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Services;
 
-public class RouteRepo : IRouteRepo
+public class RouteService : IRouteService
 {
     private readonly AppDbContext ldb;
     
-    public RouteRepo(AppDbContext ldb)
+    public RouteService(AppDbContext ldb)
     {
         this.ldb = ldb;
     }

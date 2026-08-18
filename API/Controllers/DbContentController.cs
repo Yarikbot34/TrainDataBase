@@ -7,46 +7,46 @@ namespace API.Controllers;
 [Route("api/v1/content")]
 public class DbContentController : ControllerBase
 {
-    private readonly IdbContentRepo _contentRepo;
+    private readonly IdbContentService _contentService;
 
-    public DbContentController(IdbContentRepo db)
+    public DbContentController(IdbContentService cdb)
     {
-        _contentRepo = db;
+        _contentService = cdb;
     }
 
 
     [HttpGet("writedYears")]
     public async Task<IActionResult> GetWritedYearsAsync()
     {
-        var answ = await _contentRepo.GetRecordedYearsAsync();
+        var answ = await _contentService.GetRecordedYearsAsync();
         return Ok(answ);
     }
 
     [HttpGet("writedMonths")]
     public async Task<IActionResult> GetWritedMonthsAsync()
     {
-        var answ = await _contentRepo.GetRecordedMonthsAsync();
+        var answ = await _contentService.GetRecordedMonthsAsync();
         return Ok(answ);
     }
 
     [HttpGet("writedNumbers")]
     public async Task<IActionResult> GetWritedNumbersAsync()
     {
-        var answ = await _contentRepo.GetRecordedNumbersAsync();
+        var answ = await _contentService.GetRecordedNumbersAsync();
         return Ok(answ);
     }
 
     [HttpGet("writedStations")]
     public async Task<IActionResult> GetWritedStationsAsync()
     {
-        var answ = await _contentRepo.GetRecordedStationsAsync();
+        var answ = await _contentService.GetRecordedStationsAsync();
         return Ok(answ);
     }
 
     [HttpGet("writedSchemas")]
     public async Task<IActionResult> GetWritedSchemasAsync()
     {
-        var answ = await _contentRepo.GetRecordedSchemasAsync();
+        var answ = await _contentService.GetRecordedSchemasAsync();
         return Ok(answ);
     }
 }

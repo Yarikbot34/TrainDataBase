@@ -3,7 +3,7 @@ using Domain.DTO;
 
 namespace Services;
 
-public interface ITrainRepo
+public interface ITrainService
 {
    Task<List<TrainDto>> GetTrainsAsync();
    Task<List<Train>> GetTrainsByPeriodAndNumber(int year, int month, string number);

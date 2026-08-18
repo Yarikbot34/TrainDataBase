@@ -1,6 +1,6 @@
 namespace Services;
 
-public interface IdbContentRepo
+public interface IdbContentService
 {
    Task<List<int>> GetRecordedYearsAsync();
    Task<List<int>> GetRecordedMonthsAsync();

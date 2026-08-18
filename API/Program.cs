@@ -9,12 +9,12 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
 
 builder.Services.AddScoped<ITableReader, TrainExtractor>();
-builder.Services.AddScoped<ITrainRepo, TrainRepo>();
-builder.Services.AddScoped<ISummaryDataRepo, SummaryDataRepo>();
-builder.Services.AddScoped<IdbContentRepo, DbContentRepo>();
-builder.Services.AddScoped<IRouteRepo, RouteRepo>();
-builder.Services.AddScoped<IStationRepo, StationRepo>();
-builder.Services.AddScoped<IMapRepo, MapRepo>();
+builder.Services.AddScoped<ITrainService, TrainService>();
+builder.Services.AddScoped<ISummaryDataService, SummaryDataService>();
+builder.Services.AddScoped<IdbContentService, DbContentService>();
+builder.Services.AddScoped<IRouteService, RouteService>();
+builder.Services.AddScoped<IStationService, StationService>();
+builder.Services.AddScoped<IMapService, MapService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

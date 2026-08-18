@@ -2,7 +2,7 @@ using Domain.Classes;
 using Domain.DTO;
 namespace Services;
 
-public interface IStationRepo
+public interface IStationService
 {
     Task<List<Station>> GetStationsAsync();
 }

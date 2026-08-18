@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Services;
 
-public class SummaryDataRepo : ISummaryDataRepo
+public class SummaryDataService : ISummaryDataService
 {
     private readonly AppDbContext ldb;
 
-    public SummaryDataRepo(AppDbContext db)
+    public SummaryDataService(AppDbContext db)
     {
         ldb = db;
     }

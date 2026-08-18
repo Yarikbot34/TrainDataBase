@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Services;
 
-public class MapRepo : IMapRepo
+public class MapService : IMapService
 {
     private readonly AppDbContext ldb;
     
-    public  MapRepo(AppDbContext db)
+    public  MapService(AppDbContext db)
     {
         ldb = db;
     }

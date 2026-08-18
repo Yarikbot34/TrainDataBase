@@ -3,11 +3,11 @@ using Domain.Classes;
 using Domain.DTO;
 namespace Services;
 
-public class StationRepo : IStationRepo
+public class StationService : IStationService
 {
     private readonly AppDbContext ldb;
 
-    public StationRepo(AppDbContext db)
+    public StationService(AppDbContext db)
     {
         ldb = db;
     }

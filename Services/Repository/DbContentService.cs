@@ -2,11 +2,11 @@ using DB;
 
 namespace Services;
 
-public class DbContentRepo : IdbContentRepo
+public class DbContentService : IdbContentService
 {
     private readonly AppDbContext ldb;
 
-    public DbContentRepo(AppDbContext db)
+    public DbContentService(AppDbContext db)
     {
         ldb = db;
     }

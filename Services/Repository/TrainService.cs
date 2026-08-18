@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Services;
 
-public class TrainRepo : ITrainRepo
+public class TrainService : ITrainService
 {
     AppDbContext ldb;
     
-    public TrainRepo(AppDbContext db)
+    public TrainService(AppDbContext db)
     {
         ldb = db;
     }

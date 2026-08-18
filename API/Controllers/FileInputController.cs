@@ -11,12 +11,12 @@ namespace API.Controllers;
 public class InputFileController : ControllerBase
 {
     private readonly ITableReader _tableReader;
-    private readonly ITrainRepo _trainRepo;
+    private readonly ITrainService _trainService;
     
-    public InputFileController(ITableReader tableReader, ITrainRepo trainRepo)
+    public InputFileController(ITableReader tableReader, ITrainService trainService)
     {
         _tableReader = tableReader;
-        _trainRepo = trainRepo;
+        _trainService = trainService;
     }
 
     [HttpPost("input")]
@@ -53,7 +53,7 @@ public class InputFileController : ControllerBase
     [HttpPatch("input/addDesc/{id}")]
     public async Task<IActionResult> UpdateTrainDesc(int id, TrainDto dto)
     {
-        _trainRepo.AddTrainDescById(id, dto);
+        _trainService.AddTrainDescById(id, dto);
         return Ok();
     }
     

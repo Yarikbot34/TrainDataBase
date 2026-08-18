@@ -12,36 +12,36 @@ namespace API.Controllers;
 [Route("api/v1/TableView")]
 public class TableViewController : ControllerBase
 {
-    private readonly IStationRepo _stationRepo;
-    private readonly ITrainRepo _trainRepo;
-    private readonly IRouteRepo _routeRepo;
+    private readonly IStationService _stationService;
+    private readonly ITrainService _trainService;
+    private readonly IRouteService _routeService;
 
-    public TableViewController(ITrainRepo trainRepo, IRouteRepo routeRepo, IStationRepo stationRepo)
+    public TableViewController(ITrainService trainService, IRouteService routeService, IStationService stationService)
     {
-        _stationRepo = stationRepo;
-        _trainRepo = trainRepo;
-        _routeRepo = routeRepo;
+        _stationService = stationService;
+        _trainService = trainService;
+        _routeService = routeService;
     }
     
     [HttpGet("routes/{years?}")]
     public async Task<ActionResult> GetRoutes(int[]? years = null)
     {
         if (years == null ) years = new []{DateTime.Now.Year % 1000};
-        var answer = await _routeRepo.GetRoutesAsync(years);
+        var answer = await _routeService.GetRoutesAsync(years);
         return Ok(answer);
     }
 
     [HttpGet("routes/filter")]
     public async Task<ActionResult> GetRoutesFilter([FromQuery] RouteFilterDto filter)
     {
-        var answ = _routeRepo.GetRoutesByFilter(filter);
+        var answ = _routeService.GetRoutesByFilter(filter);
         return Ok(answ);
     }
     
     [HttpGet("trains")]
     public async Task<ActionResult> GetTrains()
     {
-        var answer = await _trainRepo.GetTrainsAsync();
+        var answer = await _trainService.GetTrainsAsync();
         return Ok(answer);
     }
 
@@ -49,14 +49,14 @@ public class TableViewController : ControllerBase
     public async Task<ActionResult> GetTrains(int year, int month, string number)
     {
         string clearNumber = Uri.UnescapeDataString(number);
-        var answer = await _trainRepo.GetTrainsByPeriodAndNumber(year, month, clearNumber);
+        var answer = await _trainService.GetTrainsByPeriodAndNumber(year, month, clearNumber);
         return Ok(answer);
     }
     
     [HttpGet("stations")]
     public async Task<ActionResult> GetStations()
     {
-        var answer = await _stationRepo.GetStationsAsync();
+        var answer = await _stationService.GetStationsAsync();
         return Ok(answer);
     }
     

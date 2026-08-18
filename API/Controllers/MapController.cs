@@ -9,24 +9,24 @@ namespace API.Controllers;
 [Route("api/v1/map")]
 public class MapController : ControllerBase
 {
-    private readonly IMapRepo _mapRepo;
+    private readonly IMapService _mapService;
     
-    public MapController(IMapRepo mapRepo)
+    public MapController(IMapService mapService)
     {
-        this._mapRepo = mapRepo;
+        this._mapService = mapService;
     }
 
     [HttpPost("uploadSchema")]
     public async Task<IActionResult> UploadSchema(MapSchema schema)
     {
-        await _mapRepo.UploadMapSchemaAsync(schema);
+        await _mapService.UploadMapSchemaAsync(schema);
         return Ok();
     }
 
     [HttpPost("getSchema")]
     public async Task<IActionResult> GetSchemaAsync(MapRequestDto req)
     {
-        var asnw = await _mapRepo.GetMapSchemaAsync(req.schemaName,req.years, req.months);
+        var asnw = await _mapService.GetMapSchemaAsync(req.schemaName,req.years, req.months);
         return Ok(asnw);
     }
 }
