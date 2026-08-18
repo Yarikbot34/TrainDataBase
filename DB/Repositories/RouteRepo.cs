@@ -12,6 +12,18 @@ public class RouteRepo : IRouteRepo
         ldb = db;
     }
 
+    public async Task WriteRouteAsync(Route route)
+    {
+        ldb.Routes.Add(route);
+        await ldb.SaveChangesAsync();
+    }
+
+    public async Task WriteRoutesAsync(IEnumerable<Route> routes)
+    {
+        ldb.Routes.AddRange(routes);
+        await ldb.SaveChangesAsync();
+    }
+
     public async Task<List<Route>> GetAllRoutesAsync()
     {
         var asnw = await ldb.Routes.ToListAsync();

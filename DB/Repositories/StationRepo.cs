@@ -12,6 +12,18 @@ public class StationRepo : IStationRepo
         ldb = db;
     }
 
+    public async Task WriteStationAsync(Station station)
+    {
+        ldb.Stations.Add(station);
+        await ldb.SaveChangesAsync();
+    }
+
+    public async Task WriteStationsAsync(IEnumerable<Station> stations)
+    {
+        ldb.Stations.AddRange(stations);
+        await ldb.SaveChangesAsync();
+    }
+    
     public async Task<Station> GetStationByIdAsync(int stationId)
     {
         return await ldb.Stations.FindAsync(stationId);

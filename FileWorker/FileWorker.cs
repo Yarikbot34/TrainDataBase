@@ -5,9 +5,9 @@ using DB;
 using Domain.DTO;
 
 
-namespace TableReader;
+namespace FileWorker;
 
-public class TrainExtractor : ITableReader
+public class TrainExtractor : IFileWorker
 {
     private readonly AppDbContext ldb;
     public TrainExtractor(AppDbContext db)

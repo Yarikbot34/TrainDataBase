@@ -32,4 +32,11 @@ public class TransactionRepo : ITransactionRepo
             .ToListAsync();
         return answ;
     }
+
+    public async Task<Transaction?> GetTransactionByYearAndMonthAsync(int year, int month)
+    {
+        var answ = await ldb.Transactions
+            .FirstOrDefaultAsync(t => t.Year == year && t.Month == month);
+        return answ;
+    }
 }

@@ -1,7 +1,7 @@
 using Domain.Classes;
 using Domain.DTO;
 
-namespace TableReader;
+namespace FileWorker;
 
 public interface ITableReader
 {
