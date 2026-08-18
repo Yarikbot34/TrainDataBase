@@ -8,7 +8,7 @@ public class StationService : IStationService
 {
     private readonly IStationRepo _stationRepo;
 
-    public StationService(AppDbContext db, IStationRepo stationRepo)
+    public StationService(IStationRepo stationRepo)
     {
         _stationRepo = stationRepo;
     }

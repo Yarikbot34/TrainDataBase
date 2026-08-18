@@ -6,26 +6,31 @@ namespace Services;
 public class DbContentService : IdbContentService
 {
     private readonly AppDbContext ldb;
+    private readonly ITransactionRepo _transactionRepo;
     private readonly IRouteRepo _routeRepo;
     private readonly IStationRepo _stationRepo;
 
-    public DbContentService(AppDbContext db,  IRouteRepo route,  IStationRepo stationRepo)
+    public DbContentService
+        (AppDbContext db,  IRouteRepo route,  IStationRepo stationRepo, ITransactionRepo transactionRepo)
     {
         ldb = db;
         _routeRepo = route;
         _stationRepo = stationRepo;
+        _transactionRepo = transactionRepo;   
     }
     
     
     public async Task<List<int>> GetRecordedYearsAsync()
     {
-        HashSet<int> years = ldb.Transactions.Select(x => x.Year).ToHashSet();
+        var transactions = await _transactionRepo.GetAllTransactionsAsync();
+        HashSet<int> years = transactions.Select(x => x.Year).ToHashSet();
         return years.ToList();
     }
 
     public async Task<List<int>> GetRecordedMonthsAsync()
     {
-        HashSet<int> months = ldb.Transactions.Select(x => x.Month).ToHashSet();
+        var transactions = await _transactionRepo.GetTransactionsByYearAsync(DateTime.Today.Year);
+        HashSet<int> months = transactions.Select(x => x.Month).ToHashSet();
         return months.ToList();
     }
 

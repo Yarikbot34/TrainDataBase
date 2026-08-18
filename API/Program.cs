@@ -11,8 +11,11 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddScoped<IRouteRepo, RouteRepo>();
 builder.Services.AddScoped<ITrainRepo, TrainRepo>();
+builder.Services.AddScoped<IStationRepo, StationRepo>();
+builder.Services.AddScoped<ITransactionRepo, TransactionRepo>();
 
 builder.Services.AddScoped<ITableReader, TrainExtractor>();
+
 builder.Services.AddScoped<ITrainService, TrainService>();
 builder.Services.AddScoped<ISummaryDataService, SummaryDataService>();
 builder.Services.AddScoped<IdbContentService, DbContentService>();
