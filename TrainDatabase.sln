@@ -4,7 +4,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API", "API\API.csproj", "{B
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DB", "DB\DB.csproj", "{93484ED3-8F25-41C9-BA1F-0F09E64D84B6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TableReader", "TableReader\TableReader.csproj", "{E9ED6D91-A61E-4D35-809A-AB857CCFDF72}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileWorker", "FileWorker\FileWorker.csproj", "{E9ED6D91-A61E-4D35-809A-AB857CCFDF72}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "Domain\Domain.csproj", "{EEF2D032-B09A-44FE-862F-F6F888054B78}"
 EndProject

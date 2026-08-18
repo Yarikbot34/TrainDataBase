@@ -2,24 +2,30 @@
 using ClosedXML.Excel;
 using Domain.Classes;
 using DB;
+using DB.Repositories;
 using Domain.DTO;
 
 
 namespace FileWorker;
 
-public class TrainExtractor : IFileWorker
+public class FileWorker : IFileWorker
 {
-    private readonly AppDbContext ldb;
-    public TrainExtractor(AppDbContext db)
+    private readonly ITransactionRepo _transactionRepo;
+    private readonly IStationRepo _stationRepo;
+    private readonly IRouteRepo _routeRepo;
+    public FileWorker
+        ( ITransactionRepo transactionRepo, IStationRepo stationRepo, IRouteRepo routeRepo)
     {
-        ldb = db;
+        _stationRepo = stationRepo;
+        _transactionRepo = transactionRepo;
+        _routeRepo = routeRepo;
     }
     
     
-    public Task<List<TrainDto>> ExtractFromFile(FileStream fs, int year, int month)
+    public async Task<List<TrainDto>> ExtractFromFile(FileStream fs, int year, int month)
     {
-        Transaction tr = ldb.Transactions.ToList().FirstOrDefault(t => t.Year == year &&  t.Month == month);
-        if (tr != null)
+        Transaction? tr = await _transactionRepo.GetTransactionByYearAndMonthAsync(year, month);
+        if (tr is null)
         {
             throw new Exception(
                 "В базе данных уже есть записи датированные данным периодом, во избежание конфликта запись отклонена.");
@@ -53,8 +59,7 @@ public class TrainExtractor : IFileWorker
 
         List<Station> existStations = new List<Station>();
         
-        try { existStations = ldb.Stations.ToList(); }
-        catch (Exception e) { }
+        existStations = await _stationRepo.GetAllStationsAsync();
         
         List<Station> stations = new List<Station>();
         List<Train> trainWithDesc = new List<Train>();
@@ -151,7 +156,7 @@ public class TrainExtractor : IFileWorker
 
         var dtoWithNoDesc = writeDto();
         
-        return Task.FromResult(dtoWithNoDesc);
+        return dtoWithNoDesc;
 
         Station GetStationOrNew(string stationName)
         {
@@ -194,13 +199,13 @@ public class TrainExtractor : IFileWorker
             return Pcat;
         }
 
-        void WriteToBase()
+        async Task<string> WriteToBase()
         {
             note.UnitsGet = stations.Count + trains.Length + routes.Length;
-            ldb.Transactions.Add(note);
-            ldb.Stations.AddRange(stations);
-            ldb.Routes.AddRange(routes);
-            ldb.SaveChanges();
+            await _transactionRepo.WriteNewTransactionAsync(note);
+            await _stationRepo.WriteStationsAsync(stations);
+            await _routeRepo.WriteRoutesAsync(routes);
+            return "ok";
         }
 
         List<TrainDto> writeDto()

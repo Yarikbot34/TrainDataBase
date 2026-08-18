@@ -3,7 +3,7 @@ using Domain.DTO;
 
 namespace FileWorker;
 
-public interface ITableReader
+public interface IFileWorker
 {
     Task<List<TrainDto>> ExtractFromFile(FileStream fs, int year, int month);
 }

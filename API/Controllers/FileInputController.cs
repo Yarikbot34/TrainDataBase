@@ -1,7 +1,7 @@
 using Domain.DTO;
 using Microsoft.AspNetCore.Mvc;
 using Services;
-using TableReader;
+using FileWorker;
 
 namespace API.Controllers;
 
@@ -10,12 +10,12 @@ namespace API.Controllers;
 [Route("api/v1/file")]
 public class InputFileController : ControllerBase
 {
-    private readonly ITableReader _tableReader;
+    private readonly IFileWorker _fileWorker;
     private readonly ITrainService _trainService;
     
-    public InputFileController(ITableReader tableReader, ITrainService trainService)
+    public InputFileController(IFileWorker fileWorker, ITrainService trainService)
     {
-        _tableReader = tableReader;
+        _fileWorker = fileWorker;
         _trainService = trainService;
     }
 
@@ -36,7 +36,7 @@ public class InputFileController : ControllerBase
         var fs = new FileStream(path, FileMode.Open, FileAccess.Read);
         try
         {
-            var trainWithNoDesc = await _tableReader.ExtractFromFile(fs, year, month);
+            var trainWithNoDesc = await _fileWorker.ExtractFromFile(fs, year, month);
             return Ok(trainWithNoDesc);
             
         } catch (Exception ex)

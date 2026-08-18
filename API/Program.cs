@@ -1,6 +1,6 @@
 using DB;
 using DB.Repositories;
-using TableReader;
+using FileWorker;
 using Microsoft.EntityFrameworkCore;
 using Services;
 
@@ -15,7 +15,7 @@ builder.Services.AddScoped<IStationRepo, StationRepo>();
 builder.Services.AddScoped<ITransactionRepo, TransactionRepo>();
 builder.Services.AddScoped<IMapSchemaRepo, MapSchemaRepo>();
 
-builder.Services.AddScoped<ITableReader, TrainExtractor>();
+builder.Services.AddScoped<IFileWorker, FileWorker.FileWorker>();
 
 builder.Services.AddScoped<ITrainService, TrainService>();
 builder.Services.AddScoped<ISummaryDataService, SummaryDataService>();
