@@ -152,7 +152,7 @@ public class FileWorkerService : IFileWorker
             route.Another = GetCategoryData(4);
             counter++;
         }
-        WriteToBase();
+        await WriteToBase();
 
         var dtoWithNoDesc = writeDto();
         

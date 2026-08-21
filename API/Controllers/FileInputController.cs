@@ -53,7 +53,7 @@ public class InputFileController : ControllerBase
     [HttpPatch("input/addDesc/{id}")]
     public async Task<IActionResult> UpdateTrainDesc(int id, TrainDto dto)
     {
-        _trainService.AddTrainDescById(id, dto);
+        await _trainService.AddTrainDescById(id, dto);
         return Ok();
     }
     
