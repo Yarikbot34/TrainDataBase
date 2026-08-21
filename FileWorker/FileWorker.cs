@@ -8,12 +8,12 @@ using Domain.DTO;
 
 namespace FileWorker;
 
-public class FileWorker : IFileWorker
+public class FileWorkerService : IFileWorker
 {
     private readonly ITransactionRepo _transactionRepo;
     private readonly IStationRepo _stationRepo;
     private readonly IRouteRepo _routeRepo;
-    public FileWorker
+    public FileWorkerService
         ( ITransactionRepo transactionRepo, IStationRepo stationRepo, IRouteRepo routeRepo)
     {
         _stationRepo = stationRepo;
@@ -25,7 +25,7 @@ public class FileWorker : IFileWorker
     public async Task<List<TrainDto>> ExtractFromFile(FileStream fs, int year, int month)
     {
         Transaction? tr = await _transactionRepo.GetTransactionByYearAndMonthAsync(year, month);
-        if (tr is null)
+        if (tr is not null)
         {
             throw new Exception(
                 "В базе данных уже есть записи датированные данным периодом, во избежание конфликта запись отклонена.");
