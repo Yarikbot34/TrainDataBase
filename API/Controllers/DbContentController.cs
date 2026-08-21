@@ -22,10 +22,10 @@ public class DbContentController : ControllerBase
         return Ok(answ);
     }
 
-    [HttpGet("writedMonths")]
+    [HttpGet("writedPeriods")]
     public async Task<IActionResult> GetWritedMonthsAsync()
     {
-        var answ = await _contentService.GetRecordedMonthsAsync();
+        var answ = await _contentService.GetRecordedPeriodsAsync();
         return Ok(answ);
     }
 

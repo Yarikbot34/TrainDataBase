@@ -1,5 +1,6 @@
 using DB.Repositories;
 using DB;
+using Domain.DTO;
 
 namespace Services;
 
@@ -27,11 +28,21 @@ public class DbContentService : IdbContentService
         return years.ToList();
     }
 
-    public async Task<List<int>> GetRecordedMonthsAsync()
+    public async Task<List<PeriodDto>> GetRecordedPeriodsAsync()
     {
-        var transactions = await _transactionRepo.GetTransactionsByYearAsync(DateTime.Today.Year);
-        HashSet<int> months = transactions.Select(x => x.Month).ToHashSet();
-        return months.ToList();
+        var years = await GetRecordedYearsAsync();
+        var answ = new List<PeriodDto>();
+        foreach (var year in years)
+        {
+            var months = await _transactionRepo.GetTransactionsByYearAsync(year);
+            var period = new PeriodDto()
+            {
+                Year = year,
+                Months = months.Select(t => t.Month).ToHashSet().ToList(),
+            };
+            answ.Add(period);
+        }
+        return answ;
     }
 
     public async Task<List<string>> GetRecordedNumbersAsync()

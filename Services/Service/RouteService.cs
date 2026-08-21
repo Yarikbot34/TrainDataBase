@@ -35,8 +35,11 @@ public class RouteService : IRouteService
 
         IQueryable<Route> ApplyFilter(RouteFilterDto filter, IQueryable<Route> query)
         {
-            if (filter.year != null) query = query.Where(r => r.Year == filter.year);
-            if (filter.month != null) query = query.Where(r => r.Month == filter.month);     
+            if (filter.period is not null)
+            {
+                query = query.Where(r => filter.period
+                    .Any(p => p.Months.Contains(r.Month) && p.Year == r.Year));
+            }
             if (filter.number != null) query = query.Where(r => r.RouteNumber.Contains(filter.number.Trim()));
             
             if (filter.stationFrom != null)
