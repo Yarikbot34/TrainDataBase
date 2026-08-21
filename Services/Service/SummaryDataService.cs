@@ -22,13 +22,13 @@ public class SummaryDataService : ISummaryDataService
         if (year == DateTime.Today.Year % 1000)
         {
             AllRoutes = await _routeRepo
-                .GetRoutesByYearListAsync(new List<int> { year,  year - 1 });
+                .GetRoutesByYearListAsync(new List<int> { year,  year - 1 }, true);
             isTodayYear = true;
         }
         else
         {
             AllRoutes = await _routeRepo
-                .GetRoutesByYearListAsync(new List<int> { year });
+                .GetRoutesByYearListAsync(new List<int> { year }, true);
             isTodayYear = false;
         }
         

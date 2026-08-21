@@ -50,11 +50,27 @@ public class RouteRepo : IRouteRepo
         return answ;
     }
 
-    public async Task<List<Route>> GetRoutesByYearListAsync(List<int> years)
+    public async Task<List<Route>> GetRoutesByYearListAsync(List<int> years, bool includeTrains = false)
     {
-        var answ = await ldb.Routes
-            .Where(r => years.Contains(r.Year))
-            .ToListAsync();
+        List<Route> answ = null;
+        if (includeTrains)
+        {
+            answ = await ldb.Routes
+                .Where(r => years.Contains(r.Year))
+                .Include(r => r.Trains)
+                .ThenInclude(t => t.StationFrom)
+                .Include(r => r.Trains)
+                .ThenInclude(t => t.StationTo)
+                .Include(r => r.Trains)
+                .ThenInclude(t => t.StationMiddle)
+                .ToListAsync();
+        }
+        else
+        {
+            answ = await ldb.Routes
+                .Where(r => years.Contains(r.Year))
+                .ToListAsync();   
+        }
         return answ;
     }
 }

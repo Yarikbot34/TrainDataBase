@@ -8,5 +8,5 @@ public interface IRouteRepo
     Task<List<Route>> GetAllRoutesAsync();
     Task<List<Route>> GetAllRoutesWithTrainsAsync();
     Task<Route> GetRouteByIdAsync(int routeId);
-    Task<List<Route>> GetRoutesByYearListAsync(List<int> years);
+    Task<List<Route>> GetRoutesByYearListAsync(List<int> years, bool includeTrains = false);
 }
