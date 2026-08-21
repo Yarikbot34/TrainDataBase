@@ -31,8 +31,8 @@ public class TableViewController : ControllerBase
         return Ok(answer);
     }
 
-    [HttpGet("routes/filter")]
-    public async Task<ActionResult> GetRoutesFilter([FromQuery] RouteFilterDto filter)
+    [HttpPost("routes/filter")]
+    public async Task<ActionResult> GetRoutesFilter(RouteFilterDto filter)
     {
         var answ = _routeService.GetRoutesByFilter(filter);
         return Ok(answ);
