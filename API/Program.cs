@@ -26,6 +26,7 @@ builder.Services.AddScoped<IStationService, StationService>();
 builder.Services.AddScoped<IMapService, MapService>();
 
 builder.Services.AddControllers();
+builder.Services.AddHealthChecks();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -42,6 +43,7 @@ var app = builder.Build();
 
 app.UseCors("AllowAll");
 app.UseSwagger();
+app.MapHealthChecks("/health");
 app.UseSwaggerUI();
 app.MapControllers();
 app.Run();
