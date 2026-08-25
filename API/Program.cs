@@ -10,6 +10,7 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
 
+builder.Services.AddScoped<IUserRepo, UserRepo>();
 builder.Services.AddScoped<IRouteRepo, RouteRepo>();
 builder.Services.AddScoped<ITrainRepo, TrainRepo>();
 builder.Services.AddScoped<IStationRepo, StationRepo>();
@@ -19,6 +20,8 @@ builder.Services.AddScoped<IMapCellRepo, MapCellRepo>();
 
 builder.Services.AddScoped<IFileWorker, FileWorkerService>();
 
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITrainService, TrainService>();
 builder.Services.AddScoped<ISummaryDataService, SummaryDataService>();
 builder.Services.AddScoped<IdbContentService, DbContentService>();

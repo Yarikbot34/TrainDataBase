@@ -27,4 +27,19 @@ public class UserRepo : IUserRepo
         }
         return answ;
     }
+
+    public async Task<List<User>> GetAllUsersAsync()
+    {
+        return await ldb.Users.ToListAsync();
+    }
+    
+    public bool CountOfUsersIsNull()
+    {
+        return ldb.Users.ToList().Count == 0;
+    }
+
+    public bool UserExistsByUsername(string username)
+    {
+        return ldb.Users.Any(u => u.Username == username);
+    }
 }
