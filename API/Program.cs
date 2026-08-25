@@ -1,3 +1,4 @@
+using API.BuilderFuctions;
 using DB;
 using DB.Repositories;
 using FileWorker;
@@ -24,6 +25,8 @@ builder.Services.AddScoped<IdbContentService, DbContentService>();
 builder.Services.AddScoped<IRouteService, RouteService>();
 builder.Services.AddScoped<IStationService, StationService>();
 builder.Services.AddScoped<IMapService, MapService>();
+
+builder.SetupJWT();
 
 builder.Services.AddAuthentication();
 builder.Services.AddControllers();
