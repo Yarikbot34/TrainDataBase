@@ -25,6 +25,7 @@ builder.Services.AddScoped<IRouteService, RouteService>();
 builder.Services.AddScoped<IStationService, StationService>();
 builder.Services.AddScoped<IMapService, MapService>();
 
+builder.Services.AddAuthentication();
 builder.Services.AddControllers();
 builder.Services.AddHealthChecks();
 builder.Services.AddEndpointsApiExplorer();

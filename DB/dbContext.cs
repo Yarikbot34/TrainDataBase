@@ -6,6 +6,7 @@ namespace DB;
 
 public class AppDbContext : DbContext
 {
+    public  DbSet<User> Users { get; set; }
     public DbSet<Station> Stations => Set<Station>();
     public DbSet<Route> Routes => Set<Route>();
     public DbSet<Train> Trains => Set<Train>();
@@ -38,6 +39,13 @@ public class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        //User
+        modelBuilder.Entity<User>(entity =>
+        {
+            entity.HasKey(u => u.Id);
+        });
+        
+        
         //Station
         modelBuilder.Entity<Station>(entity =>
         {
