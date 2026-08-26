@@ -23,6 +23,8 @@ public class Route
     
     public int TransactionId { get; set; }
     public Transaction Transaction { get; set; }
+    
+    public int RowInFile { get; set; }
 
 
 

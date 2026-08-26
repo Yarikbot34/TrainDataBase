@@ -28,6 +28,8 @@ public class TrainDto
     public int RangePerMonth { get; set; }
     
     public int TransactionId { get; set; }
+    
+    public int RowInFile { get; set; }
 
     [JsonConstructor]
     private TrainDto() { }
@@ -50,6 +52,7 @@ public class TrainDto
         RangePerDay = train.RangePerDay;
         RangePerMonth = train.RangePerMonth;
         TransactionId = train.TransactionId;
+        RowInFile = train.RowInFile;
     }
 }
 

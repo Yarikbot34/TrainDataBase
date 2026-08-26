@@ -112,6 +112,8 @@ public class FileWorkerService : IFileWorker
             train.RangePerDay = GetClearInt(TrainDataList.Cell(FirstRows[0] + counter + refCounter, 7).Value.ToString());
             train.DayInRaise = GetClearInt(TrainDataList.Cell(FirstRows[0] + counter + refCounter, 8).Value.ToString());
             train.RangePerMonth = GetClearInt(TrainDataList.Cell(FirstRows[0] + counter + refCounter, 9).Value.ToString());
+
+            train.RowInFile = counter + FirstRows[0];
             
             if (train.Distance == 0 || train.RangePerDay == 0) train.IsCanceled = true;
             if (train.HasDesc) trainWithDesc.Add(train);
@@ -150,6 +152,8 @@ public class FileWorkerService : IFileWorker
             route.FedBenefit = GetCategoryData(2);
             route.RegBenefit = GetCategoryData(3);
             route.Another = GetCategoryData(4);
+            
+            route.RowInFile =  counter + FirstRows[1];
             counter++;
         }
         await WriteToBase();
