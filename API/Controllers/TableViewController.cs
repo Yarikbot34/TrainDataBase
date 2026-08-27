@@ -26,15 +26,15 @@ public class TableViewController : ControllerBase
     [HttpGet("routes/{years?}")]
     public async Task<ActionResult> GetRoutes(List<int>? years = null)
     {
-        if (years == null ) years = new List<int>{DateTime.Now.Year % 1000};
-        var answer = await _routeService.GetRoutesAsync(years);
+        if (years is null ) years = new List<int>{DateTime.Now.Year % 1000};
+        var answer = await _routeService.GetRoutesWithSummAsync(years);
         return Ok(answer);
     }
-
+    
     [HttpPost("routes/filter")]
     public async Task<ActionResult> GetRoutesFilter(RouteFilterDto filter)
     {
-        var answ = _routeService.GetRoutesByFilter(filter);
+        var answ = _routeService.GetRoutesByFilterWithSummAsync(filter);
         return Ok(answ);
     }
     

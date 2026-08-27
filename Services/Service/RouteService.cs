@@ -15,6 +15,20 @@ public class RouteService : IRouteService
         _routeRepo = routeRepo;
     }
 
+    public async Task<RoutesWithSummDto> GetRoutesWithSummAsync(List<int> years)
+    {
+        var rotes = await GetRoutesAsync(years);
+        var answ = new RoutesWithSummDto(rotes);
+        return answ;
+    }
+    
+    public async Task<RoutesWithSummDto> GetRoutesByFilterWithSummAsync(RouteFilterDto filter)
+    {
+        var rotes = await GetRoutesByFilter(filter);
+        var answ = new RoutesWithSummDto(rotes);
+        return answ;
+    }
+
     public async Task<List<RouteDto>> GetRoutesAsync(List<int> years)
     {
         var answ = _routeRepo.GetRoutesByYearListAsync(years).Result
