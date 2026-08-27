@@ -25,8 +25,9 @@ public class UserService : IUserService
     public async Task<bool> CheckUserAsync(AuthDto request)
     {
         var user = await _userRepo.GetUserByUsernameAsync(request.Name);
-        string password = BCrypt.Net.BCrypt.HashPassword(request.Password);
-
-        return password == user.PasswordHash;
+        if (user is null) throw new Exception("Пользователь не найден");
+        bool answ = BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash);
+        
+        return answ;
     }
 }
