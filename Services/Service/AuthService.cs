@@ -53,7 +53,8 @@ public class AuthService : IAuthService
             return await RegisterUserAsync(user, "Admin");
         }
 
-        if (_userRepo.UserExistsByUsername(user.Name))
+        var bdUser = await _userRepo.GetUserByUsernameAsync(user.Name);
+        if (bdUser is not null && await _userService.CheckUserAsync(user))
         {
             var jwtKey = Environment.GetEnvironmentVariable("JWT_SECRET_KEY");
             if (string.IsNullOrEmpty(jwtKey)) throw new Exception("Ошибка генерации jwt ключа");

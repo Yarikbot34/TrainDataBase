@@ -18,7 +18,7 @@ public class UserRepo : IUserRepo
         await ldb.SaveChangesAsync();
     }
 
-    public async Task<User> GetUserByUsernameAsync(string username)
+    public async Task<User?> GetUserByUsernameAsync(string username)
     {
         var answ = await ldb.Users.FirstOrDefaultAsync(u => u.Username == username);
         if (answ is null)
