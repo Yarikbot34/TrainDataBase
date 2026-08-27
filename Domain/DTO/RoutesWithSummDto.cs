@@ -2,14 +2,14 @@ namespace Domain.DTO;
 
 public class RoutesWithSummDto
 {
-    summData SummCount {get; set;}
-    summData SummPayment {get; set; }
-    summData AverWayLength {get; set;}
-    summData SummPaymentBySubj {get; set;}
+    public summData SummCount {get; set;}
+    public summData SummPayment {get; set; }
+    public summData AverWayLength {get; set;}
+    public summData SummPaymentBySubj {get; set;}
     
     public List<RouteDto> Routes {get; set;}
 
-    private class summData
+    public class summData
     {
         public double FullSum {get; set;}
         public double CasualSum{get; set;}
@@ -50,18 +50,28 @@ public class RoutesWithSummDto
         
         AverWayLength = new summData
         {
-            CasualSum = Routes.Sum(r => r.Casual.WayLength/r.Casual.Count),
-            StudentSum = Routes.Sum(r => r.Student.WayLength/r.Student.Count),
-            FedBenefitSum = Routes.Sum(r => r.FedBenefit.WayLength/r.FedBenefit.Count),
-            RegBenefitSum = Routes.Sum(r => r.RegBenefit.WayLength/r.RegBenefit.Count),
-            Another = Routes.Sum(r => r.Another.WayLength/r.Another.Count),
+            CasualSum = SummCount.CasualSum == 0 ? 0 
+                : Routes.Sum(r => r.Casual.WayLength * r.Casual.Count) / Routes.Sum(r => r.Casual.Count),
+
+            StudentSum = SummCount.StudentSum == 0 ? 0 
+                : Routes.Sum(r => r.Student.WayLength * r.Student.Count) / Routes.Sum(r => r.Student.Count),
+
+            FedBenefitSum = SummCount.FedBenefitSum == 0 ? 0 
+                : Routes.Sum(r => r.FedBenefit.WayLength * r.FedBenefit.Count) / Routes.Sum(r => r.FedBenefit.Count),
+
+            RegBenefitSum = SummCount.RegBenefitSum == 0 ? 0 
+                : Routes.Sum(r => r.RegBenefit.WayLength * r.RegBenefit.Count) / Routes.Sum(r => r.RegBenefit.Count),
+
+            Another = SummCount.Another == 0 ? 0 
+                : Routes.Sum(r => r.Another.WayLength * r.Another.Count) / Routes.Sum(r => r.Another.Count),
         };
-        AverWayLength.FullSum = AverWayLength.CasualSum / SummCount.CasualSum +
-                                AverWayLength.StudentSum / SummCount.StudentSum +
-                                AverWayLength.FedBenefitSum / SummCount.FedBenefitSum +
-                                AverWayLength.RegBenefitSum / SummCount.RegBenefitSum +
-                                AverWayLength.Another /  SummCount.Another;
+        double totalLen = AverWayLength.CasualSum * SummCount.CasualSum +
+                          AverWayLength.StudentSum * SummCount.StudentSum +
+                          AverWayLength.FedBenefitSum * SummCount.FedBenefitSum +
+                          AverWayLength.RegBenefitSum * SummCount.RegBenefitSum +
+                          AverWayLength.Another * SummCount.Another;
         
+        AverWayLength.FullSum = SummCount.FullSum == 0 ? 0 : totalLen/SummCount.FullSum;
         
         SummPaymentBySubj = new summData
         {
