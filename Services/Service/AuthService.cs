@@ -64,7 +64,11 @@ public class AuthService : IAuthService
             var jwtKey = Environment.GetEnvironmentVariable("JWT_SECRET_KEY");
             if (string.IsNullOrEmpty(jwtKey)) throw new Exception("Ошибка генерации jwt ключа");
 
-            var calims = new[] { new Claim(ClaimTypes.Name, user.Name) };
+            var calims = new[]
+            {
+                new Claim(ClaimTypes.Name, bdUser.Username),
+                new Claim(ClaimTypes.Role, bdUser.Role)
+            };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
             var cerds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
