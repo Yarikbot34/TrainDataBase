@@ -13,11 +13,11 @@ public class UserService : IUserService
         _userRepo = userRepo;
     }
 
-    public async Task CreateUserAsync(AuthDto request)
+    public async Task CreateUserAsync(AuthDto request, string role)
     {
         string password = BCrypt.Net.BCrypt.HashPassword(request.Password);
         
-        User user = new User(request.Name, password);
+        User user = new User(request.Name, password, role);
         
         await _userRepo.CreateUserAsync(user);
     }

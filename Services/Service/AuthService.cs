@@ -10,6 +10,7 @@ namespace Services;
 
 public class AuthService : IAuthService
 {
+    public static IReadOnlyCollection<string> Roles = new [] {"Admin", "View", "Upload"};
     private readonly IUserService _userService;
     private readonly IUserRepo _userRepo;
 
@@ -19,9 +20,13 @@ public class AuthService : IAuthService
         _userRepo = userRepo;
     }
 
-    public async Task<string> RegisterUserAsync(AuthDto user, string? role = "Basic")
+    public async Task<string> RegisterUserAsync(AuthDto user, string? role = "View")
     {
-        await _userService.CreateUserAsync(user);
+        if (!Roles.Contains(role))
+        {
+            role = "View";
+        }
+        await _userService.CreateUserAsync(user, role);
 
         var jwtKey = Environment.GetEnvironmentVariable("JWT_SECRET_KEY");
         if (string.IsNullOrEmpty(jwtKey)) throw new Exception("Ошибка генерации jwt ключа");

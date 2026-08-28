@@ -4,6 +4,6 @@ namespace Services;
 
 public interface IUserService
 {
-    Task CreateUserAsync(AuthDto request);
+    Task CreateUserAsync(AuthDto request, string role);
     Task<bool> CheckUserAsync(AuthDto request);
 }
