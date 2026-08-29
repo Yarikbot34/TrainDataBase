@@ -2,6 +2,7 @@ using Domain.DTO;
 using Microsoft.AspNetCore.Mvc;
 using Services;
 using FileWorker;
+using Microsoft.AspNetCore.Authorization;
 
 namespace API.Controllers;
 
@@ -18,8 +19,9 @@ public class InputFileController : ControllerBase
         _fileWorker = fileWorker;
         _trainService = trainService;
     }
-
+    
     [HttpPost("input")]
+    [Authorize(Roles = "Admin, Upload")]
     public async Task<IActionResult> InputDataFromFile(IFormFile file, int year, int month)
     {
         int yearlng = year + 2000;
@@ -36,7 +38,7 @@ public class InputFileController : ControllerBase
         var fs = new FileStream(path, FileMode.Open, FileAccess.Read);
         try
         {
-            var trainWithNoDesc = await _fileWorker.ExtractFromFile(fs, year, month);
+            var trainWithNoDesc = await _fileWorker.ExtractFromFile(fs, year, month, User);
             return Ok(trainWithNoDesc);
             
         } catch (Exception ex)
