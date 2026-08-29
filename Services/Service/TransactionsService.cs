@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using DB.Repositories;
 using Domain.DTO;
 
@@ -6,10 +7,14 @@ namespace Services;
 public class TransactionsService : ITransactionsService
 {
     private readonly ITransactionRepo _transactionRepo;
+    private readonly IUserService _userService;
+    private readonly IStationRepo _stationRepo;
     
-    public  TransactionsService(ITransactionRepo transactionRepo)
+    public  TransactionsService(ITransactionRepo transactionRepo, IUserService userService, IStationRepo stationRepo)
     {
         _transactionRepo = transactionRepo;
+        _userService = userService;
+        _stationRepo = stationRepo;
     }
 
     public async Task<List<TransactionDto>> GetTransactionsListAsync(TransactionFilterDto filter)
@@ -31,8 +36,18 @@ public class TransactionsService : ITransactionsService
         await _transactionRepo.PathTransactionAsync(transaction);
     }
 
-    public Task RemoveUnitsByTransactionIdAsync(int transactionId)
+    public async Task RemoveUnitsByTransactionAsync(TransactionDeleteDto dto, ClaimsPrincipal user)
     {
-        return Task.CompletedTask;
+        AuthDto auth = new AuthDto
+        {
+            Name = user.Identity.Name,
+            Password = dto.AdminPassword
+        };
+        if (await _userService.CheckUserAsync(auth))
+        { 
+            var transaction = await _transactionRepo.GetTransactionByIdAsync(dto.TransactionId);
+            if (transaction is null) throw new Exception("Транзакция не найдена");
+            await _transactionRepo.DeleteTransactionAsync(transaction, dto.StationDelete);
+        }
     }
 }

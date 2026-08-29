@@ -14,4 +14,6 @@ public interface ITransactionRepo
     Task<Transaction?> GetTransactionByYearAndMonthAsync(int year, int month);
     
     Task PathTransactionAsync(Transaction t);
+    
+    Task DeleteTransactionAsync(Transaction t, bool removeStations = false);
 }

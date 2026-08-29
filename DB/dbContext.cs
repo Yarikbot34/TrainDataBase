@@ -112,7 +112,8 @@ public class AppDbContext : DbContext
             
             entity.HasOne(t => t.Transaction)
                 .WithMany()
-                .HasForeignKey(t => t.TransactionId);
+                .HasForeignKey(t => t.TransactionId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         //Train 
@@ -151,7 +152,7 @@ public class AppDbContext : DbContext
             entity.HasOne(t => t.User)
                 .WithMany()
                 .HasForeignKey(t => t.UserId)
-                .OnDelete(DeleteBehavior.SetNull);
+                .OnDelete(DeleteBehavior.Cascade);
         });
         
         //Map Schema

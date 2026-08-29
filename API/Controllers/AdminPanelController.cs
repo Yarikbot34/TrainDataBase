@@ -31,4 +31,11 @@ public class AdminPanelController : ControllerBase
         await _transactionsService.PatchTransactionDescFromDtoAsync(dto);
         return Ok();
     }
+
+    [HttpDelete("transactions/{transactionId}")]
+    public async Task<IActionResult> DeleteTransactionAsync(TransactionDeleteDto dto)
+    {
+        await _transactionsService.RemoveUnitsByTransactionAsync(dto, User);
+        return Ok();
+    }
 }
