@@ -47,6 +47,7 @@ public class FileWorkerService : IFileWorker
         note.Month = month;
         note.User = dbUser;
         note.UserId = dbUser.Id;
+        note.Type = Transaction.TransactionType.AddFile;
         
         
         using var book = new XLWorkbook(fs);

@@ -15,5 +15,16 @@ public class Transaction
     public int? UserId { get; set; }
     public User? User {get; set;}
     
+    public TransactionType Type {get; set;}
+    
     public int UnitsGet {get; set;}
+
+
+    public enum TransactionType
+    {
+        Add,
+        AddFile,
+        Update,
+        Delete
+    }
 }

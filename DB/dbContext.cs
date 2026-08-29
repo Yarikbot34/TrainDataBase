@@ -56,7 +56,8 @@ public class AppDbContext : DbContext
             
             entity.HasOne(t => t.Transaction)
                 .WithMany()
-                .HasForeignKey(t => t.TransactionId);
+                .HasForeignKey(t => t.TransactionId)
+                .OnDelete(DeleteBehavior.SetNull);
         });
 
         //Route

@@ -9,6 +9,7 @@ namespace API.Controllers;
 
 [ApiController]
 [Route("api/v1/file")]
+[Authorize(Roles = "Admin, Upload")]
 public class InputFileController : ControllerBase
 {
     private readonly IFileWorker _fileWorker;
@@ -21,7 +22,6 @@ public class InputFileController : ControllerBase
     }
     
     [HttpPost("input")]
-    [Authorize(Roles = "Admin, Upload")]
     public async Task<IActionResult> InputDataFromFile(IFormFile file, int year, int month)
     {
         int yearlng = year + 2000;
@@ -51,12 +51,16 @@ public class InputFileController : ControllerBase
             System.IO.File.Delete(path);
         }
     }
-
+    
     [HttpPatch("input/addDesc/{id}")]
     public async Task<IActionResult> UpdateTrainDesc(int id, TrainDto dto)
     {
-        await _trainService.AddTrainDescById(id, dto);
-        return Ok();
+        if (User.Identity is not null)
+        {
+            await _trainService.AddTrainDescById(id, dto, User);
+            return Ok();
+        }
+        else return BadRequest("Ошибка авторизации");
     }
     
 }

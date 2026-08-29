@@ -1,3 +1,5 @@
+using System.Diagnostics.Metrics;
+using System.Security.Claims;
 using Domain.Classes;
 using DB;
 using DB.Repositories;
@@ -9,10 +11,13 @@ namespace Services;
 public class TrainService : ITrainService
 {
     private readonly ITrainRepo _trainRepo;
+    private readonly ITransactionRepo _transactionRepo;
+    private readonly IUserRepo _userRepo;
     
-    public TrainService(ITrainRepo trainRepo)
+    public TrainService(ITrainRepo trainRepo, ITransactionRepo transactionRepo)
     {
         _trainRepo = trainRepo;
+        _transactionRepo = transactionRepo;
     }
     
     public async Task<List<TrainDto>> GetTrainsAsync()
@@ -33,15 +38,51 @@ public class TrainService : ITrainService
         return answ;
     }
 
-    public async Task AddTrainDescById(int id, TrainDto dto)
+    public async Task AddTrainDescById(int id, TrainDto dto, ClaimsPrincipal user)
     {
-        string description = dto.Description;
-        Train train = await _trainRepo.GetTrainByIdAsync(id);
-        if (train != null)
+        if (user.Identity is null) throw new Exception("Не удалось авторизовать пользователя");
+        var transaction = await _transactionRepo.GetTransactionByYearAndMonthAsync(dto.Year, dto.Month);
+        if (transaction is not null)
         {
-            train.Description = description;
-            await _trainRepo.UpdateTrain(train);
+            if (transaction.Date == DateOnly.FromDateTime(DateTime.Now) &&
+                TimeOnly.FromDateTime(DateTime.Now) - transaction.Time < TimeSpan.FromHours(2) &&
+                transaction.User is not null &&
+                user.Identity.Name == transaction.User.Username)
+            {
+                await WriteDto();
+            }
+            else
+            {
+                User reqUser = await _userRepo.GetUserByUsernameAsync(user.Identity.Name);
+                if (reqUser is not null)
+                {
+                    await WriteDto();
+                    
+                    Transaction note = new Transaction();
+                    note.Date = DateOnly.FromDateTime(DateTime.Now);
+                    note.Time = TimeOnly.FromDateTime(DateTime.Now);
+                    note.User = reqUser;
+                    note.Type = Transaction.TransactionType.Update;
+                    note.Year = dto.Year;
+                    note.Month = dto.Month;
+                    note.Description = $"Добавлено/Отредактировано описание для поезда {dto.Number} в {dto.Month}.{dto.Year}";
+                    note.UnitsGet = 1;
+                    await _transactionRepo.WriteNewTransactionAsync(note);
+                }
+            }
+
+            async Task WriteDto()
+            {
+                string description = dto.Description;
+                Train train = await _trainRepo.GetTrainByIdAsync(id);
+                if (train != null)
+                {
+                    train.Description = description;
+                    await _trainRepo.UpdateTrain(train);
+                }
+                else throw new Exception("Поезд с таким номером не найден");
+            }
         }
-        else throw new Exception("Поезд с таким номером не найден");
     }
+
 }
