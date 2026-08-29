@@ -146,6 +146,11 @@ public class AppDbContext : DbContext
             entity.Property(t => t.Year).IsRequired();
             entity.Property(t => t.Month).IsRequired();
             entity.Property(t => t.UnitsGet).IsRequired();
+            
+            entity.HasOne(t => t.User)
+                .WithMany()
+                .HasForeignKey(t => t.UserId)
+                .OnDelete(DeleteBehavior.SetNull);
         });
         
         //Map Schema
