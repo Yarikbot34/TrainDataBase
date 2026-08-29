@@ -1,5 +1,6 @@
 using DB.Repositories;
 using DB;
+using Domain.Classes;
 using Domain.DTO;
 
 namespace Services;
@@ -64,5 +65,10 @@ public class DbContentService : IdbContentService
         var schemasRaw =  await _mapSchemaRepo.GetAllSchemasAsync();
         HashSet<string> schemas = schemasRaw.Select(s => s.Name).ToHashSet();
         return schemas.ToList();
+    }
+    
+    public async Task<List<string>> GetTransactionTypesAsync()
+    {
+        return Enum.GetNames(typeof(Transaction.TransactionType)).ToList();
     }
 }

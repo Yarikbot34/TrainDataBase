@@ -9,4 +9,5 @@ public interface IdbContentService
    Task<List<string>> GetRecordedNumbersAsync();
    Task<List<string>> GetRecordedStationsAsync();
    Task<List<string>> GetRecordedSchemasAsync();
+   Task<List<String>> GetTransactionTypesAsync();
 }

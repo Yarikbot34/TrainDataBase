@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using DB.Repositories;
+using Domain.Classes;
 using Domain.DTO;
 
 namespace Services;
@@ -8,15 +9,13 @@ public class TransactionsService : ITransactionsService
 {
     private readonly ITransactionRepo _transactionRepo;
     private readonly IUserService _userService;
-    private readonly IStationRepo _stationRepo;
     
-    public  TransactionsService(ITransactionRepo transactionRepo, IUserService userService, IStationRepo stationRepo)
+    public  TransactionsService(ITransactionRepo transactionRepo, IUserService userService)
     {
         _transactionRepo = transactionRepo;
         _userService = userService;
-        _stationRepo = stationRepo;
     }
-
+    
     public async Task<List<TransactionDto>> GetTransactionsListAsync(TransactionFilterDto filter)
     {
         var transactions = await _transactionRepo.GetTransactionsByFilterAsync(filter);

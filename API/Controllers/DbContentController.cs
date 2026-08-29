@@ -49,4 +49,11 @@ public class DbContentController : ControllerBase
         var answ = await _contentService.GetRecordedSchemasAsync();
         return Ok(answ);
     }
+    
+    [HttpGet("WritedTransactionTypes")]
+    public async Task<IActionResult> GetTransactionTypes()
+    {
+        var answ = await _contentService.GetTransactionTypesAsync();
+        return Ok(answ);
+    }
 }

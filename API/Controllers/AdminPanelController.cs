@@ -17,8 +17,7 @@ public class AdminPanelController : ControllerBase
         _transactionsService = transactionsService;
     }
     
-    
-    [HttpGet("transactions")]
+    [HttpPost("transactions")]
     public async Task<IActionResult> GetTransactionsAsync(TransactionFilterDto filter)
     {
         var answ = await _transactionsService.GetTransactionsListAsync(filter);
