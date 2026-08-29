@@ -64,10 +64,21 @@ public class TransactionRepo : ITransactionRepo
         return transactions;
     }
 
+    public async Task<Transaction?> GetTransactionByIdAsync(int id)
+    {
+        return await ldb.Transactions.FindAsync(id);
+    }
+    
     public async Task<Transaction?> GetTransactionByYearAndMonthAsync(int year, int month)
     {
         var answ = await ldb.Transactions
             .FirstOrDefaultAsync(t => t.Year == year && t.Month == month);
         return answ;
+    }
+
+    public async Task PathTransactionAsync(Transaction t)
+    {
+        ldb.Transactions.Update(t);
+        await ldb.SaveChangesAsync();
     }
 }

@@ -1,0 +1,34 @@
+using Domain.DTO;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Services;
+
+namespace API.Controllers;
+
+[ApiController]
+[Authorize(Roles = "Admin")]
+[Route("api/v1/adminPanel")]
+public class AdminPanelController : ControllerBase
+{
+    private readonly ITransactionsService _transactionsService;
+
+    public AdminPanelController(ITransactionsService transactionsService)
+    {
+        _transactionsService = transactionsService;
+    }
+    
+    
+    [HttpGet("transactions")]
+    public async Task<IActionResult> GetTransactionsAsync(TransactionFilterDto filter)
+    {
+        var answ = await _transactionsService.GetTransactionsListAsync(filter);
+        return Ok(answ);
+    }
+
+    [HttpPatch("transactions/{transactionId}")]
+    public async Task<IActionResult> PatchTransactionDesc(TransactionDto dto)
+    {
+        await _transactionsService.PatchTransactionDescFromDtoAsync(dto);
+        return Ok();
+    }
+}
