@@ -1,4 +1,5 @@
 using Domain.Classes;
+using Domain.DTO;
 using Microsoft.EntityFrameworkCore;
 
 namespace DB.Repositories;
@@ -31,6 +32,36 @@ public class TransactionRepo : ITransactionRepo
             .Where(t => t.Year == year)
             .ToListAsync();
         return answ;
+    }
+
+    public async Task<List<Transaction>> GetTransactionsByFilterAsync(TransactionFilterDto filter)
+    {
+        List<Transaction> transactions;
+        if (filter.Periods is not null)
+        {
+            transactions  = await ldb.Transactions
+                .Where(t => filter.Periods.Any(p => p.Months.Contains(t.Month) && p.Year == t.Year))
+                .Include(t => t.User)
+                .ToListAsync();
+        }
+        else
+        {
+            transactions  = await ldb.Transactions
+                .Include(t => t.User)
+                .ToListAsync();
+        }
+            
+        if (filter.UserNames is not null) transactions = transactions
+            .Where(t => filter.UserNames.Contains(t.User.Username)).ToList();
+        if (filter.TransactionTypes is not null) transactions = transactions
+            .Where(t => filter.TransactionTypes.Contains(t.Type.ToString())).ToList();
+        if (filter.EndDate is not null && filter.StartDate is not null && filter.EndDate > filter.StartDate)
+        {
+            transactions = transactions
+                .Where(t => filter.EndDate.Value <= t.Date.ToDateTime(t.Time) )
+                .Where(t => filter.StartDate.Value >= t.Date.ToDateTime(t.Time)).ToList();
+        }
+        return transactions;
     }
 
     public async Task<Transaction?> GetTransactionByYearAndMonthAsync(int year, int month)

@@ -27,4 +27,9 @@ public class Transaction
         Update,
         Delete
     }
+
+    public DateTime GetDateTime()
+    {
+        return Date.ToDateTime(Time);
+    }
 }
