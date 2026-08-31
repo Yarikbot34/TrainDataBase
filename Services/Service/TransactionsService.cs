@@ -42,6 +42,8 @@ public class TransactionsService : ITransactionsService
             Name = user.Identity.Name,
             Password = dto.AdminPassword
         };
+        Console.WriteLine("====");
+        Console.WriteLine(auth.Name);
         if (await _userService.CheckUserAsync(auth))
         { 
             var transaction = await _transactionRepo.GetTransactionByIdAsync(dto.TransactionId);

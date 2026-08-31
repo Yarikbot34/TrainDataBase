@@ -6,6 +6,7 @@ using Services;
 namespace API.Controllers;
 
 [ApiController]
+[Authorize(Roles = "Admin")]
 [Route("api/v1/adminPanel")]
 public class AdminPanelController : ControllerBase
 {
