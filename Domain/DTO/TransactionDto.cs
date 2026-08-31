@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Domain.Classes;
 
 namespace Domain.DTO;
@@ -13,7 +14,10 @@ public class TransactionDto
     public string UserName { get; set; }
     public string Description { get; set; }
     public string TransactionType { get; set; }
-
+    
+    [JsonConstructor]
+    public TransactionDto(){}
+    
     public TransactionDto(Transaction transaction)
     {
         Id = transaction.Id;
