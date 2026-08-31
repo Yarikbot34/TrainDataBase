@@ -11,7 +11,7 @@ public interface ITransactionRepo
     Task<List<Transaction>> GetTransactionsByFilterAsync(TransactionFilterDto filter);
     Task<Transaction?> GetTransactionByIdAsync(int id);
     Task<List<Transaction>> GetAllTransactionsAsync();
-    Task<Transaction?> GetTransactionByYearAndMonthAsync(int year, int month);
+    Task<Transaction?> GetTransactionByYearAndMonthAsync(int year, int month, bool getUser = false);
     
     Task PathTransactionAsync(Transaction t);
     

@@ -69,10 +69,21 @@ public class TransactionRepo : ITransactionRepo
         return await ldb.Transactions.FindAsync(id);
     }
     
-    public async Task<Transaction?> GetTransactionByYearAndMonthAsync(int year, int month)
+    public async Task<Transaction?> GetTransactionByYearAndMonthAsync(int year, int month, bool getUser = false)
     {
-        var answ = await ldb.Transactions
-            .FirstOrDefaultAsync(t => t.Year == year && t.Month == month);
+        Transaction? answ;
+        if (getUser)
+        {
+            answ = await ldb.Transactions
+                .Include(t => t.User)
+                .FirstOrDefaultAsync(t => t.Year == year && t.Month == month);
+        }
+        else
+        {
+            answ = await ldb.Transactions
+                .FirstOrDefaultAsync(t => t.Year == year && t.Month == month);
+        }
+        
         return answ;
     }
 

@@ -14,10 +14,11 @@ public class TrainService : ITrainService
     private readonly ITransactionRepo _transactionRepo;
     private readonly IUserRepo _userRepo;
     
-    public TrainService(ITrainRepo trainRepo, ITransactionRepo transactionRepo)
+    public TrainService(ITrainRepo trainRepo, ITransactionRepo transactionRepo, IUserRepo userRepo)
     {
         _trainRepo = trainRepo;
         _transactionRepo = transactionRepo;
+        _userRepo = userRepo;
     }
     
     public async Task<List<TrainDto>> GetTrainsAsync()
@@ -41,11 +42,15 @@ public class TrainService : ITrainService
     public async Task AddTrainDescById(int id, TrainDto dto, ClaimsPrincipal user)
     {
         if (user.Identity is null) throw new Exception("Не удалось авторизовать пользователя");
-        var transaction = await _transactionRepo.GetTransactionByYearAndMonthAsync(dto.Year, dto.Month);
+        var transaction = await _transactionRepo.GetTransactionByYearAndMonthAsync(dto.Year, dto.Month, true);
         if (transaction is not null)
         {
-            if (transaction.Date == DateOnly.FromDateTime(DateTime.Now) &&
-                TimeOnly.FromDateTime(DateTime.Now) - transaction.Time < TimeSpan.FromHours(2) &&
+            
+            DateTime transactionTime = transaction.Date.ToDateTime(transaction.Time).ToUniversalTime();
+            Console.WriteLine(DateTime.UtcNow - transactionTime < TimeSpan.FromHours(2));
+            Console.WriteLine(transaction.User is not null);
+            Console.WriteLine(user.Identity.Name == transaction.User.Username);
+            if (DateTime.UtcNow - transactionTime < TimeSpan.FromHours(2) &&
                 transaction.User is not null &&
                 user.Identity.Name == transaction.User.Username)
             {
