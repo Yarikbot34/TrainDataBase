@@ -37,7 +37,7 @@ public class TransactionRepo : ITransactionRepo
     public async Task<List<Transaction>> GetTransactionsByFilterAsync(TransactionFilterDto filter)
     {
         List<Transaction> transactions;
-        if (filter.Periods is not null)
+        if (filter.Periods is not null && filter.Periods.Count > 0)
         {
             transactions  = await ldb.Transactions
                 .Where(t => filter.Periods.Any(p => p.Months.Contains(t.Month) && p.Year == t.Year))
@@ -51,9 +51,9 @@ public class TransactionRepo : ITransactionRepo
                 .ToListAsync();
         }
             
-        if (filter.UserNames is not null) transactions = transactions
+        if (filter.UserNames is not null && filter.UserNames.Count > 0) transactions = transactions
             .Where(t => filter.UserNames.Contains(t.User.Username)).ToList();
-        if (filter.TransactionTypes is not null) transactions = transactions
+        if (filter.TransactionTypes is not null && filter.TransactionTypes.Count > 0) transactions = transactions
             .Where(t => filter.TransactionTypes.Contains(t.Type.ToString())).ToList();
         if (filter.EndDate is not null && filter.StartDate is not null && filter.EndDate > filter.StartDate)
         {

@@ -6,7 +6,6 @@ using Services;
 namespace API.Controllers;
 
 [ApiController]
-[Authorize(Roles = "Admin")]
 [Route("api/v1/adminPanel")]
 public class AdminPanelController : ControllerBase
 {
@@ -21,6 +20,7 @@ public class AdminPanelController : ControllerBase
     public async Task<IActionResult> GetTransactionsAsync(TransactionFilterDto filter)
     {
         var answ = await _transactionsService.GetTransactionsListAsync(filter);
+        foreach (var item in answ)Console.WriteLine(item.TransactionType);
         return Ok(answ);
     }
 
