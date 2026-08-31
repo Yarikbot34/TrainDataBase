@@ -93,13 +93,9 @@ public class TransactionRepo : ITransactionRepo
         await ldb.SaveChangesAsync();
     }
 
-    public async Task DeleteTransactionAsync(Transaction t, bool removeStations = false)
+    public async Task DeleteTransactionAsync(Transaction t)
     {
         ldb.Transactions.Remove(t);
-        if (removeStations)
-        {
-            ldb.Stations.RemoveRange(ldb.Stations.Where(s => s.TransactionId == t.Id));
-        }
         await ldb.SaveChangesAsync();
     }
 }

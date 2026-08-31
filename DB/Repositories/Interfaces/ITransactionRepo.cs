@@ -15,5 +15,5 @@ public interface ITransactionRepo
     
     Task PathTransactionAsync(Transaction t);
     
-    Task DeleteTransactionAsync(Transaction t, bool removeStations = false);
+    Task DeleteTransactionAsync(Transaction t);
 }

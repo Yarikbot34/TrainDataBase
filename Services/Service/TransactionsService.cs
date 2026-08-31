@@ -42,13 +42,11 @@ public class TransactionsService : ITransactionsService
             Name = user.Identity.Name,
             Password = dto.AdminPassword
         };
-        Console.WriteLine("====");
-        Console.WriteLine(auth.Name);
         if (await _userService.CheckUserAsync(auth))
         { 
             var transaction = await _transactionRepo.GetTransactionByIdAsync(dto.TransactionId);
             if (transaction is null) throw new Exception("Транзакция не найдена");
-            await _transactionRepo.DeleteTransactionAsync(transaction, dto.StationDelete);
+            await _transactionRepo.DeleteTransactionAsync(transaction);
         }
     }
 }
