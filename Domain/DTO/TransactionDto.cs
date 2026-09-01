@@ -25,7 +25,7 @@ public class TransactionDto
         Month = transaction.Month;
         DateCreated = transaction.GetDateTime();
         UnitCount = transaction.UnitsGet;
-        UserName = UserName is null ? "Удален" : UserName;
+        UserName = transaction.User is null ? "Удален" : transaction.User.Username;
         Description = transaction.Description;
         TransactionType = transaction.Type.ToString();
     }
