@@ -95,7 +95,14 @@ public class TransactionRepo : ITransactionRepo
 
     public async Task DeleteTransactionAsync(Transaction t)
     {
-        ldb.Transactions.Remove(t);
+        if (t.Type == Transaction.TransactionType.AddFile)
+        {
+            ldb.Transactions
+                .RemoveRange(ldb.Transactions.Where(tr => tr.Month == t.Month && 
+                                                          tr.Year == t.Year && 
+                                                          tr.Type != Transaction.TransactionType.Add));
+        }
+        else ldb.Transactions.Remove(t);
         await ldb.SaveChangesAsync();
     }
 }

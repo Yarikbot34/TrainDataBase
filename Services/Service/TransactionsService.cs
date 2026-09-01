@@ -9,11 +9,13 @@ public class TransactionsService : ITransactionsService
 {
     private readonly ITransactionRepo _transactionRepo;
     private readonly IUserService _userService;
+    private readonly IUserRepo _userRepo;
     
-    public  TransactionsService(ITransactionRepo transactionRepo, IUserService userService)
+    public  TransactionsService(ITransactionRepo transactionRepo, IUserService userService, IUserRepo userRepo)
     {
         _transactionRepo = transactionRepo;
         _userService = userService;
+        _userRepo = userRepo;
     }
     
     public async Task<List<TransactionDto>> GetTransactionsListAsync(TransactionFilterDto filter)
@@ -46,7 +48,17 @@ public class TransactionsService : ITransactionsService
         { 
             var transaction = await _transactionRepo.GetTransactionByIdAsync(dto.TransactionId);
             if (transaction is null) throw new Exception("Транзакция не найдена");
+            Transaction deleteNote = new Transaction();
+            deleteNote.Month = transaction.Month;
+            deleteNote.Year = transaction.Year;
+            deleteNote.Time = TimeOnly.FromDateTime(DateTime.Now);
+            deleteNote.Date = DateOnly.FromDateTime(DateTime.Now);
+            deleteNote.Type = Transaction.TransactionType.Delete;
+            deleteNote.Description = $"Удаление элементов из файла за {transaction.Month}.{transaction.Year}";
+            deleteNote.User = await _userRepo.GetUserByUsernameAsync(auth.Name);
             await _transactionRepo.DeleteTransactionAsync(transaction);
+            await _transactionRepo.WriteNewTransactionAsync(deleteNote);
+            
         }
     }
 }
