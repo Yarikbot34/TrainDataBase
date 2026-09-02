@@ -53,7 +53,9 @@ public class AuthService : IAuthService
 
     public async Task<string> LoginUserAsync(AuthDto user)
     {
-        if (_userRepo.CountOfUsersIsNull())
+        if (_userRepo.CountOfUsersIsNull() &&
+            user.Name == Environment.GetEnvironmentVariable("ADMIN_NAME") &&
+            user.Password == Environment.GetEnvironmentVariable("ADMIN_PASSWORD"))
         {
             return await RegisterUserAsync(user, "Admin");
         }
