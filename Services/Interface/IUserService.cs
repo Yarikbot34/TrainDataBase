@@ -6,4 +6,5 @@ public interface IUserService
 {
     Task CreateUserAsync(AuthDto request, string role);
     Task<bool> CheckUserAsync(AuthDto request);
+    Task<List<UserDto>> GetUsersAsync();
 }

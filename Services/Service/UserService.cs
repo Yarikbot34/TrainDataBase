@@ -30,4 +30,11 @@ public class UserService : IUserService
         
         return answ;
     }
+
+    public async Task<List<UserDto>> GetUsersAsync()
+    {
+        var users = await _userRepo.GetAllUsersAsync();
+        var answ = users.Select(u => new UserDto(u)).ToList();
+        return answ;
+    }
 }
