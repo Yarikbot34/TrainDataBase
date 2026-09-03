@@ -35,7 +35,13 @@ public class TransactionPanelController : ControllerBase
     [HttpDelete("transactions/{transactionId}")]
     public async Task<IActionResult> DeleteTransactionAsync(TransactionDeleteDto dto)
     {
-        await _transactionsService.RemoveUnitsByTransactionAsync(dto, User);
-        return Ok();
+        try
+        {
+            await _transactionsService.RemoveUnitsByTransactionAsync(dto, User);
+            return Ok();
+        } catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
     }
 }

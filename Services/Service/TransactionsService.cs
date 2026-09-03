@@ -45,7 +45,7 @@ public class TransactionsService : ITransactionsService
             Password = dto.AdminPassword
         };
         if (await _userService.CheckUserAsync(auth))
-        { 
+        {
             var transaction = await _transactionRepo.GetTransactionByIdAsync(dto.TransactionId);
             if (transaction is null) throw new Exception("Транзакция не найдена");
             Transaction deleteNote = new Transaction();
@@ -58,7 +58,8 @@ public class TransactionsService : ITransactionsService
             deleteNote.User = await _userRepo.GetUserByUsernameAsync(auth.Name);
             await _transactionRepo.DeleteTransactionAsync(transaction);
             await _transactionRepo.WriteNewTransactionAsync(deleteNote);
-            
+
         }
+        else throw new Exception("Неверный пароль. Отказано в доступе");
     }
 }
