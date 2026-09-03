@@ -25,14 +25,16 @@ public class FileWorkerService : IFileWorker
     }
     
     
-    public async Task<List<TrainDto>> ExtractFromFile(FileStream fs, int year, int month, ClaimsPrincipal user)
+    public async Task<List<TrainDto>> ExtractFromFile(FileStream fs, UploadFileDto uploadDto, ClaimsPrincipal user)
     {
         if (user.Identity is null || user.Identity.Name is null) throw new Exception("Отказано в доступе");
         
         User? dbUser = await _userRepo.GetUserByUsernameAsync(user.Identity.Name);
         
         if (dbUser is null) throw new Exception("Пользователь с таким именем не найден");
-        
+
+        int year = uploadDto.year;
+        int month = uploadDto.month;
         
         Transaction? tr = await _transactionRepo.GetTransactionByYearAndMonthAsync(year, month);
         if (tr is not null)
@@ -47,6 +49,7 @@ public class FileWorkerService : IFileWorker
         note.Month = month;
         note.User = dbUser;
         note.UserId = dbUser.Id;
+        note.Description = uploadDto.description is null ? "" : uploadDto.description;
         note.Type = Transaction.TransactionType.AddFile;
         
         
@@ -69,10 +72,8 @@ public class FileWorkerService : IFileWorker
         var PaymentDataList = book.Worksheet(3);
         FirstRows[2] = GetFirstRowIndex(PaymentDataList);
         Columns[1] = GetNumeredColumns(FirstRows[2], PaymentDataList);
-
-        List<Station> existStations = new List<Station>();
         
-        existStations = await _stationRepo.GetAllStationsAsync();
+         List<Station> existStations = await _stationRepo.GetAllStationsAsync();
         
         List<Station> stations = new List<Station>();
         List<Train> trainWithDesc = new List<Train>();

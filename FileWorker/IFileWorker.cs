@@ -6,5 +6,5 @@ namespace FileWorker;
 
 public interface IFileWorker
 {
-    Task<List<TrainDto>> ExtractFromFile(FileStream fs, int year, int month, ClaimsPrincipal user);
+    Task<List<TrainDto>> ExtractFromFile(FileStream fs, UploadFileDto uploadDto, ClaimsPrincipal user);
 }

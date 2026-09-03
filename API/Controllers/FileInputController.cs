@@ -22,10 +22,10 @@ public class InputFileController : ControllerBase
     }
     
     [HttpPost("input")]
-    public async Task<IActionResult> InputDataFromFile(IFormFile file, int year, int month)
+    public async Task<IActionResult> InputDataFromFile(IFormFile file, UploadFileDto uploadDto)
     {
-        int yearlng = year + 2000;
-        if (yearlng > DateTime.Today.Year || (yearlng == DateTime.Today.Year && month > DateTime.Today.Month))
+        int yearlng = uploadDto.year + 2000;
+        if (yearlng > DateTime.Today.Year || (yearlng == DateTime.Today.Year && uploadDto.month > DateTime.Today.Month))
         {
             return BadRequest("Этот период ещё не прожит");
         }
@@ -38,7 +38,7 @@ public class InputFileController : ControllerBase
         var fs = new FileStream(path, FileMode.Open, FileAccess.Read);
         try
         {
-            var trainWithNoDesc = await _fileWorker.ExtractFromFile(fs, year, month, User);
+            var trainWithNoDesc = await _fileWorker.ExtractFromFile(fs, uploadDto, User);
             return Ok(trainWithNoDesc);
             
         } catch (Exception ex)
