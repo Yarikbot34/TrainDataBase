@@ -8,11 +8,11 @@ namespace API.Controllers;
 [ApiController]
 [Authorize(Roles = "Admin")]
 [Route("api/v1/adminPanel")]
-public class AdminPanelController : ControllerBase
+public class TransactionPanelController : ControllerBase
 {
     private readonly ITransactionsService _transactionsService;
 
-    public AdminPanelController(ITransactionsService transactionsService)
+    public TransactionPanelController(ITransactionsService transactionsService)
     {
         _transactionsService = transactionsService;
     }

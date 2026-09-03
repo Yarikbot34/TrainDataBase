@@ -37,7 +37,7 @@ public class FileWorkerService : IFileWorker
         int month = uploadDto.month;
         
         Transaction? tr = await _transactionRepo.GetTransactionByYearAndMonthAsync(year, month);
-        if (tr is not null)
+        if (tr is not null && tr.Type == Transaction.TransactionType.AddFile)
         {
             throw new Exception(
                 "В базе данных уже есть записи датированные данным периодом, во избежание конфликта запись отклонена.");
