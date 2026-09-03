@@ -22,8 +22,11 @@ public class InputFileController : ControllerBase
     }
     
     [HttpPost("input")]
-    public async Task<IActionResult> InputDataFromFile(IFormFile file, UploadFileDto uploadDto)
+    public async Task<IActionResult> InputDataFromFile(UploadFileDto uploadDto)
     {
+        var file = uploadDto.file;
+        uploadDto.year = uploadDto.year > 1000 ? uploadDto.year % 1000 : uploadDto.year;
+        uploadDto.description = String.IsNullOrEmpty(uploadDto.description) ? "" : uploadDto.description;
         int yearlng = uploadDto.year + 2000;
         if (yearlng > DateTime.Today.Year || (yearlng == DateTime.Today.Year && uploadDto.month > DateTime.Today.Month))
         {
