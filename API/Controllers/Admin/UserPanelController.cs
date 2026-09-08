@@ -31,16 +31,31 @@ public class UserPanelController : ControllerBase
     [HttpPost("Users/Add")]
     public async Task<IActionResult> AddUserAsync([FromBody] AddNewUserDto request)
     {
-        var answ = await _AuthService.RegisterNewUserAsync(request, User);
-        if (answ) return Ok(answ);
-        return BadRequest();
+        try
+        {
+            var answ = await _AuthService.RegisterNewUserAsync(request, User);
+            if (answ) return Ok(answ);
+            return BadRequest();
+        }
+        catch  (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
         
     }
 
     [HttpDelete("Users/{id}")]
     public async Task<IActionResult> DeleteUserAsync(int id, [FromBody] string adminPassword)
     {
-        await _UserService.DeleteUserAsync(id, adminPassword, User);
-        return Ok();
+        try
+        {
+            bool answ = await _UserService.DeleteUserAsync(id, adminPassword, User);
+            if (answ) return Ok();
+            return BadRequest();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 }
