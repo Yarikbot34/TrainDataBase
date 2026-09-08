@@ -1,9 +1,10 @@
+using System.Security.Claims;
 using Domain.DTO;
 
 namespace Services;
 
 public interface IAuthService
 {
-    Task<string> RegisterUserAsync(AuthDto user, string? role = "Basic");
+    Task<bool> RegisterNewUserAsync(AddNewUserDto request, ClaimsPrincipal user);
     Task<string> LoginUserAsync(AuthDto user);
 }

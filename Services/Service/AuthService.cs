@@ -20,35 +20,31 @@ public class AuthService : IAuthService
         _userRepo = userRepo;
     }
 
-    public async Task<string> RegisterUserAsync(AuthDto user, string? role = "View")
+    public async Task<bool> RegisterNewUserAsync(AddNewUserDto request, ClaimsPrincipal user)
     {
-        if (!Roles.Contains(role))
-        {
-            role = "View";
-        }
-        await _userService.CreateUserAsync(user, role);
+        if (!Roles.Contains(request.Role)) throw new Exception("Ошибка, роль не найдена");
+        if (user.Identity is null || 
+            user.Identity.Name is null) throw new Exception("Ошибка аутентификации Админстратора");
 
-        var jwtKey = Environment.GetEnvironmentVariable("JWT_SECRET_KEY");
-        if (string.IsNullOrEmpty(jwtKey)) throw new Exception("Ошибка генерации jwt ключа");
-
-        var calims = new[]
+        AuthDto testAdmin = new AuthDto
         {
-            new Claim(ClaimTypes.Name, user.Name),
-            new Claim(ClaimTypes.Role, role)
+            Name = user.Identity.Name,
+            Password = request.Password,
         };
+        if (await _userService.CheckUserAsync(testAdmin))
+        {
+            if (await _userRepo.GetUserByUsernameAsync(request.Name) is not null) 
+                throw new Exception("Пользователь с таким именем уже есть в базе");
 
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
-        var cerds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-        var token = new JwtSecurityToken(
-            issuer: "TrDB-sys",
-            audience: "TrDB-usr",
-            claims: calims,
-            expires: DateTime.Now.AddHours(12),
-            signingCredentials: cerds
-        );
-
-        return new JwtSecurityTokenHandler().WriteToken(token);
+            AuthDto newUser = new AuthDto()
+            {
+                Name = request.Name,
+                Password = request.Password,
+            };
+            string token = await RegisterUserAsync(newUser, request.Role);
+            return String.IsNullOrEmpty(token);
+        }
+        return false;
     }
 
     public async Task<string> LoginUserAsync(AuthDto user)
@@ -87,5 +83,36 @@ public class AuthService : IAuthService
         }
 
         throw new Exception("Пользователь не найден");
+    }
+    
+    private async Task<string> RegisterUserAsync(AuthDto user, string? role = "View")
+    {
+        if (!Roles.Contains(role))
+        {
+            role = "View";
+        }
+        await _userService.CreateUserAsync(user, role);
+
+        var jwtKey = Environment.GetEnvironmentVariable("JWT_SECRET_KEY");
+        if (string.IsNullOrEmpty(jwtKey)) throw new Exception("Ошибка генерации jwt ключа");
+
+        var calims = new[]
+        {
+            new Claim(ClaimTypes.Name, user.Name),
+            new Claim(ClaimTypes.Role, role)
+        };
+
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
+        var cerds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+        var token = new JwtSecurityToken(
+            issuer: "TrDB-sys",
+            audience: "TrDB-usr",
+            claims: calims,
+            expires: DateTime.Now.AddHours(12),
+            signingCredentials: cerds
+        );
+
+        return new JwtSecurityTokenHandler().WriteToken(token);
     }
 }
