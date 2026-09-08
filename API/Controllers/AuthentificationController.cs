@@ -16,14 +16,6 @@ public class AuthentificationController : ControllerBase
         _authorizationService = authorizationService;
     }
     
-    
-    [HttpPost("register")]
-    public async Task<IActionResult> RegisterUser(AuthDto user)
-    {
-        string tokenStr = await _authorizationService.RegisterUserAsync(user);
-        return Ok(new {token = tokenStr});
-    }
-
     [HttpPost("login")]
     public async Task<IActionResult> LoginUser(AuthDto user)
     {
