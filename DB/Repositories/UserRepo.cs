@@ -32,7 +32,18 @@ public class UserRepo : IUserRepo
     {
         return await ldb.Users.ToListAsync();
     }
-    
+
+    public async Task<bool> DeleteUserByIdAsync(int id)
+    {
+        if (id == 0) return false; // Админа не удалять
+        
+        var deleteUser = await ldb.Users.FirstOrDefaultAsync(u => u.Id == id);
+        if (deleteUser is null) return false;
+        ldb.Users.Remove(deleteUser);
+        await ldb.SaveChangesAsync();
+        return true;
+    }
+
     public bool CountOfUsersIsNull()
     {
         return ldb.Users.ToList().Count == 0;

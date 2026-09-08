@@ -36,4 +36,11 @@ public class UserPanelController : ControllerBase
         return BadRequest();
         
     }
+
+    [HttpDelete("Users/{id}")]
+    public async Task<IActionResult> DeleteUserAsync(int id, [FromBody] string adminPassword)
+    {
+        await _UserService.DeleteUserAsync(id, adminPassword, User);
+        return Ok();
+    }
 }

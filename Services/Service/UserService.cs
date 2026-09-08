@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using DB.Repositories;
 using Domain.Classes;
 using Domain.DTO;
@@ -37,4 +38,25 @@ public class UserService : IUserService
         var answ = users.Select(u => new UserDto(u)).ToList();
         return answ;
     }
+
+    public async Task<bool> DeleteUserAsync(int id, string adminPassword, ClaimsPrincipal user)
+    {
+        if (user.Identity is null ||
+            user.Identity.Name is null) throw new Exception("Ошибка аутентификации");
+        
+        AuthDto test = new AuthDto
+        {
+            Name = user.Identity.Name,
+            Password = adminPassword
+        };
+
+        if (await CheckUserAsync(test))
+        {
+            bool result = await _userRepo.DeleteUserByIdAsync(id);
+            return result;
+        }
+        
+        return false;
+    }
+
 }
