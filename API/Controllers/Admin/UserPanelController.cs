@@ -60,8 +60,11 @@ public class UserPanelController : ControllerBase
     }
 
     [HttpPatch("Users/edit")]
-    public async Task<IActionResult> EditUserAsync(UserDto userData, [FromBody] string adminPassword)
+    public async Task<IActionResult> EditUserAsync(EditUserDto request)
     {
+        UserDto userData = request.GetUserDto();
+        string adminPassword = request.AdminPassword;
+        
         bool answ = await _UserService.EditUserAsync(userData,adminPassword, User);
         if (answ) return Ok();
         return BadRequest();
