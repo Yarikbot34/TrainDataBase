@@ -58,4 +58,12 @@ public class UserPanelController : ControllerBase
             return BadRequest(ex.Message);
         }
     }
+
+    [HttpPatch("Users/edit")]
+    public async Task<IActionResult> EditUserAsync(UserDto userData, [FromBody] string adminPassword)
+    {
+        bool answ = await _UserService.EditUserAsync(userData,adminPassword, User);
+        if (answ) return Ok();
+        return BadRequest();
+    }
 }

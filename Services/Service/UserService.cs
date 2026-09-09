@@ -39,6 +39,41 @@ public class UserService : IUserService
         return answ;
     }
 
+    public async Task<bool> EditUserAsync(UserDto request, string adminPassword, ClaimsPrincipal user)
+    {
+        
+        if (user.Identity is null ||
+            user.Identity.Name is null) throw new Exception("Ошибка аутентификации");
+        
+        if (request.Id == 0)
+        {
+            var checkAdmin = await _userRepo.GetUserByIdAsync(request.Id);
+            {
+                if (!(checkAdmin is not null &&
+                    user.Identity.Name == checkAdmin.Username))
+                {
+                    throw new Exception("Отказано в доступе");
+                }
+            }
+        }
+        
+        AuthDto test = new AuthDto
+        {
+            Name = user.Identity.Name,
+            Password = adminPassword
+        };
+        if (await CheckUserAsync(test))
+        {
+            var originalUser = await _userRepo.GetUserByIdAsync(request.Id);
+            if (originalUser is null) throw new Exception("Пользователь с таким id не найден");
+            originalUser.Username = request.Username;
+            originalUser.Role = request.Role;
+            var result = await _userRepo.UpdateUserAsync(originalUser);
+            return result;
+        }
+        return false;
+    }
+
     public async Task<bool> DeleteUserAsync(int id, string adminPassword, ClaimsPrincipal user)
     {
         if (user.Identity is null ||

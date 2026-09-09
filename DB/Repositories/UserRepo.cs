@@ -1,4 +1,5 @@
 using Domain.Classes;
+using Domain.DTO;
 using Microsoft.EntityFrameworkCore;
 
 namespace DB.Repositories;
@@ -18,6 +19,12 @@ public class UserRepo : IUserRepo
         await ldb.SaveChangesAsync();
     }
 
+
+    public async Task<User?> GetUserByIdAsync(int userId)
+    {
+        return await ldb.Users.FirstOrDefaultAsync(u => u.Id == userId);
+    }
+    
     public async Task<User?> GetUserByUsernameAsync(string username)
     {
         var answ = await ldb.Users.FirstOrDefaultAsync(u => u.Username == username);
@@ -31,6 +38,13 @@ public class UserRepo : IUserRepo
     public async Task<List<User>> GetAllUsersAsync()
     {
         return await ldb.Users.ToListAsync();
+    }
+
+    public async Task<bool> UpdateUserAsync(User user)
+    {
+        ldb.Users.Update(user);
+        await ldb.SaveChangesAsync();
+        return true;
     }
 
     public async Task<bool> DeleteUserByIdAsync(int id)
