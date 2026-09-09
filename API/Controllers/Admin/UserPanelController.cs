@@ -69,4 +69,11 @@ public class UserPanelController : ControllerBase
         if (answ) return Ok();
         return BadRequest();
     }
+
+    [HttpGet("Users/Roles")]
+    public async Task<IActionResult> GetRolesAsync()
+    {
+        var answ = await _AuthService.GetRolesAsync();
+        return Ok(answ);
+    }
 }

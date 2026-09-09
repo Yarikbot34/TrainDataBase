@@ -20,6 +20,11 @@ public class AuthService : IAuthService
         _userRepo = userRepo;
     }
 
+    public async Task<List<string>> GetRolesAsync()
+    {
+        return Roles.ToList();
+    }
+    
     public async Task<bool> RegisterNewUserAsync(AddNewUserDto request, ClaimsPrincipal user)
     {
         if (!Roles.Contains(request.Role)) throw new Exception("Ошибка, роль не найдена");
