@@ -75,11 +75,11 @@ public class RoutesWithSummDto
         
         SummPaymentBySubj = new summData
         {
-            CasualSum = Routes.Sum(r => r.Casual.Payment),
-            StudentSum = Routes.Sum(r => r.Student.Payment),
-            FedBenefitSum = Routes.Sum(r => r.FedBenefit.Payment),
-            RegBenefitSum = Routes.Sum(r => r.RegBenefit.Payment),
-            Another = Routes.Sum(r => r.Another.Payment)
+            CasualSum = Routes.Sum(r => r.Casual.PaymentBySubject),
+            StudentSum = Routes.Sum(r => r.Student.PaymentBySubject),
+            FedBenefitSum = Routes.Sum(r => r.FedBenefit.PaymentBySubject),
+            RegBenefitSum = Routes.Sum(r => r.RegBenefit.PaymentBySubject),
+            Another = Routes.Sum(r => r.Another.PaymentBySubject),
         };
         SummPaymentBySubj.FullSum = SummPaymentBySubj.GetSum();
     }
