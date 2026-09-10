@@ -23,7 +23,7 @@ public class DbContentController : ControllerBase
     }
 
     [HttpGet("writedPeriods")]
-    public async Task<IActionResult> GetWritedMonthsAsync()
+    public async Task<IActionResult> GetWritedPeriodsAsync()
     {
         var answ = await _contentService.GetRecordedPeriodsAsync();
         return Ok(answ);

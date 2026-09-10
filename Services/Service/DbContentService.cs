@@ -39,7 +39,10 @@ public class DbContentService : IdbContentService
             var period = new PeriodDto()
             {
                 Year = year,
-                Months = months.Select(t => t.Month).ToHashSet().ToList(),
+                Months = months
+                    .Where(t => t.Type != Transaction.TransactionType.Delete &&
+                                t.Type != Transaction.TransactionType.Update)
+                    .Select(t => t.Month).ToHashSet().ToList(),
             };
             answ.Add(period);
         }
