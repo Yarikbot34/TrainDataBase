@@ -49,6 +49,7 @@ public class AuthService : IAuthService
             string token = await RegisterUserAsync(newUser, request.Role);
             return String.IsNullOrEmpty(token);
         }
+        Console.WriteLine($"Пользователь не прошел авторизацию\n {testAdmin.Name}\n{testAdmin.Password}");
         return false;
     }
 

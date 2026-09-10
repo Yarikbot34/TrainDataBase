@@ -3,6 +3,7 @@ using DB;
 using DB.Repositories;
 using FileWorker;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -38,6 +39,8 @@ builder.Services.AddControllers();
 builder.Services.AddHealthChecks();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.AddSwaggerAuth();
+
 
 builder.Services.AddCors(options =>
 { options.AddPolicy("AllowAll", policy =>
