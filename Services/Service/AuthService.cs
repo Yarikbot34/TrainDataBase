@@ -34,7 +34,7 @@ public class AuthService : IAuthService
         AuthDto testAdmin = new AuthDto
         {
             Name = user.Identity.Name,
-            Password = request.Password,
+            Password = request.AdminPassword,
         };
         if (await _userService.CheckUserAsync(testAdmin))
         {
