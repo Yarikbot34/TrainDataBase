@@ -31,11 +31,14 @@ public class TrainService : ITrainService
         return answ;
     }
     
-    public async Task<List<Train>> GetTrainsByPeriodAndNumber(int year, int month, string number)
+    public async Task<List<TrainDto>> GetTrainsByPeriodAndNumber(int year, int month, string number)
     {
         number = number.Replace("*", "").Trim();
-        var answ = await _trainRepo
+        var trains = await _trainRepo
             .GetAllTrainsByNumberAndYearMonthAsync(year, month, number);
+        var answ = trains.Select(t => new TrainDto(t))
+            .OrderBy(t => t.RowInFile)
+            .ToList();
         return answ;
     }
 
