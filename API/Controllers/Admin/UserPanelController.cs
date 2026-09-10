@@ -34,7 +34,7 @@ public class UserPanelController : ControllerBase
         try
         {
             var answ = await _AuthService.RegisterNewUserAsync(request, User);
-            if (answ) return Ok(answ);
+            if (answ) return Ok();
             return BadRequest();
         }
         catch  (Exception ex)

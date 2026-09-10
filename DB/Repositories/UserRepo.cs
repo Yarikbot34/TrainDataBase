@@ -28,10 +28,6 @@ public class UserRepo : IUserRepo
     public async Task<User?> GetUserByUsernameAsync(string username)
     {
         var answ = await ldb.Users.FirstOrDefaultAsync(u => u.Username == username);
-        if (answ is null)
-        {
-            throw new Exception("Пользователь под таким именем не найден");
-        }
         return answ;
     }
 
