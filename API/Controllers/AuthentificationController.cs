@@ -19,8 +19,16 @@ public class AuthentificationController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> LoginUser(AuthDto user)
     {
-        string tokenStr = await _authorizationService.LoginUserAsync(user);
-        return Ok(new {token = tokenStr});
+        try
+        {
+            string tokenStr = await _authorizationService.LoginUserAsync(user);
+            return Ok(new { token = tokenStr });
+        }
+        catch (Exception ex)
+        {
+            return Unauthorized(ex.Message);
+        }
+        
     }
     
     
