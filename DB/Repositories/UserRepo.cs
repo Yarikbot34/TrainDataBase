@@ -45,7 +45,7 @@ public class UserRepo : IUserRepo
 
     public async Task<bool> DeleteUserByIdAsync(int id)
     {
-        if (id == 0) return false; // Админа не удалять
+        if (id == 1) return false; // Админа не удалять
         
         var deleteUser = await ldb.Users.FirstOrDefaultAsync(u => u.Id == id);
         if (deleteUser is null) return false;

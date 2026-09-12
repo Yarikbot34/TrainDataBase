@@ -45,7 +45,7 @@ public class UserService : IUserService
         if (user.Identity is null ||
             user.Identity.Name is null) throw new Exception("Ошибка аутентификации");
         
-        if (request.Id == 0)
+        if (request.Id == 1)
         {
             var checkAdmin = await _userRepo.GetUserByIdAsync(request.Id);
             {
