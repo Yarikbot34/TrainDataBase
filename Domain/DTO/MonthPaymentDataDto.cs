@@ -5,6 +5,8 @@ public class MonthPaymentDataDto
     public int year { get; set; }
     public int month { get; set; }
     
+    public string? PeriodDesc { get; set; }
+    
     public int CasualPayment { get; set; }
     public int StudentPayment { get; set; }
     public int FedBenefitPayment { get; set; }

@@ -5,6 +5,8 @@ public class MonthPassengerDataDto
     public int year { get; set; }
     public int month { get; set; }
 
+    public string? PeriodDesc { get; set; }
+    
     public int CasualCount { get; set; }
     public double CasualPercent{ get; set; }
     

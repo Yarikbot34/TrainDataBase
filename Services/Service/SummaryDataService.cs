@@ -9,10 +9,12 @@ namespace Services;
 public class SummaryDataService : ISummaryDataService
 {
     private readonly IRouteRepo _routeRepo;
+    private readonly ITransactionRepo _transactionRepo;
 
-    public SummaryDataService(IRouteRepo routeRepo)
+    public SummaryDataService(IRouteRepo routeRepo,  ITransactionRepo transactionRepo)
     {
         _routeRepo = routeRepo;
+        _transactionRepo = transactionRepo;
     }
 
     public async Task<List<MonthPaymentDataDto>> GetYearPaymentDataInMonthAsync(int year)
@@ -43,7 +45,9 @@ public class SummaryDataService : ISummaryDataService
             var routes = AllRoutes.Where(r => r.Month == i).ToList();
             if (routes.Count != 0)
             {
+                var transaction = await _transactionRepo.GetTransactionByYearAndMonthAsync(year, i);
                 MonthPaymentDataDto dto = new MonthPaymentDataDto();
+                dto.PeriodDesc = transaction is null ? "" : transaction.Description;
                 if (isTodayYear)
                 {
                     dto.year = i > DateTime.Today.Month ? year - 1 : year;
@@ -119,7 +123,9 @@ public class SummaryDataService : ISummaryDataService
             var routes = AllRoutes.Where(r => r.Month == i).ToList();
             if (routes.Count != 0)
             {
+                var transaction = await _transactionRepo.GetTransactionByYearAndMonthAsync(year, i);
                 MonthPassengerDataDto dto = new MonthPassengerDataDto();
+                dto.PeriodDesc = transaction is null ? "" : transaction.Description;
                 if (isTodayYear)
                 {
                     dto.year = i > DateTime.Today.Month ? year - 1 : year;
