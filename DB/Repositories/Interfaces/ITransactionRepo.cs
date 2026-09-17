@@ -12,6 +12,7 @@ public interface ITransactionRepo
     Task<Transaction?> GetTransactionByIdAsync(int id);
     Task<List<Transaction>> GetAllTransactionsAsync();
     Task<Transaction?> GetTransactionByYearAndMonthAsync(int year, int month, bool getUser = false);
+    Task<Transaction?> GetTransactionByYearMonthTypeAsync(int year, int month, Transaction.TransactionType type);
     
     Task PathTransactionAsync(Transaction t);
     

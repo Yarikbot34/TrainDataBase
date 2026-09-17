@@ -87,6 +87,17 @@ public class TransactionRepo : ITransactionRepo
         return answ;
     }
 
+    public async Task<Transaction?> GetTransactionByYearMonthTypeAsync(
+        int year, 
+        int month,
+        Transaction.TransactionType transactionType)
+    {
+        return await ldb.Transactions.FirstOrDefaultAsync(t =>
+            t.Month == month &&
+            t.Year == year &&
+            t.Type == transactionType);
+    }
+
     public async Task PathTransactionAsync(Transaction t)
     {
         ldb.Transactions.Update(t);
