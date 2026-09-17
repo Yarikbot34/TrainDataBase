@@ -45,7 +45,7 @@ public class SummaryDataService : ISummaryDataService
             var routes = AllRoutes.Where(r => r.Month == i).ToList();
             if (routes.Count != 0)
             {
-                var transaction = await _transactionRepo.GetTransactionByYearAndMonthAsync(year, i);
+                var transaction = await _transactionRepo.GetTransactionByYearMonthTypeAsync(year, i, Transaction.TransactionType.AddFile);
                 MonthPaymentDataDto dto = new MonthPaymentDataDto();
                 dto.PeriodDesc = transaction is null ? "" : transaction.Description;
                 if (isTodayYear)
@@ -123,7 +123,7 @@ public class SummaryDataService : ISummaryDataService
             var routes = AllRoutes.Where(r => r.Month == i).ToList();
             if (routes.Count != 0)
             {
-                var transaction = await _transactionRepo.GetTransactionByYearAndMonthAsync(year, i);
+                var transaction = await _transactionRepo.GetTransactionByYearMonthTypeAsync(year, i, Transaction.TransactionType.AddFile);
                 MonthPassengerDataDto dto = new MonthPassengerDataDto();
                 dto.PeriodDesc = transaction is null ? "" : transaction.Description;
                 if (isTodayYear)
