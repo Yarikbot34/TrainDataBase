@@ -39,35 +39,8 @@ public class RouteService : IRouteService
     
     public async Task<List<RouteDto>> GetRoutesByFilter(RouteFilterDto filter)
     {
-        var routeList = _routeRepo.GetAllRoutesWithTrainsAsync()
-            .Result.AsQueryable();
-        
-        routeList = ApplyFilter(filter, routeList);  
-        
-        var answ = routeList.Select(r => new RouteDto(r)).ToList();
+        var routes = await _routeRepo.GetRoutesByFilterAsync(filter);
+        var answ = routes.Select(r => new RouteDto(r)).ToList();
         return answ;
-
-        IQueryable<Route> ApplyFilter(RouteFilterDto filter, IQueryable<Route> query)
-        {
-            if (filter.period is not null)
-            {
-                query = query.Where(r => filter.period
-                    .Any(p => p.Months.Contains(r.Month) && p.Year == r.Year));
-            }
-            if (filter.number != null) query = query.Where(r => r.RouteNumber.Contains(filter.number.Trim()));
-            
-            if (filter.stationFrom != null)
-            {
-                query = query.Where(r => r.Trains.Any(t => 
-                    t.StationFrom.Name == filter.stationFrom));
-            }
-
-            if (filter.stationTo != null)
-            {
-                query = query.Where(r => r.Trains.Any(t => 
-                    t.StationTo.Name == filter.stationTo));
-            }
-            return query;
-        }
     }
 }

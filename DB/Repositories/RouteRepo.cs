@@ -1,4 +1,5 @@
 using Domain.Classes;
+using Domain.DTO;
 using Microsoft.EntityFrameworkCore;
 
 namespace DB.Repositories;
@@ -48,6 +49,39 @@ public class RouteRepo : IRouteRepo
         var answ = await ldb.Routes
             .FirstOrDefaultAsync(r => r.RouteId == routeId);
         return answ;
+    }
+
+    public async Task<List<Route>> GetRoutesByFilterAsync(RouteFilterDto filter)
+    {
+        var routeList = GetAllRoutesWithTrainsAsync()
+            .Result.AsQueryable();
+        
+        var answ = ApplyFilter(filter, routeList);  
+        
+        return answ.ToList();
+
+        IQueryable<Route> ApplyFilter(RouteFilterDto filter, IQueryable<Route> query)
+        {
+            if (filter.period is not null)
+            {
+                query = query.Where(r => filter.period
+                    .Any(p => p.Months.Contains(r.Month) && p.Year == r.Year));
+            }
+            if (filter.number != null) query = query.Where(r => r.RouteNumber.Contains(filter.number.Trim()));
+            
+            if (filter.stationFrom != null)
+            {
+                query = query.Where(r => r.Trains.Any(t => 
+                    t.StationFrom.Name == filter.stationFrom));
+            }
+
+            if (filter.stationTo != null)
+            {
+                query = query.Where(r => r.Trains.Any(t => 
+                    t.StationTo.Name == filter.stationTo));
+            }
+            return query;
+        }
     }
 
     public async Task<List<Route>> GetRoutesByYearListAsync(List<int> years, bool includeTrains = false)
