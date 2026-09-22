@@ -34,7 +34,7 @@ public class TableViewController : ControllerBase
     [HttpPost("routes/filter")]
     public async Task<ActionResult> GetRoutesFilter(RouteFilterDto filter)
     {
-        var answ = _routeService.GetRoutesByFilterWithSummAsync(filter);
+        var answ = await _routeService.GetRoutesByFilterWithSummAsync(filter);
         return Ok(answ);
     }
     
