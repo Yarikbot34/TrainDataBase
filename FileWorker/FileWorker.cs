@@ -236,72 +236,283 @@ public class FileWorkerService : IFileWorker
             return dtos;
         }
         
-    }
-    
-    private string GetValueOrZero(IXLCell cell)
-    {
-        string data = cell.Value
-            .ToString()
-            .Replace("*", "")
-            .Replace(",", ".")
-            .Trim();
-        return data == "" ?  "0" : data;
-    }
-
-    private int GetFirstRowIndex(IXLWorksheet worksheet)
-    {
-        int counter = 0;
-        string IdValue = "";
-        string NextValue = "";
-        while (IdValue != "1" || NextValue == IdValue )
+        string GetValueOrZero(IXLCell cell)
         {
-            counter++;
-            IdValue = worksheet.Cell(counter, 1).Value.ToString();
-            NextValue = worksheet.Cell(counter+1, 1).Value.ToString();
+            string data = cell.Value
+                .ToString()
+                .Replace("*", "")
+                .Replace(",", ".")
+                .Trim();
+            return data == "" ?  "0" : data;
         }
-        return counter;
-    }
 
-    private int[] GetNumeredColumns(int firstRow, IXLWorksheet worksheet)
-    {
-        int row = firstRow - 1; //Переходим на строку с нумерацией
-        List<int> columns = new List<int>();
-        columns.Add(0);
-        int colCounter = 1;
-        int referenceNumber = 1;
-        int nullCells = 0;
-        while (columns.Count <= 12)
+        int GetFirstRowIndex(IXLWorksheet worksheet)
         {
-            if (worksheet.Cell(row, colCounter).Value.ToString() == referenceNumber.ToString())
+            int counter = 0;
+            string IdValue = "";
+            string NextValue = "";
+            while (IdValue != "1" || NextValue == IdValue )
             {
-                nullCells = 0;
-                referenceNumber++;
-                columns.Add(colCounter);
-                colCounter++;
+                counter++;
+                IdValue = worksheet.Cell(counter, 1).Value.ToString();
+                NextValue = worksheet.Cell(counter+1, 1).Value.ToString();
             }
-            else
-            {
-                colCounter++;
-                nullCells++;
-                if (nullCells > 2) break;
-            }
+            return counter;
         }
-        return columns.ToArray();
 
+        int[] GetNumeredColumns(int firstRow, IXLWorksheet worksheet)
+        {
+            int row = firstRow - 1; //Переходим на строку с нумерацией
+            List<int> columns = new List<int>();
+            columns.Add(0);
+            int colCounter = 1;
+            int referenceNumber = 1;
+            int nullCells = 0;
+            while (columns.Count <= 12)
+            {
+                if (worksheet.Cell(row, colCounter).Value.ToString() == referenceNumber.ToString())
+                {
+                    nullCells = 0;
+                    referenceNumber++;
+                    columns.Add(colCounter);
+                    colCounter++;
+                }
+                else
+                {
+                    colCounter++;
+                    nullCells++;
+                    if (nullCells > 2) break;
+                }
+            }
+            return columns.ToArray();
+
+        }
+
+        int GetTrainCount(IXLWorksheet worksheet, int TableStart)
+        {
+            int counter = TableStart;
+            string value = "1";
+            string id = "1";
+            while (id != "" || (value != "" && int.TryParse(value, out _)))
+            {
+                counter++;
+                id = worksheet.Cell(counter, 1).Value.ToString();
+                value = worksheet.Cell(counter, 2).Value.ToString().Split('/')[0].Replace("*", "");
+            }
+            return counter-1-TableStart;
+        }
+        
     }
 
-    private int GetTrainCount(IXLWorksheet worksheet, int TableStart)
+    public async Task<string?> CreateFile(RouteFilterDto filter)
     {
-        int counter = TableStart;
-        string value = "1";
-        string id = "1";
-        while (id != "" || (value != "" && int.TryParse(value, out _)))
+        var routes = await _routeRepo.GetRoutesByFilterAsync(filter, true);
+        if (routes.Count == 0) return null;
+        var wBook = CreateNewBook();
+        var trainSheet = wBook.Worksheet("Поезда");
+        var passSheet = wBook.Worksheet("Пассажиропоток");
+        var paySheet = wBook.Worksheet("Доходы");
+
+        int tRow = 2;
+        int rRow = 3;
+        
+        for (int i = 0; i < routes.Count; i++)
         {
-            counter++;
-            id = worksheet.Cell(counter, 1).Value.ToString();
-            value = worksheet.Cell(counter, 2).Value.ToString().Split('/')[0].Replace("*", "");
+            Console.WriteLine($"R{routes.Count} - T{routes[i].Trains.Count}");
+            for (int j = 0; j < routes[i].Trains.Count; j++)
+            {
+                tRow++;
+                WriteTrain(routes[i].Trains[j], tRow);
+            }
+            rRow++;
+            WriteRoutePass(routes[i], rRow);
+            WriteRoutePaym(routes[i], rRow);
         }
-        return counter-1-TableStart;
+        wBook.SaveAs("test.xlsx");
+        Console.WriteLine("All");
+        return null;
+
+
+        void WriteTrain(Train train, int row)
+        {
+            Console.WriteLine($"${row}");
+            trainSheet.Cell(row, "A").Value = row - 2;
+            trainSheet.Cell(row, "B").Value = train.month + "." + train.year;
+            trainSheet.Cell(row, "C").Value = train.Number;
+
+            var stations = new List<string>();
+            stations.Add(train.StationFrom.Name);
+            if (train.StationMiddleId is not null) stations.Add(train.StationMiddle.Name);
+            stations.Add(train.StationTo.Name);
+            trainSheet.Cell(row, "D").Value = String.Join("-", stations);
+            trainSheet.Cell(row, "E").Value = 
+                train.TimeFrom.ToString("HH:mm") + "-" + 
+                train.TimeTo.ToString("HH:mm") ;
+            trainSheet.Cell(row, "F").Value = train.Distance;
+            trainSheet.Cell(row, "G").Value = train.RailcarCount;
+            trainSheet.Cell(row, "H").Value = train.RangePerDay;
+            trainSheet.Cell(row, "I").Value = train.DayInRaise;
+            trainSheet.Cell(row, "J").Value = train.RangePerMonth;
+        }
+
+        void WriteRoutePass(Route route, int row)
+        {
+            passSheet.Cell(row, "A").Value = row - 2;
+            passSheet.Cell(row, "B").Value = route.Month + "." + route.Year;
+            passSheet.Cell(row, "C").Value = route.RouteNumber;
+            
+            passSheet.Cell(row, "D").Value = route.Casual.Count;
+            passSheet.Cell(row, "E").Value = route.Student.Count;
+            passSheet.Cell(row, "F").Value = route.FedBenefit.Count;
+            passSheet.Cell(row, "G").Value = route.RegBenefit.Count;
+            passSheet.Cell(row, "H").Value = route.Another.Count;
+            
+            passSheet.Cell(row, "I").Value = route.Casual.WayLength;
+            passSheet.Cell(row, "J").Value = route.Student.WayLength;
+            passSheet.Cell(row, "K").Value = route.FedBenefit.WayLength;
+            passSheet.Cell(row, "L").Value = route.RegBenefit.WayLength;
+            passSheet.Cell(row, "M").Value = route.Another.WayLength;
+        }
+
+        void WriteRoutePaym(Route route, int row)
+        {
+            paySheet.Cell(row, "A").Value = row - 2;
+            paySheet.Cell(row, "B").Value = route.Month + "." + route.Year;
+            paySheet.Cell(row, "C").Value = route.RouteNumber;
+            paySheet.Cell(row, "D").Value = route.Casual.Payment;
+            paySheet.Cell(row, "E").Value = route.Student.Payment;
+            paySheet.Cell(row, "F").Value = route.FedBenefit.Payment;
+            paySheet.Cell(row, "G").Value = route.RegBenefit.Payment;
+            paySheet.Cell(row, "H").Value = route.Another.Payment;
+            
+            paySheet.Cell(row, "I").Value = route.Student.PaymentBySubject;
+            paySheet.Cell(row, "J").Value = route.FedBenefit.PaymentBySubject;
+            paySheet.Cell(row, "K").Value = route.RegBenefit.PaymentBySubject;
+            paySheet.Cell(row, "L").Value = route.Another.PaymentBySubject;
+        }
+        
+        
+        XLWorkbook CreateNewBook()
+        {
+            XLWorkbook book = new();
+            var trainsSheet = book.Worksheets.Add("Поезда");
+            var passSheet = book.Worksheets.Add("Пассажиропоток");
+            var paymSheet = book.Worksheets.Add("Доходы");
+
+
+            trainsSheet.Cell("A1").Value = "1. Объем вагоно-километровой работы:";
+            trainsSheet.Range("A1:J1").Merge(); 
+            
+            trainsSheet.Cell("A2").Value = "№ п/п";
+            trainsSheet.Cell("B2").Value = "Период";
+            trainsSheet.Cell("C2").Value = "№ поезда";
+            trainsSheet.Cell("D2").Value = "Станция отправления – станция назначения";
+            trainsSheet.Cell("E2").Value = "Время отправления и прибытия по конечным станциям";
+            trainsSheet.Cell("F2").Value = "Расстояние между станциями, км";
+            trainsSheet.Cell("G2").Value = "Количество вагонов, ед.";
+            trainsSheet.Cell("H2").Value = "Вагоно-километры в сутки";
+            trainsSheet.Cell("I2").Value = "Количество дней курсирования";
+            trainsSheet.Cell("J2").Value = "Вагоно-километры в месяц";
+            
+            trainsSheet.Column("A").Width = 6;
+            trainsSheet.Column("B").Width = 12;
+            trainsSheet.Column("C").Width = 10;
+            trainsSheet.Column("D").Width = 35;
+            trainsSheet.Column("E").Width = 35;
+            trainsSheet.Column("F").Width = 18;
+            trainsSheet.Column("G").Width = 15;
+            trainsSheet.Column("H").Width = 18;
+            trainsSheet.Column("I").Width = 18;
+            trainsSheet.Column("J").Width = 18;
+            
+            var trainsHeaderRange = trainsSheet.Range("A2:J2");
+            trainsHeaderRange.Style.Font.Bold = true;
+            trainsHeaderRange.Style.Alignment.WrapText = true;
+            trainsHeaderRange.Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
+            trainsHeaderRange.Style.Border.SetOutsideBorder(XLBorderStyleValues.Thin);
+            trainsHeaderRange.Style.Border.SetInsideBorder(XLBorderStyleValues.Thin);
+            
+            passSheet.Cell("A1").Value = "2. Фактическое количество перевезенных пассажиров:";
+            passSheet.Range("A1:L1").Merge();
+            
+            passSheet.Cell("A2").Value = "№ п/п";
+            passSheet.Cell("B2").Value = "Период";
+            passSheet.Cell("C2").Value = "№ поездов (по направлениям \"туда-обратно\")";
+            passSheet.Cell("D2").Value = "Количество перевезенных пассажиров, чел.";
+            passSheet.Cell("I2").Value = "Средняя дальность поездки, км.";
+
+            passSheet.Range("D2:H2").Merge(); 
+            passSheet.Range("I2:M2").Merge();
+            
+            passSheet.Range("A2:A3").Merge();
+            passSheet.Range("B2:B3").Merge();
+            passSheet.Range("C2:C3").Merge();
+            
+            string[] subHeaders = new string[]
+            {
+                "Пассажиры, не имеющие льгот",
+                "Обучающиеся (скидка по провозной плате 50%)",
+                "Федеральные льготники",
+                "Региональные льготники, за исключением обучающихся",
+                "Иные пассажиры, которым были предоставлены льготы (дети от 7 до 14 лет, работники пользующиеся Ф-4)"
+            };
+            
+            for (int i = 0; i < subHeaders.Length; i++)
+                passSheet.Cell(3, 4 + i).Value = subHeaders[i];
+            
+            for (int i = 0; i < subHeaders.Length; i++)
+                passSheet.Cell(3, 9 + i).Value = subHeaders[i];
+            
+            passSheet.Column("A").Width = 6;
+            passSheet.Column("C").Width = 22;
+            for (int col = 3; col <= 13; col++)
+                passSheet.Column(col).Width = 20;
+            
+            var passHeaderRange = passSheet.Range("A2:M3");
+            passHeaderRange.Style.Font.Bold = true;
+            passHeaderRange.Style.Alignment.WrapText = true;
+            passHeaderRange.Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
+            passHeaderRange.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+            passHeaderRange.Style.Border.SetOutsideBorder(XLBorderStyleValues.Thin);
+            passHeaderRange.Style.Border.SetInsideBorder(XLBorderStyleValues.Thin);
+            
+            paymSheet.Cell("A1").Value = "3. Размер полученных доходов:";
+            paymSheet.Range("A1:L1").Merge();
+            
+            paymSheet.Cell("A2").Value = "№ п/п";
+            paymSheet.Cell("B2").Value = "Период";
+            paymSheet.Cell("C2").Value = "№ поездов (по направлениям \"туда-обратно\")";
+            paymSheet.Cell("D2").Value = "Доходы, полученные от перевозки пассажиров, руб.";
+            paymSheet.Cell("I2").Value = "Доходы, причитающиеся от субъектов, установивших льготы, руб.";
+            
+            paymSheet.Range("D2:H2").Merge();
+            paymSheet.Range("I2:L2").Merge();
+            
+            paymSheet.Range("A2:A3").Merge();
+            paymSheet.Range("B2:B3").Merge();
+            paymSheet.Range("C2:C3").Merge();
+            
+            for (int i = 0; i < subHeaders.Length; i++)
+                paymSheet.Cell(3, 4 + i).Value = subHeaders[i];
+
+            for (int i = 1; i < subHeaders.Length; i++)
+                paymSheet.Cell(3, 8 + i).Value = subHeaders[i];
+            
+            paymSheet.Column("A").Width = 6;
+            paymSheet.Column("B").Width = 22;
+            for (int col = 3; col <= 12; col++)
+                paymSheet.Column(col).Width = 20;
+
+            var paymHeaderRange = paymSheet.Range("A2:L3");
+            paymHeaderRange.Style.Font.Bold = true;
+            paymHeaderRange.Style.Alignment.WrapText = true;
+            paymHeaderRange.Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
+            paymHeaderRange.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+            paymHeaderRange.Style.Border.SetOutsideBorder(XLBorderStyleValues.Thin);
+            paymHeaderRange.Style.Border.SetInsideBorder(XLBorderStyleValues.Thin);
+
+            return book;
+        }
     }
 }
 

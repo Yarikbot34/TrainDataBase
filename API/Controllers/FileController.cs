@@ -65,5 +65,12 @@ public class InputFileController : ControllerBase
         }
         else return BadRequest("Ошибка авторизации");
     }
+
+    [HttpPost("download/routes")]
+    public async Task<IActionResult> DownloadRoutes(RouteFilterDto filter)
+    {
+        await _fileWorker.CreateFile(filter);
+        return Ok();
+    }
     
 }
