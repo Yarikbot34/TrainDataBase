@@ -9,7 +9,7 @@ public interface IRouteRepo
     Task WriteRoutesAsync(IEnumerable<Route> routes);
     Task<List<Route>> GetAllRoutesAsync();
     Task<List<Route>> GetAllRoutesWithTrainsAsync();
-    Task<List<Route>> GetRoutesByFilterAsync(RouteFilterDto filter);
+    Task<List<Route>> GetRoutesByFilterAsync(RouteFilterDto filter,  bool includeTrains = false);
     Task<Route> GetRouteByIdAsync(int routeId);
     Task<List<Route>> GetRoutesByYearListAsync(List<int> years, bool includeTrains = false);
 }

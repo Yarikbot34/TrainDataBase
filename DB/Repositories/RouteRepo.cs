@@ -51,10 +51,19 @@ public class RouteRepo : IRouteRepo
         return answ;
     }
 
-    public async Task<List<Route>> GetRoutesByFilterAsync(RouteFilterDto filter)
+    public async Task<List<Route>> GetRoutesByFilterAsync(RouteFilterDto filter, bool includeTrains = false)
     {
-        var routeList = GetAllRoutesWithTrainsAsync()
-            .Result.AsQueryable();
+        var routeList = new List<Route>().AsQueryable();
+        if (includeTrains)
+        {
+            var routeListRaw = await GetAllRoutesWithTrainsAsync();
+            routeList = routeListRaw.AsQueryable();
+        }
+        else
+        {
+            var routeListRaw = await GetAllRoutesAsync();
+            routeList = routeListRaw.AsQueryable();
+        }
         
         var answ = ApplyFilter(filter, routeList);  
         
