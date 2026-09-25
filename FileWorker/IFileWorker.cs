@@ -7,5 +7,5 @@ namespace FileWorker;
 public interface IFileWorker
 {
     Task<List<TrainDto>> ExtractFromFile(FileStream fs, UploadFileDto uploadDto, ClaimsPrincipal user);
-    Task<string> CreateFile(RouteFilterDto filter);
+    Task<string> CreateFile(RouteFilterDto filter, MemoryStream buffer);
 }

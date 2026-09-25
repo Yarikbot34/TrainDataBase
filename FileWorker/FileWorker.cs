@@ -5,6 +5,7 @@ using Domain.Classes;
 using DB;
 using DB.Repositories;
 using Domain.DTO;
+using Microsoft.Extensions.DependencyInjection;
 
 
 namespace FileWorker;
@@ -304,10 +305,12 @@ public class FileWorkerService : IFileWorker
         
     }
 
-    public async Task<string?> CreateFile(RouteFilterDto filter)
+    public async Task<string?> CreateFile(RouteFilterDto filter, MemoryStream buffer)
     {
+        string fileName = $"{DateTime.Now}.xlsx";
+        
         var routes = await _routeRepo.GetRoutesByFilterAsync(filter, true);
-        if (routes.Count == 0) return null;
+        if (routes.Count == 0) throw new Exception("По заданным фильтрам маршруты не обнаружены");
         var wBook = CreateNewBook();
         var trainSheet = wBook.Worksheet("Поезда");
         var passSheet = wBook.Worksheet("Пассажиропоток");
@@ -329,9 +332,8 @@ public class FileWorkerService : IFileWorker
             WriteRoutePass(routes[i], rRow);
             WriteRoutePaym(routes[i], rRow);
         }
-        wBook.SaveAs("test.xlsx");
-        Console.WriteLine("All");
-        return null;
+        wBook.SaveAs(buffer);
+        return fileName;
 
 
         void WriteTrain(Train train, int row)
@@ -354,11 +356,12 @@ public class FileWorkerService : IFileWorker
             trainSheet.Cell(row, "H").Value = train.RangePerDay;
             trainSheet.Cell(row, "I").Value = train.DayInRaise;
             trainSheet.Cell(row, "J").Value = train.RangePerMonth;
+            trainSheet.Cell(row, "K").Value = train.Description;
         }
 
         void WriteRoutePass(Route route, int row)
         {
-            passSheet.Cell(row, "A").Value = row - 2;
+            passSheet.Cell(row, "A").Value = row - 3;
             passSheet.Cell(row, "B").Value = route.Month + "." + route.Year;
             passSheet.Cell(row, "C").Value = route.RouteNumber;
             
@@ -377,7 +380,7 @@ public class FileWorkerService : IFileWorker
 
         void WriteRoutePaym(Route route, int row)
         {
-            paySheet.Cell(row, "A").Value = row - 2;
+            paySheet.Cell(row, "A").Value = row - 3;
             paySheet.Cell(row, "B").Value = route.Month + "." + route.Year;
             paySheet.Cell(row, "C").Value = route.RouteNumber;
             paySheet.Cell(row, "D").Value = route.Casual.Payment;
@@ -402,7 +405,7 @@ public class FileWorkerService : IFileWorker
 
 
             trainsSheet.Cell("A1").Value = "1. Объем вагоно-километровой работы:";
-            trainsSheet.Range("A1:J1").Merge(); 
+            trainsSheet.Range("A1:K1").Merge(); 
             
             trainsSheet.Cell("A2").Value = "№ п/п";
             trainsSheet.Cell("B2").Value = "Период";
@@ -414,6 +417,7 @@ public class FileWorkerService : IFileWorker
             trainsSheet.Cell("H2").Value = "Вагоно-километры в сутки";
             trainsSheet.Cell("I2").Value = "Количество дней курсирования";
             trainsSheet.Cell("J2").Value = "Вагоно-километры в месяц";
+            trainsSheet.Cell("K2").Value = "Примечание";
             
             trainsSheet.Column("A").Width = 6;
             trainsSheet.Column("B").Width = 12;
@@ -425,8 +429,9 @@ public class FileWorkerService : IFileWorker
             trainsSheet.Column("H").Width = 18;
             trainsSheet.Column("I").Width = 18;
             trainsSheet.Column("J").Width = 18;
+            trainsSheet.Column("K").Width = 50;
             
-            var trainsHeaderRange = trainsSheet.Range("A2:J2");
+            var trainsHeaderRange = trainsSheet.Range("A2:K2");
             trainsHeaderRange.Style.Font.Bold = true;
             trainsHeaderRange.Style.Alignment.WrapText = true;
             trainsHeaderRange.Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;

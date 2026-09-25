@@ -69,8 +69,18 @@ public class InputFileController : ControllerBase
     [HttpPost("download/routes")]
     public async Task<IActionResult> DownloadRoutes(RouteFilterDto filter)
     {
-        await _fileWorker.CreateFile(filter);
-        return Ok();
+        using (var buffer = new MemoryStream())
+        {
+            try
+            {
+                string name = await _fileWorker.CreateFile(filter, buffer);
+                return File(buffer.ToArray(), "application/octet-stream", name);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
     }
     
 }
