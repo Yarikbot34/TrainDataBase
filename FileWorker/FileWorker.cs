@@ -154,8 +154,8 @@ public class FileWorkerService : IFileWorker
             route.Year = year;
             route.Month = month;
             
-            string number = PassengerDataList.Cell(FirstRows[1] + counter, 2).Value.ToString();
-            route.RouteNumber = number.ToLower().Contains("ручную") ? "0" : number;
+            string number = PassengerDataList.Cell(FirstRows[1] + counter, 2).Value.ToString().Trim();
+            route.RouteNumber = number.ToLower().Contains("ручную") ? "Ручной ввод" : number;
 
             var RouteTrains = trains.Where(t => t.Number.Contains(route.RouteNumber)).ToList();
             route.Trains = RouteTrains;
@@ -322,6 +322,7 @@ public class FileWorkerService : IFileWorker
             for (int j = 0; j < routes[i].Trains.Count; j++)
             {
                 tRow++;
+                Console.WriteLine($"{routes[i].Trains.Count}");
                 WriteTrain(routes[i].Trains[j], tRow);
             }
             rRow++;
