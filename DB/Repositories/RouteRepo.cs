@@ -54,7 +54,9 @@ public class RouteRepo : IRouteRepo
     public async Task<List<Route>> GetRoutesByFilterAsync(RouteFilterDto filter, bool includeTrains = false)
     {
         var routeList = new List<Route>().AsQueryable();
-        if (includeTrains)
+        if (includeTrains || 
+            filter.stationFrom is not null || 
+            filter.stationTo is not null)
         {
             var routeListRaw = await GetAllRoutesWithTrainsAsync();
             routeList = routeListRaw.AsQueryable();
