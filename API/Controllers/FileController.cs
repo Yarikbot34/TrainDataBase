@@ -65,8 +65,9 @@ public class InputFileController : ControllerBase
         }
         else return BadRequest("Ошибка авторизации");
     }
-
+    
     [HttpPost("download/routes")]
+    [Authorize(Roles = "Admin, Upload, View")]
     public async Task<IActionResult> DownloadRoutes(RouteFilterDto filter)
     {
         using (var buffer = new MemoryStream())

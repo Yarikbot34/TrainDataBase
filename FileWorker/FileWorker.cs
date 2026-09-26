@@ -338,16 +338,16 @@ public class FileWorkerService : IFileWorker
 
         void WriteTrain(Train train, int row)
         {
-            Console.WriteLine($"${row}");
             trainSheet.Cell(row, "A").Value = row - 2;
             trainSheet.Cell(row, "B").Value = train.month + "." + train.year;
-            trainSheet.Cell(row, "C").Value = train.Number;
+            trainSheet.Cell(row, "C").Value = train.HasDesc ? train.Description + "*": train.Description;
 
             var stations = new List<string>();
             stations.Add(train.StationFrom.Name);
             if (train.StationMiddleId is not null) stations.Add(train.StationMiddle.Name);
             stations.Add(train.StationTo.Name);
             trainSheet.Cell(row, "D").Value = String.Join("-", stations);
+            
             trainSheet.Cell(row, "E").Value = 
                 train.TimeFrom.ToString("HH:mm") + "-" + 
                 train.TimeTo.ToString("HH:mm") ;
