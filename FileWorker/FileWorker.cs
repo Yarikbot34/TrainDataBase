@@ -307,9 +307,9 @@ public class FileWorkerService : IFileWorker
 
     public async Task<string?> CreateFile(RouteFilterDto filter, MemoryStream buffer)
     {
+        List<Route> routes;
         string fileName = $"{DateTime.Now}.xlsx";
-        
-        var routes = await _routeRepo.GetRoutesByFilterAsync(filter, true);
+        routes = await _routeRepo.GetRoutesByFilterAsync(filter, true);
         if (routes.Count == 0) throw new Exception("По заданным фильтрам маршруты не обнаружены");
         var wBook = CreateNewBook();
         var trainSheet = wBook.Worksheet("Поезда");
@@ -321,11 +321,9 @@ public class FileWorkerService : IFileWorker
         
         for (int i = 0; i < routes.Count; i++)
         {
-            Console.WriteLine($"R{routes.Count} - T{routes[i].Trains.Count}");
             for (int j = 0; j < routes[i].Trains.Count; j++)
             {
                 tRow++;
-                Console.WriteLine($"{routes[i].Trains.Count}");
                 WriteTrain(routes[i].Trains[j], tRow);
             }
             rRow++;
@@ -340,7 +338,7 @@ public class FileWorkerService : IFileWorker
         {
             trainSheet.Cell(row, "A").Value = row - 2;
             trainSheet.Cell(row, "B").Value = train.month + "." + train.year;
-            trainSheet.Cell(row, "C").Value = train.HasDesc ? train.Description + "*": train.Description;
+            trainSheet.Cell(row, "C").Value = train.HasDesc ? train.Number + "*": train.Number;
 
             var stations = new List<string>();
             stations.Add(train.StationFrom.Name);
