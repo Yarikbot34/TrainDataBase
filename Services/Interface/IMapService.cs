@@ -6,5 +6,5 @@ namespace Services;
 public interface IMapService
 {
     Task UploadMapSchemaAsync(MapSchema schema);
-    Task<MapSchemaDto> GetMapSchemaAsync(string schemaName, int[] years, int[] months);
+    Task<MapSchemaDto> GetMapSchemaAsync(MapRequestDto mapRequest);
 }

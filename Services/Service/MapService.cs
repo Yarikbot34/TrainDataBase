@@ -71,18 +71,15 @@ public class MapService : IMapService
         }
     }
 
-    public async Task<MapSchemaDto> GetMapSchemaAsync(string schemaName, int[] years, int[] months)
+    public async Task<MapSchemaDto> GetMapSchemaAsync(MapRequestDto mapRequest)
     {
-        var schema = await _mapSchemaRepo.GetSchemaByNameAsync(schemaName);
+        var schema = await _mapSchemaRepo.GetSchemaByNameAsync(mapRequest.schemaName);
         if (schema is null)
         {
-            throw  new Exception($"Схема {schemaName} не найдена в базе");
+            throw  new Exception($"Схема {mapRequest.schemaName} не найдена в базе");
         }
-
-        var trains = await _trainRepo.GetAllTrainsAsync();
-        trains = trains
-            .Where(t => years.Contains(t.year) && months.Contains(t.month))
-            .ToList();
+        
+        var trains = await _trainRepo.GetTrainsByPeriodAsync(mapRequest.Periods);
         
         var cells = schema.MapCells;
         

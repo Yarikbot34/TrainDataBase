@@ -8,6 +8,7 @@ public interface ITrainRepo
     Task<Train> GetTrainByIdAsync(int id);
     Task<List<Train>> GetAllTrainsAsync();
     Task<List<Train>> GetAllTrainsByYearAsync(List<int> year);
+    Task<List<Train>> GetTrainsByPeriodAsync(List<PeriodDto> periods);
     Task<List<Train>> GetAllTrainsByNumberAndYearMonthAsync(int year, int month, string number);
     
     Task UpdateTrain(Train train);

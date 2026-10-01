@@ -2,7 +2,6 @@ namespace Domain.DTO;
 
 public class MapRequestDto
 {
-    public int[] years { get; set; }
-    public int[] months { get; set; }
+    public List<PeriodDto> Periods { get; set; } = new();
     public string schemaName { get; set; }
 }

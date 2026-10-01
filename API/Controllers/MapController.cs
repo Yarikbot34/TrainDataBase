@@ -26,7 +26,7 @@ public class MapController : ControllerBase
     [HttpPost("getSchema")]
     public async Task<IActionResult> GetSchemaAsync(MapRequestDto req)
     {
-        var asnw = await _mapService.GetMapSchemaAsync(req.schemaName,req.years, req.months);
+        var asnw = await _mapService.GetMapSchemaAsync(req);
         return Ok(asnw);
     }
 }

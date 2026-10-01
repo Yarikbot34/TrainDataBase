@@ -45,6 +45,22 @@ public class TrainRepo : ITrainRepo
         return answ;
     }
 
+    public async Task<List<Train>> GetTrainsByPeriodAsync(List<PeriodDto> periods)
+    {
+        var raw = await ldb.Trains
+            .Include(t => t.StationFrom)
+            .Include(t => t.StationMiddle)
+            .Include(t => t.StationTo)
+            .AsNoTracking().ToListAsync();
+            
+        var answ = raw.Where(t => periods.Any(p => 
+                (p.Year == t.year) && 
+                (p.Months.Contains(t.month))
+                ))
+            .ToList();
+        return answ;
+    }
+
     public async Task<List<Train>> GetAllTrainsByNumberAndYearMonthAsync(int year, int month, string number)
     {
         var answ = await ldb.Trains
