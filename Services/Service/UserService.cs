@@ -2,6 +2,7 @@ using System.Security.Claims;
 using DB.Repositories;
 using Domain.Classes;
 using Domain.DTO;
+using Domain.Enums;
 
 namespace Services;
 
@@ -67,7 +68,7 @@ public class UserService : IUserService
             var originalUser = await _userRepo.GetUserByIdAsync(request.Id);
             if (originalUser is null) throw new Exception("Пользователь с таким id не найден");
             originalUser.Username = request.Username;
-            originalUser.Role = request.Role;
+            originalUser.Role = (Role)Enum.Parse(typeof(Role), request.Role);
             var result = await _userRepo.UpdateUserAsync(originalUser);
             return result;
         }

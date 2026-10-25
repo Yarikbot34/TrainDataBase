@@ -71,7 +71,7 @@ public class AuthService : IAuthService
             var calims = new[]
             {
                 new Claim(ClaimTypes.Name, bdUser.Username),
-                new Claim(ClaimTypes.Role, bdUser.Role)
+                new Claim(ClaimTypes.Role, bdUser.Role.ToString())
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));

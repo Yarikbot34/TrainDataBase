@@ -18,6 +18,6 @@ public class UserDto
         Id = user.Id;
         Username = user.Username;
         DateCreated = user.Created;
-        Role = user.Role;
+        Role = user.Role.ToString();
     }
 }

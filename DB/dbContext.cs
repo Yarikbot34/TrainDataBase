@@ -43,6 +43,10 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<User>(entity =>
         {
             entity.HasKey(u => u.Id);
+            entity.Property(u => u.Role)
+                .HasConversion<string>();
+            entity.Property(u => u.Created)
+                .HasColumnType("timestamp without time zone");
         });
         
         
