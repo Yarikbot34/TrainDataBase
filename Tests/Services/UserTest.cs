@@ -54,4 +54,49 @@ public class UserTest
         
         await Assert.ThrowsAsync<System.ArgumentException>(() => _userService.CreateUserAsync(tstDto, tstRole));
     }
+
+    [Fact]
+    public async Task CheckUserTest()
+    {
+        var tstTrueDto = new AuthDto()
+        {
+            Name = "test",
+            Password = "test",
+        };
+        var tstFalseDto = new AuthDto()
+        {
+            Name = "testAdmin",
+            Password = "test123",
+        };
+        var tstPassword = BCrypt.Net.BCrypt.HashPassword("test");
+        _userRepoMock.Setup(repo => repo.GetUserByUsernameAsync(It.IsAny<string>()))
+            .ReturnsAsync(new User()
+            {
+                Id = 1,
+                Username = "test",
+                PasswordHash = tstPassword
+            });
+        
+        var answT = await _userService.CheckUserAsync(tstTrueDto);
+        var answF = await _userService.CheckUserAsync(tstFalseDto);
+        
+        _userRepoMock.Verify(repo => repo.GetUserByUsernameAsync(It.IsAny<string>()), Times.Exactly(2));
+        
+        Assert.True(answT);
+        Assert.False(answF);
+    }
+
+    [Fact]
+    public async Task CheckNullUserTest()
+    {
+        var tstDto = new AuthDto()
+        {
+            Name = "test",
+            Password = "test",
+        };
+        _userRepoMock.Setup(repo => repo.GetUserByUsernameAsync(It.IsAny<string>()))
+            .ReturnsAsync(null as User);
+        
+        await Assert.ThrowsAsync<Exception>(() => _userService.CheckUserAsync(tstDto));
+    }
 }
