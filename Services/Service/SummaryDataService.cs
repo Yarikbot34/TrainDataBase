@@ -3,6 +3,7 @@ using DB.Repositories;
 using Domain.DTO;
 using Domain.Classes;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Hybrid;
 
 namespace Services;
 
@@ -10,94 +11,121 @@ public class SummaryDataService : ISummaryDataService
 {
     private readonly IRouteRepo _routeRepo;
     private readonly ITransactionRepo _transactionRepo;
+    private readonly HybridCache _cache;
 
-    public SummaryDataService(IRouteRepo routeRepo,  ITransactionRepo transactionRepo)
+    public SummaryDataService(IRouteRepo routeRepo,  ITransactionRepo transactionRepo,  HybridCache cache)
     {
         _routeRepo = routeRepo;
         _transactionRepo = transactionRepo;
+        _cache = cache;
     }
 
     public async Task<List<MonthPaymentDataDto>> GetYearPaymentDataInMonthAsync(int year)
     {
-        bool isTodayYear;
-        List<Route> AllRoutes;
-        if (year == DateTime.Today.Year % 1000)
-        {
-            AllRoutes = await _routeRepo
-                .GetRoutesByYearListAsync(new List<int> { year,  year - 1 }, true);
-            isTodayYear = true;
-        }
-        else
-        {
-            AllRoutes = await _routeRepo
-                .GetRoutesByYearListAsync(new List<int> { year }, true);
-            isTodayYear = false;
-        }
+        var key = $"sum:Payment:{year}";
         
-        int[] months;
-        if (isTodayYear) months = getLastYearMonth();
-        else months = Enumerable.Range(1, 12).ToArray();
+        var answ = await _cache.GetOrCreateAsync(
+            key,
+            async ct => await GetYearPaymentDataInMonth());
         
-        List<MonthPaymentDataDto> payDtoList = new List<MonthPaymentDataDto>();
+        return answ;
         
-        foreach (var i in months)
+        async Task<List<MonthPaymentDataDto>> GetYearPaymentDataInMonth()
         {
-            var routes = AllRoutes.Where(r => r.Month == i).ToList();
-            if (routes.Count != 0)
+            List<MonthPaymentDataDto> payDtoList = new List<MonthPaymentDataDto>();
+            
+            bool isTodayYear;
+            List<Route> AllRoutes;
+            if (year == DateTime.Today.Year % 1000)
             {
-                var transaction = await _transactionRepo.GetTransactionByYearMonthTypeAsync(year, i, Transaction.TransactionType.AddFile);
-                MonthPaymentDataDto dto = new MonthPaymentDataDto();
-                dto.PeriodDesc = transaction is null ? "" : transaction.Description;
-                if (isTodayYear)
-                {
-                    dto.year = i > DateTime.Today.Month ? year - 1 : year;
-                }
-                else
-                {
-                    dto.year = year;
-                }
-                dto.month = i;
-
-                int CasualP = 0;
-                int StudentP = 0;
-                int FedBenefitP = 0;
-                int RegBenefitP = 0;
-                int AnotherP = 0;
-                int TrainKmPerMonth = 0;
-                int Summ = 0;
-                foreach (var r in routes)
-                {
-                    CasualP += Convert.ToInt32(r.Casual.Payment + r.Casual.PaymentBySubject);
-                    StudentP += Convert.ToInt32(r.Student.Payment + r.Student.PaymentBySubject);
-                    FedBenefitP += Convert.ToInt32(r.FedBenefit.Payment + r.FedBenefit.PaymentBySubject);
-                    RegBenefitP += Convert.ToInt32(r.RegBenefit.Payment + r.RegBenefit.PaymentBySubject);
-                    AnotherP += Convert.ToInt32(r.Another.Payment + r.Another.PaymentBySubject);
-                    Summ = CasualP + StudentP + FedBenefitP + RegBenefitP + AnotherP;
-
-                    foreach (var t in r.Trains)
-                    {
-                        TrainKmPerMonth += t.RangePerMonth;
-                    }
-                }
-
-                dto.CasualPayment = CasualP;
-                dto.StudentPayment = StudentP;
-                dto.RegBenefitPayment = RegBenefitP;
-                dto.FedBenefitPayment = FedBenefitP;
-                dto.TrainKmPerMonth = TrainKmPerMonth;
-                dto.AnotherPayment = AnotherP;
-                dto.SummPayment = Summ;
-                
-                payDtoList.Add(dto);
+                AllRoutes = await _routeRepo
+                    .GetRoutesByYearListAsync(new List<int> { year, year - 1 }, true);
+                isTodayYear = true;
             }
-        }
+            else
+            {
+                AllRoutes = await _routeRepo
+                    .GetRoutesByYearListAsync(new List<int> { year }, true);
+                isTodayYear = false;
+            }
 
-        return payDtoList;
+            int[] months;
+            if (isTodayYear) months = getLastYearMonth();
+            else months = Enumerable.Range(1, 12).ToArray();
+
+
+
+            foreach (var i in months)
+            {
+                var routes = AllRoutes.Where(r => r.Month == i).ToList();
+                if (routes.Count != 0)
+                {
+                    var transaction =
+                        await _transactionRepo.GetTransactionByYearMonthTypeAsync(year, i,
+                            Transaction.TransactionType.AddFile);
+                    MonthPaymentDataDto dto = new MonthPaymentDataDto();
+                    dto.PeriodDesc = transaction is null ? "" : transaction.Description;
+                    if (isTodayYear)
+                    {
+                        dto.year = i > DateTime.Today.Month ? year - 1 : year;
+                    }
+                    else
+                    {
+                        dto.year = year;
+                    }
+
+                    dto.month = i;
+
+                    int CasualP = 0;
+                    int StudentP = 0;
+                    int FedBenefitP = 0;
+                    int RegBenefitP = 0;
+                    int AnotherP = 0;
+                    int TrainKmPerMonth = 0;
+                    int Summ = 0;
+                    foreach (var r in routes)
+                    {
+                        CasualP += Convert.ToInt32(r.Casual.Payment + r.Casual.PaymentBySubject);
+                        StudentP += Convert.ToInt32(r.Student.Payment + r.Student.PaymentBySubject);
+                        FedBenefitP += Convert.ToInt32(r.FedBenefit.Payment + r.FedBenefit.PaymentBySubject);
+                        RegBenefitP += Convert.ToInt32(r.RegBenefit.Payment + r.RegBenefit.PaymentBySubject);
+                        AnotherP += Convert.ToInt32(r.Another.Payment + r.Another.PaymentBySubject);
+                        Summ = CasualP + StudentP + FedBenefitP + RegBenefitP + AnotherP;
+
+                        foreach (var t in r.Trains)
+                        {
+                            TrainKmPerMonth += t.RangePerMonth;
+                        }
+                    }
+
+                    dto.CasualPayment = CasualP;
+                    dto.StudentPayment = StudentP;
+                    dto.RegBenefitPayment = RegBenefitP;
+                    dto.FedBenefitPayment = FedBenefitP;
+                    dto.TrainKmPerMonth = TrainKmPerMonth;
+                    dto.AnotherPayment = AnotherP;
+                    dto.SummPayment = Summ;
+
+                    payDtoList.Add(dto);
+                }
+            }
+            return  payDtoList;
+        }
     }
 
     public async Task<List<MonthPassengerDataDto>> GetYearPassengerDataInMonthAsync(int year)
     {
-        bool isTodayYear;
+        var key = $"sum:Passenger:{year}";
+
+        var answ = await _cache.GetOrCreateAsync(
+            key,
+            async ct => await getYearPassengerStat());
+
+        return answ;
+        
+        async Task<List<MonthPassengerDataDto>> getYearPassengerStat()
+        {
+            bool isTodayYear;
         List<Route> AllRoutes;
         if (year == DateTime.Today.Year % 1000)
         {
@@ -178,6 +206,7 @@ public class SummaryDataService : ISummaryDataService
             }
         }
         return passDtoList;
+        }
     }
 
     int[] getLastYearMonth()

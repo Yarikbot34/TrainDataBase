@@ -3,13 +3,23 @@ using DB;
 using DB.Repositories;
 using FileWorker;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
+using Microsoft.Extensions.Caching.Hybrid;
 using Services;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
+
+builder.Services.AddHybridCache(options =>
+{
+    options.DefaultEntryOptions = new HybridCacheEntryOptions
+    {
+        Expiration = TimeSpan.FromHours(8),
+        LocalCacheExpiration = TimeSpan.FromHours(8),
+        Flags = HybridCacheEntryFlags.DisableDistributedCache
+    };
+});
 
 builder.Services.AddScoped<IUserRepo, UserRepo>();
 builder.Services.AddScoped<IRouteRepo, RouteRepo>();
