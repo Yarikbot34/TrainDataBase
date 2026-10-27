@@ -3,23 +3,36 @@ using DB.Repositories;
 using Domain.Classes;
 using Domain.DTO;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Hybrid;
 
 namespace Services;
 
 public class RouteService : IRouteService
 {
     private readonly IRouteRepo _routeRepo;
-    
-    public RouteService(IRouteRepo routeRepo)
+    private readonly HybridCache _cache;
+    public RouteService(IRouteRepo routeRepo, HybridCache cache)
     {
         _routeRepo = routeRepo;
+        _cache = cache;
     }
 
     public async Task<RoutesWithSummDto> GetRoutesWithSummAsync(List<int> years)
     {
-        var rotes = await GetRoutesAsync(years);
-        var answ = new RoutesWithSummDto(rotes);
-        return answ;
+        var key = "routes:withSumm";
+        
+        var asnw = await _cache.GetOrCreateAsync(
+            key,
+            async ct => await BuildRoutesWithSumm());
+        
+        return asnw;
+
+        async Task<RoutesWithSummDto> BuildRoutesWithSumm()
+        {
+            var rotes = await GetRoutesAsync(years);
+            var dto = new RoutesWithSummDto(rotes);
+            return dto;
+        }
     }
     
     public async Task<RoutesWithSummDto> GetRoutesByFilterWithSummAsync(RouteFilterDto filter)
