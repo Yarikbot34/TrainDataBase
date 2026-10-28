@@ -39,10 +39,14 @@ public class TransactionRepo : ITransactionRepo
         List<Transaction> transactions;
         if (filter.Periods is not null && filter.Periods.Count > 0)
         {
-            transactions  = await ldb.Transactions
-                .Where(t => filter.Periods.Any(p => p.Months.Contains(t.Month) && p.Year == t.Year))
+            var transactionsQuery = await ldb.Transactions
                 .Include(t => t.User)
                 .ToListAsync();
+            
+            transactions  =  transactionsQuery
+                .Where(t => filter.Periods.Any(p => p.Months.Contains(t.Month) && p.Year == t.Year))
+                .ToList();
+                
         }
         else
         {
