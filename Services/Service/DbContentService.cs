@@ -118,7 +118,7 @@ public class DbContentService : IdbContentService
         var key = "recorded:schemas";
         
         var answ = await _cache.GetOrCreateAsync(key, async ct => await BuildRecordedSchemas(),
-            tags: new []{"dbContent", "data", "map"});
+            tags: new []{"dbContent", "map"});
         
         return answ;
         

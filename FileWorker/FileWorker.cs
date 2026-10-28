@@ -5,6 +5,7 @@ using Domain.Classes;
 using DB;
 using DB.Repositories;
 using Domain.DTO;
+using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.DependencyInjection;
 
 
@@ -16,13 +17,16 @@ public class FileWorkerService : IFileWorker
     private readonly IStationRepo _stationRepo;
     private readonly IRouteRepo _routeRepo;
     private readonly IUserRepo _userRepo;
+    private readonly HybridCache _cache;
     public FileWorkerService
-        ( ITransactionRepo transactionRepo, IStationRepo stationRepo, IRouteRepo routeRepo, IUserRepo userRepo)
+        ( ITransactionRepo transactionRepo, IStationRepo stationRepo, IRouteRepo routeRepo, IUserRepo userRepo,
+            HybridCache cache)
     {
         _stationRepo = stationRepo;
         _transactionRepo = transactionRepo;
         _routeRepo = routeRepo;
         _userRepo = userRepo;
+        _cache = cache;
     }
     
     
@@ -224,6 +228,7 @@ public class FileWorkerService : IFileWorker
             await _transactionRepo.WriteNewTransactionAsync(note);
             await _stationRepo.WriteStationsAsync(stations);
             await _routeRepo.WriteRoutesAsync(routes);
+            await _cache.RemoveByTagAsync("data");
             return "ok";
         }
 
