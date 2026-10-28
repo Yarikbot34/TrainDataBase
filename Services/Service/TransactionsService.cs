@@ -1,7 +1,9 @@
+using System.Security.Authentication;
 using System.Security.Claims;
 using DB.Repositories;
 using Domain.Classes;
 using Domain.DTO;
+using Microsoft.Extensions.Caching.Hybrid;
 
 namespace Services;
 
@@ -10,12 +12,15 @@ public class TransactionsService : ITransactionsService
     private readonly ITransactionRepo _transactionRepo;
     private readonly IUserService _userService;
     private readonly IUserRepo _userRepo;
+    private readonly HybridCache _cache;
     
-    public  TransactionsService(ITransactionRepo transactionRepo, IUserService userService, IUserRepo userRepo)
+    public  TransactionsService(ITransactionRepo transactionRepo, IUserService userService, IUserRepo userRepo, 
+        HybridCache cache)
     {
         _transactionRepo = transactionRepo;
         _userService = userService;
         _userRepo = userRepo;
+        _cache = cache;
     }
     
     public async Task<List<TransactionDto>> GetTransactionsListAsync(TransactionFilterDto filter)
@@ -27,10 +32,10 @@ public class TransactionsService : ITransactionsService
 
     public async Task PatchTransactionDescFromDtoAsync(TransactionDto dto)
     {
-        int Id = dto.Id;
-        var transaction = await _transactionRepo.GetTransactionByIdAsync(Id);
+        int id = dto.Id;
+        var transaction = await _transactionRepo.GetTransactionByIdAsync(id);
         
-        if (transaction is null) throw new Exception($"Транзакция №{Id} не обнаружена в системе");
+        if (transaction is null) throw new Exception($"Транзакция №{id} не обнаружена в системе");
         
         transaction.Description = dto.Description;
         
@@ -39,6 +44,9 @@ public class TransactionsService : ITransactionsService
 
     public async Task RemoveUnitsByTransactionAsync(TransactionDeleteDto dto, ClaimsPrincipal user)
     {
+        if (user.Identity is null || user.Identity.Name is null) 
+            throw new AuthenticationException("Ошибка итендификации");
+        
         AuthDto auth = new AuthDto
         {
             Name = user.Identity.Name,
@@ -58,6 +66,7 @@ public class TransactionsService : ITransactionsService
             deleteNote.User = await _userRepo.GetUserByUsernameAsync(auth.Name);
             await _transactionRepo.DeleteTransactionAsync(transaction);
             await _transactionRepo.WriteNewTransactionAsync(deleteNote);
+            await _cache.RemoveByTagAsync("data");
 
         }
         else throw new Exception("Неверный пароль. Отказано в доступе");

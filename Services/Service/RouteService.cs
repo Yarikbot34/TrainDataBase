@@ -42,12 +42,12 @@ public class RouteService : IRouteService
         return answ;
     }
 
-    public async Task<List<RouteDto>> GetRoutesAsync(List<int> years)
+    public Task<List<RouteDto>> GetRoutesAsync(List<int> years)
     {
         var answ = _routeRepo.GetRoutesByYearListAsync(years).Result
             .Select(r => new RouteDto(r))
             .ToList();
-        return answ;
+        return Task.FromResult(answ);
     }
     
     public async Task<List<RouteDto>> GetRoutesByFilter(RouteFilterDto filter)

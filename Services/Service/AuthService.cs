@@ -20,9 +20,9 @@ public class AuthService : IAuthService
         _userRepo = userRepo;
     }
 
-    public async Task<List<string>> GetRolesAsync()
+    public Task<List<string>> GetRolesAsync()
     {
-        return Roles.ToList();
+        return Task.FromResult(Roles.ToList());
     }
     
     public async Task<bool> RegisterNewUserAsync(AddNewUserDto request, ClaimsPrincipal user)
@@ -91,7 +91,7 @@ public class AuthService : IAuthService
         throw new Exception("Пользователь не найден");
     }
     
-    private async Task<string> RegisterUserAsync(AuthDto user, string? role = "View")
+    private async Task<string> RegisterUserAsync(AuthDto user, string role = "View")
     {
         if (!Roles.Contains(role))
         {

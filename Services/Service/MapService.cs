@@ -57,11 +57,13 @@ public class MapService : IMapService
             {
                 if (mapCell.Type == "node")
                 {
+                    if (mapCell.Data.Label is null) continue;
                     var stat = await _stationRepo.GetStationByNameAsync(mapCell.Data.Label);
                     mapCell.Station = stat;
                 }
                 else if (mapCell.Type == "edge")
                 {
+                    if (mapCell.Source is null || mapCell.Target is null) continue;
                     var statFrom = mapCells.First(c => c.CellId == mapCell.Source.Cell).Station;
                     var statTo = mapCells.First(c => c.CellId == mapCell.Target.Cell).Station;
                     mapCell.SourceStation = statFrom;
@@ -128,8 +130,6 @@ public class MapService : IMapService
         
         List<Station> GetWay(Station start, Station finish, Dictionary<Station, List<Station>> map)
         {
-            if (start is null || finish is null)
-                return null;
             
             var previous = new Dictionary<Station, Station>(); 
             var visited = new HashSet<Station> { start };
