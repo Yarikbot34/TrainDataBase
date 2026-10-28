@@ -17,7 +17,7 @@ public class SummaryDataService : ISummaryDataService
     {
         _routeRepo = routeRepo;
         _transactionRepo = transactionRepo;
-        _cache = cache;
+        _cache = cache;  
     }
 
     public async Task<List<MonthPaymentDataDto>> GetYearPaymentDataInMonthAsync(int year)
@@ -26,7 +26,8 @@ public class SummaryDataService : ISummaryDataService
         
         var answ = await _cache.GetOrCreateAsync(
             key,
-            async ct => await GetYearPaymentDataInMonth());
+            async ct => await GetYearPaymentDataInMonth(),
+            tags: new []{"summData", "routes", "data"});
         
         return answ;
         
@@ -119,7 +120,8 @@ public class SummaryDataService : ISummaryDataService
 
         var answ = await _cache.GetOrCreateAsync(
             key,
-            async ct => await getYearPassengerStat());
+            async ct => await getYearPassengerStat(),
+            tags: new []{"summData", "routes", "data"});
 
         return answ;
         

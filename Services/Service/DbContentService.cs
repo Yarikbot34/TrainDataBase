@@ -33,7 +33,8 @@ public class DbContentService : IdbContentService
     {
         var key = "recorded:years";
 
-        var answ = await _cache.GetOrCreateAsync(key, async ct => await BuildRecordedYears());
+        var answ = await _cache.GetOrCreateAsync(key, async ct => await BuildRecordedYears(), 
+            tags: new []{"dbContent", "data"});
         
         return answ;
 
@@ -50,7 +51,8 @@ public class DbContentService : IdbContentService
     {
         var key = "recorded:periods";
         
-        var answ =  await _cache.GetOrCreateAsync(key, async ct => await BuildRecordedPeriods());
+        var answ =  await _cache.GetOrCreateAsync(key, async ct => await BuildRecordedPeriods(),
+            tags: new []{"dbContent", "data"});
         
         return answ;
         
@@ -80,7 +82,8 @@ public class DbContentService : IdbContentService
     {
         var key = "recorded:numbers";
         
-        var asnw = await _cache.GetOrCreateAsync(key, async ct => await BuildRecordedNumbers());
+        var asnw = await _cache.GetOrCreateAsync(key, async ct => await BuildRecordedNumbers(),
+            tags: new []{"dbContent", "data", "routes", "trains"});
 
         return asnw;
         
@@ -114,7 +117,8 @@ public class DbContentService : IdbContentService
     {
         var key = "recorded:schemas";
         
-        var answ = await _cache.GetOrCreateAsync(key, async ct => await BuildRecordedSchemas());
+        var answ = await _cache.GetOrCreateAsync(key, async ct => await BuildRecordedSchemas(),
+            tags: new []{"dbContent", "data", "map"});
         
         return answ;
         
