@@ -45,6 +45,13 @@ public class TableViewController : ControllerBase
         return Ok(answer);
     }
 
+    [HttpGet("trains/sorted")]
+    public async Task<ActionResult> GetTrainsSorted()
+    {
+        var answer = await _trainService.GetTrainsSortedByNumberAndDescriptionAsync();
+        return Ok(answer);
+    }
+
     [HttpGet("trains/{year}/{month}/{number}")]
     public async Task<ActionResult> GetTrains(int year, int month, string number)
     {

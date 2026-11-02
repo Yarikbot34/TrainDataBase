@@ -7,6 +7,7 @@ namespace Services;
 public interface ITrainService
 {
    Task<List<TrainDto>> GetTrainsAsync();
+   Task<List<TrainDto>> GetTrainsSortedByNumberAndDescriptionAsync();
    Task<List<TrainDto>> GetTrainsByPeriodAndNumber(int year, int month, string number);
    Task AddTrainDescById(int id, TrainDto dto, ClaimsPrincipal user);
 }

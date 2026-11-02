@@ -30,6 +30,26 @@ public class TrainService : ITrainService
         
         return answ;
     }
+
+    public async Task<List<TrainDto>> GetTrainsSortedByNumberAndDescriptionAsync()
+    {
+        var trains = await _trainRepo.GetAllTrainsAsync();
+
+        return trains
+            .Select(t => new TrainDto(t))
+            .OrderBy(t => GetNumberSortKey(t.Number))
+            .ThenBy(t => string.IsNullOrWhiteSpace(t.Description))
+            .ThenBy(t => t.RowInFile)
+            .ToList();
+
+        static (bool IsNumber, int Number, string Text) GetNumberSortKey(string number)
+        {
+            var normalized = number.Replace("*", "").Trim();
+            return (int.TryParse(normalized, out var numericNumber),
+                numericNumber,
+                normalized);
+        }
+    }
     
     public async Task<List<TrainDto>> GetTrainsByPeriodAndNumber(int year, int month, string number)
     {
