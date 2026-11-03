@@ -9,6 +9,7 @@ public class TrainDto
     public int Year { get; set; }
     public int Month { get; set; }
     public string Number { get; set; }
+    public bool IsCanceled { get; set; }
     public string Description { get; set; }
     
     //Тех. Данные
@@ -40,6 +41,7 @@ public class TrainDto
         Year = train.year;
         Month = train.month;
         Number = train.Number;
+        IsCanceled = train.IsCanceled;
         Description = train.Description;
         StationFrom = train.StationFrom.Name;
         StationMiddle = StationMiddle == null ? "" : train.StationMiddle.Name;

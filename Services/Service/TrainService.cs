@@ -21,14 +21,23 @@ public class TrainService : ITrainService
         _userRepo = userRepo;
     }
     
-    public async Task<List<TrainDto>> GetTrainsAsync()
+    public async Task<TrainsWithSummDto> GetTrainsAsync()
     {
         var trains = await _trainRepo.GetAllTrainsAsync();
-        var answ = trains
+        var lastMonth = DateTime.Today.AddMonths(-11);
+        var filtered = trains.Where(t => IsInLastTwelveMonths(t.year, t.month, lastMonth)).ToList();
+        var dto = filtered
             .Select(t => new TrainDto(t))
             .ToList();
-        
-        return answ;
+        return new TrainsWithSummDto(dto);
+
+        static bool IsInLastTwelveMonths(int year, int month, DateTime firstMonth)
+        {
+            var normalizedYear = year < 1000 ? 2000 + year : year;
+            var value = new DateTime(normalizedYear, month, 1);
+            var lastMonth = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+            return value >= new DateTime(firstMonth.Year, firstMonth.Month, 1) && value <= lastMonth;
+        }
     }
 
     public async Task<List<TrainDto>> GetTrainsSortedByNumberAndDescriptionAsync()
