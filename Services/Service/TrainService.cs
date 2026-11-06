@@ -40,6 +40,13 @@ public class TrainService : ITrainService
         }
     }
 
+    public async Task<TrainsWithSummDto> GetTrainsByFilterAsync(TrainFilterDto filter)
+    {
+        var trains = await _trainRepo.GetTrainsByFilterAsync(filter);
+        var dto = trains.Select(t => new TrainDto(t)).ToList();
+        return new TrainsWithSummDto(dto);
+    }
+
     public async Task<List<TrainDto>> GetTrainsSortedByNumberAndDescriptionAsync()
     {
         var trains = await _trainRepo.GetAllTrainsAsync();

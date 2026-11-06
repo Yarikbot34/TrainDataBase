@@ -45,6 +45,13 @@ public class TableViewController : ControllerBase
         return Ok(answer);
     }
 
+    [HttpPost("trains/filter")]
+    public async Task<ActionResult> GetTrainsFilter(TrainFilterDto filter)
+    {
+        var answer = await _trainService.GetTrainsByFilterAsync(filter);
+        return Ok(answer);
+    }
+
     [HttpGet("trains/sorted")]
     public async Task<ActionResult> GetTrainsSorted()
     {
