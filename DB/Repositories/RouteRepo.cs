@@ -118,4 +118,13 @@ public class RouteRepo : IRouteRepo
         }
         return answ;
     }
+
+    public async Task<Route?> GetRoutesByYearMonthAndNumberAsync(int year, int month, string number,
+        bool includeTrains = false)
+    {
+        var answ = await ldb.Routes.FirstOrDefaultAsync(r => r.Year == year &&
+                                              r.Month == month &&
+                                              r.RouteNumber == number);
+        return answ;
+    }
 }

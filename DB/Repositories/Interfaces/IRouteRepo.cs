@@ -12,4 +12,5 @@ public interface IRouteRepo
     Task<List<Route>> GetRoutesByFilterAsync(RouteFilterDto filter,  bool includeTrains = false);
     Task<Route> GetRouteByIdAsync(int routeId);
     Task<List<Route>> GetRoutesByYearListAsync(List<int> years, bool includeTrains = false);
+    Task<Route?> GetRoutesByYearMonthAndNumberAsync(int year, int month, string number, bool includeTrains = false);
 }

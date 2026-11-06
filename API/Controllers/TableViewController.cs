@@ -66,6 +66,26 @@ public class TableViewController : ControllerBase
         var answer = await _trainService.GetTrainsByPeriodAndNumber(year, month, clearNumber);
         return Ok(answer);
     }
+
+    [HttpGet("routes/{year}/{month}/{number}")]
+    public async Task<IActionResult> GetRoute(int year, int month, string number)
+    {
+        string clearNumber = Uri.UnescapeDataString(number);
+        try
+        {
+            var answer = await _routeService.GetRouteByPeriodAndNumberAsync(year, month, clearNumber);
+            return Ok(answer);
+        } 
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound();
+        } 
+        catch  (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        
+    }
     
     [HttpGet("stations")]
     public async Task<ActionResult> GetStations()

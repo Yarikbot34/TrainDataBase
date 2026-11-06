@@ -42,6 +42,13 @@ public class RouteService : IRouteService
         return answ;
     }
 
+    public async Task<RouteDto> GetRouteByPeriodAndNumberAsync(int year, int month, string number)
+    {        
+        var answ = await _routeRepo.GetRoutesByYearMonthAndNumberAsync(year, month, number);
+        if (answ != null) return new RouteDto(answ);
+        throw new KeyNotFoundException();
+    }
+
     public Task<List<RouteDto>> GetRoutesAsync(List<int> years)
     {
         var answ = _routeRepo.GetRoutesByYearListAsync(years).Result
