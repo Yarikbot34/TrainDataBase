@@ -6,6 +6,6 @@ public class Station
     public string Name { get; set; }
     public string? Class { get; set; }
     
-    public int? TransactionId { get; set; }
-    public Transaction? Transaction { get; set; }
+    public bool InUse { get; set; }
+    public bool IsOnMap { get; set; }
 }

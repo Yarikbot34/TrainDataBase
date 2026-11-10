@@ -132,19 +132,20 @@ namespace DB.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
+                    b.Property<bool>("InUse")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsOnMap")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
-                    b.Property<int?>("TransactionId")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
 
                     b.HasAlternateKey("Name");
-
-                    b.HasIndex("TransactionId");
 
                     b.ToTable("Stations");
                 });
@@ -625,16 +626,6 @@ namespace DB.Migrations
 
                     b.Navigation("Student")
                         .IsRequired();
-
-                    b.Navigation("Transaction");
-                });
-
-            modelBuilder.Entity("Domain.Classes.Station", b =>
-                {
-                    b.HasOne("Domain.Classes.Transaction", "Transaction")
-                        .WithMany()
-                        .HasForeignKey("TransactionId")
-                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Transaction");
                 });

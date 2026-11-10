@@ -57,11 +57,6 @@ public class AppDbContext : DbContext
             entity.HasAlternateKey(s => s.Name);
             entity.Property(s => s.Name).IsRequired().HasMaxLength(200);
             entity.Property(s => s.Class).HasMaxLength(50);
-            
-            entity.HasOne(t => t.Transaction)
-                .WithMany()
-                .HasForeignKey(t => t.TransactionId)
-                .OnDelete(DeleteBehavior.SetNull);
         });
 
         //Route

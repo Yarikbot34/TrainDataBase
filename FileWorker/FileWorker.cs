@@ -186,17 +186,19 @@ public class FileWorkerService : IFileWorker
             stationName = stationName.Trim();
             var s = existStations.FirstOrDefault(s => s.Name == stationName);
             s = s == null ? stations.FirstOrDefault(s => s.Name == stationName) : s;
-            if (s == null)
+            if (s is null)
             {
                 Station station = new Station()
                 {
                     Name = stationName,
-                    Transaction = note
+                    InUse = true
                 }; 
                 stations.Add(station);
-                return station;
+                s = station;
             }
-            else return s;
+            s.InUse = true;
+            return s;
+            
         }
         
         PasCategory GetCategoryData(int categoryNumber)
