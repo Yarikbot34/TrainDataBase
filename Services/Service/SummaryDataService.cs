@@ -58,54 +58,50 @@ public class SummaryDataService : ISummaryDataService
 
             foreach (var i in months)
             {
-                var routes = AllRoutes.Where(r => r.Month == i).ToList();
+                var routes = AllRoutes.Where(r => r.Month == i && r.Year == year ||
+                                                  r.Month == i && isTodayYear && r.Month > DateTime.Today.Month).ToList();
                 if (routes.Count != 0)
                 {
                     var transaction =
                         await _transactionRepo.GetTransactionByYearMonthTypeAsync(year, i,
                             Transaction.TransactionType.AddFile);
+                    
+                    if (transaction is null) continue;
+                    
                     MonthPaymentDataDto dto = new MonthPaymentDataDto();
-                    dto.PeriodDesc = transaction is null ? "" : transaction.Description;
-                    if (isTodayYear)
-                    {
-                        dto.year = i > DateTime.Today.Month ? year - 1 : year;
-                    }
-                    else
-                    {
-                        dto.year = year;
-                    }
+                    dto.PeriodDesc = transaction.Description;
+                    dto.year = transaction.Year;
+                    dto.month = transaction.Month;
 
-                    dto.month = i;
-
-                    int CasualP = 0;
-                    int StudentP = 0;
-                    int FedBenefitP = 0;
-                    int RegBenefitP = 0;
-                    int AnotherP = 0;
-                    int TrainKmPerMonth = 0;
-                    int Summ = 0;
+                    int casualP = 0;
+                    int studentP = 0;
+                    int fedBenefitP = 0;
+                    int regBenefitP = 0;
+                    int anotherP = 0;
+                    int trainKmPerMonth = 0;
+                    int summ = 0;
                     foreach (var r in routes)
                     {
-                        CasualP += Convert.ToInt32(r.Casual.Payment + r.Casual.PaymentBySubject);
-                        StudentP += Convert.ToInt32(r.Student.Payment + r.Student.PaymentBySubject);
-                        FedBenefitP += Convert.ToInt32(r.FedBenefit.Payment + r.FedBenefit.PaymentBySubject);
-                        RegBenefitP += Convert.ToInt32(r.RegBenefit.Payment + r.RegBenefit.PaymentBySubject);
-                        AnotherP += Convert.ToInt32(r.Another.Payment + r.Another.PaymentBySubject);
-                        Summ = CasualP + StudentP + FedBenefitP + RegBenefitP + AnotherP;
+                        casualP += Convert.ToInt32(r.Casual.Payment + r.Casual.PaymentBySubject);
+                        studentP += Convert.ToInt32(r.Student.Payment + r.Student.PaymentBySubject);
+                        fedBenefitP += Convert.ToInt32(r.FedBenefit.Payment + r.FedBenefit.PaymentBySubject);
+                        regBenefitP += Convert.ToInt32(r.RegBenefit.Payment + r.RegBenefit.PaymentBySubject);
+                        anotherP += Convert.ToInt32(r.Another.Payment + r.Another.PaymentBySubject);
+                        summ = casualP + studentP + fedBenefitP + regBenefitP + anotherP;
 
                         foreach (var t in r.Trains)
                         {
-                            TrainKmPerMonth += t.RangePerMonth;
+                            trainKmPerMonth += t.RangePerMonth;
                         }
                     }
-
-                    dto.CasualPayment = CasualP;
-                    dto.StudentPayment = StudentP;
-                    dto.RegBenefitPayment = RegBenefitP;
-                    dto.FedBenefitPayment = FedBenefitP;
-                    dto.TrainKmPerMonth = TrainKmPerMonth;
-                    dto.AnotherPayment = AnotherP;
-                    dto.SummPayment = Summ;
+                    
+                    dto.CasualPayment = casualP;
+                    dto.StudentPayment = studentP;
+                    dto.RegBenefitPayment = regBenefitP;
+                    dto.FedBenefitPayment = fedBenefitP;
+                    dto.TrainKmPerMonth = trainKmPerMonth;
+                    dto.AnotherPayment = anotherP;
+                    dto.SummPayment = summ;
 
                     payDtoList.Add(dto);
                 }
@@ -120,12 +116,12 @@ public class SummaryDataService : ISummaryDataService
 
         var answ = await _cache.GetOrCreateAsync(
             key,
-            async ct => await getYearPassengerStat(),
+            async ct => await GetYearPassengerStat(),
             tags: new []{"summData", "routes", "data"});
 
         return answ;
         
-        async Task<List<MonthPassengerDataDto>> getYearPassengerStat()
+        async Task<List<MonthPassengerDataDto>> GetYearPassengerStat()
         {
             bool isTodayYear;
         List<Route> AllRoutes;
@@ -150,60 +146,59 @@ public class SummaryDataService : ISummaryDataService
         
         foreach (int i in months)
         {
-            var routes = AllRoutes.Where(r => r.Month == i).ToList();
+            var routes = AllRoutes.Where(r => r.Month == i && r.Year == year ||
+                                              r.Month == i && isTodayYear && r.Month > DateTime.Today.Month).ToList();
             if (routes.Count != 0)
             {
-                var transaction = await _transactionRepo.GetTransactionByYearMonthTypeAsync(year, i, Transaction.TransactionType.AddFile);
-                MonthPassengerDataDto dto = new MonthPassengerDataDto();
-                dto.PeriodDesc = transaction is null ? "" : transaction.Description;
-                if (isTodayYear)
-                {
-                    dto.year = i > DateTime.Today.Month ? year - 1 : year;
-                }
-                else
-                {
-                    dto.year = year;
-                }
-                dto.month = i;
+                var transaction =
+                    await _transactionRepo.GetTransactionByYearMonthTypeAsync(year, i,
+                        Transaction.TransactionType.AddFile);
+                    
+                if (transaction is null) continue;
                 
-                int CasualPass = 0;
-                int StudentPass = 0;
-                int FedPass = 0;
-                int RegPass = 0;
-                int AnotherPass = 0;
-                int SummBenefitPass = 0;
-                int SummPass = 0;
+                MonthPassengerDataDto dto = new MonthPassengerDataDto();
+                dto.PeriodDesc = transaction.Description;
+                dto.year = transaction.Year;
+                dto.month = transaction.Month;
+                
+                int casualPass = 0;
+                int studentPass = 0;
+                int fedPass = 0;
+                int regPass = 0;
+                int anotherPass = 0;
+                int summBenefitPass = 0;
+                int summPass = 0;
                 foreach (var r in routes)
                 {
-                    CasualPass += Convert.ToInt32(r.Casual.Count);
-                    StudentPass += Convert.ToInt32(r.Student.Count);
-                    FedPass += Convert.ToInt32(r.FedBenefit.Count);
-                    RegPass += Convert.ToInt32(r.RegBenefit.Count);
-                    AnotherPass += Convert.ToInt32(r.Another.Count);
+                    casualPass += Convert.ToInt32(r.Casual.Count);
+                    studentPass += Convert.ToInt32(r.Student.Count);
+                    fedPass += Convert.ToInt32(r.FedBenefit.Count);
+                    regPass += Convert.ToInt32(r.RegBenefit.Count);
+                    anotherPass += Convert.ToInt32(r.Another.Count);
                 }
-                SummPass +=  CasualPass + StudentPass + FedPass + RegPass + AnotherPass;
-                SummBenefitPass = SummPass - CasualPass;
+                summPass +=  casualPass + studentPass + fedPass + regPass + anotherPass;
+                summBenefitPass = summPass - casualPass;
 
-                double CasualPercent = ((double)CasualPass / SummPass)*100;
-                double StudentPercent = ((double)StudentPass / SummPass)*100;
-                double FedPercent = ((double)FedPass / SummPass)*100;
-                double RegPercent = ((double)RegPass / SummPass)*100;
-                double AnotherPercent = ((double)AnotherPass / SummPass)*100;
-                double SummBenefitPercent = ((double)SummBenefitPass / SummPass)*100;
+                double casualPercent = ((double)casualPass / summPass)*100;
+                double studentPercent = ((double)studentPass / summPass)*100;
+                double fedPercent = ((double)fedPass / summPass)*100;
+                double regPercent = ((double)regPass / summPass)*100;
+                double anotherPercent = ((double)anotherPass / summPass)*100;
+                double summBenefitPercent = ((double)summBenefitPass / summPass)*100;
                 
-                dto.CasualCount = CasualPass;
-                dto.CasualPercent = CasualPercent;
-                dto.StudentCount = StudentPass;
-                dto.StudentPercent = StudentPercent;
-                dto.FedBenefitCount = FedPass;
-                dto.FedBenefitPercent = FedPercent;
-                dto.RegBenefitCount = RegPass;
-                dto.RegBenefitPercent = RegPercent;
-                dto.AnotherBenefitCount = AnotherPass;
-                dto.AnotherBenefitPercent = AnotherPercent;
-                dto.SumBenefitCount =  SummBenefitPass;
-                dto.SumBenefitPercent = SummBenefitPercent;
-                dto.SumPassengerCount = SummPass;
+                dto.CasualCount = casualPass;
+                dto.CasualPercent = casualPercent;
+                dto.StudentCount = studentPass;
+                dto.StudentPercent = studentPercent;
+                dto.FedBenefitCount = fedPass;
+                dto.FedBenefitPercent = fedPercent;
+                dto.RegBenefitCount = regPass;
+                dto.RegBenefitPercent = regPercent;
+                dto.AnotherBenefitCount = anotherPass;
+                dto.AnotherBenefitPercent = anotherPercent;
+                dto.SumBenefitCount =  summBenefitPass;
+                dto.SumBenefitPercent = summBenefitPercent;
+                dto.SumPassengerCount = summPass;
                 passDtoList.Add(dto);
             }
         }
