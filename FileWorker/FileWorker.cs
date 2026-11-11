@@ -47,8 +47,9 @@ public class FileWorkerService : IFileWorker
             throw new Exception(
                 "В базе данных уже есть записи датированные данным периодом, во избежание конфликта запись отклонена.");
         }
-        
-        
+
+        bool nullStationError = false;
+        string errorTrace = "";
         Transaction note = new Transaction();
         note.Year = year;
         note.Month = month;
@@ -109,14 +110,14 @@ public class FileWorkerService : IFileWorker
             string[] Stations = TrainDataList.Cell(FirstRows[0] + counter + refCounter, 3).Value.ToString().Split(new char[]{'–','-'});
             if (Stations.Length == 2)
             {
-                train.StationFrom = GetStationOrNew(Stations[0]);
-                train.StationTo = GetStationOrNew(Stations[1]);
+                train.StationFrom = GetStation(Stations[0]);
+                train.StationTo = GetStation(Stations[1]);
             }
             else if (Stations.Length == 3)
             {
-                train.StationFrom = GetStationOrNew(Stations[0]);
-                train.StationMiddle = GetStationOrNew(Stations[1]);
-                train.StationTo = GetStationOrNew(Stations[2]);
+                train.StationFrom = GetStation(Stations[0]);
+                train.StationMiddle = GetStation(Stations[1]);
+                train.StationTo = GetStation(Stations[2]);
             }
             else if (Stations.Length > 3 ) throw  new Exception($"Не получилось получить станции в строке {counter + FirstRows[0] + refCounter}. Проверьте количество тире в названии станции.");
             
@@ -148,6 +149,8 @@ public class FileWorkerService : IFileWorker
             
             counter++;
         }
+
+        if (nullStationError) throw new Exception(errorTrace);
         //Достаем маршруты
         Route[] routes = new Route[GetTrainCount(PassengerDataList, FirstRows[1])];
         for (int i = 0; i < routes.Length; i++) routes[i] = new Route();
@@ -178,25 +181,28 @@ public class FileWorkerService : IFileWorker
         await WriteToBase();
 
         var dtoWithNoDesc = writeDto();
-        
         return dtoWithNoDesc;
 
-        Station GetStationOrNew(string stationName)
+        //###################################
+        //#########Iternal functions#########
+        //###################################
+        
+        Station? GetStation(string stationName)
         {
             stationName = stationName.Trim();
             var s = existStations.FirstOrDefault(s => s.Name == stationName);
             s = s == null ? stations.FirstOrDefault(s => s.Name == stationName) : s;
             if (s is null)
             {
-                Station station = new Station()
-                {
-                    Name = stationName,
-                    InUse = true
-                }; 
-                stations.Add(station);
-                s = station;
+                nullStationError =  true;
+                string errMessage = 
+                    $"Станция с названием {stationName} в строке {counter + FirstRows[0] + refCounter} не найдена в базе";
+                errorTrace += errMessage + '\n'; 
             }
-            s.InUse = true;
+            else
+            {
+                s.InUse = true;
+            }
             return s;
             
         }
