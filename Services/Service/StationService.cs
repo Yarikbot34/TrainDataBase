@@ -18,4 +18,15 @@ public class StationService : IStationService
     {
         return await _stationRepo.GetAllStationsAsync();
     }
+
+    public async Task WriteStationFromDtoAsync(StationDto dto)
+    {
+        var station = dto.ToStation();
+        await _stationRepo.WriteStationAsync(station);
+    }
+
+    public async Task DeleteStationByIdAsync(int id)
+    {
+        await _stationRepo.DeleteStationByIdAsync(id);
+    }
 }

@@ -40,4 +40,12 @@ public class StationRepo : IStationRepo
     {
         return await ldb.Stations.ToListAsync();
     }
+
+    public async Task DeleteStationByIdAsync(int stationId)
+    {
+        var station = await ldb.Stations.FindAsync(stationId);
+        if (station is null) throw new KeyNotFoundException("Станция с таким id не найдена");
+        ldb.Stations.Remove(station);
+        await ldb.SaveChangesAsync();
+    }
 }

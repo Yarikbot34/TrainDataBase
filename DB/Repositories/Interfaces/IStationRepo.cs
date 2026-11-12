@@ -9,4 +9,5 @@ public interface IStationRepo
     Task<Station> GetStationByIdAsync(int stationId);
     Task<Station?> GetStationByNameAsync(string name);
     Task<List<Station>> GetAllStationsAsync();
+    Task DeleteStationByIdAsync(int stationId);
 }
