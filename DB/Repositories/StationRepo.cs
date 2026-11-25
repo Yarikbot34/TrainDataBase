@@ -1,5 +1,7 @@
 using Domain.Classes;
+using Domain.Enums;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 
 namespace DB.Repositories;
 
@@ -47,5 +49,25 @@ public class StationRepo : IStationRepo
         if (station is null) throw new KeyNotFoundException("Станция с таким id не найдена");
         ldb.Stations.Remove(station);
         await ldb.SaveChangesAsync();
+    }
+
+    public async Task<StationUpdateResult> UpdateStationAsync(int stationId, string name, string? stationClass)
+    {
+        try
+        {
+            // Name — альтернативный ключ, который нельзя изменить через отслеживаемую сущность EF Core.
+            var affectedRows = await ldb.Stations
+                .Where(station => station.Id == stationId)
+                .ExecuteUpdateAsync(setters => setters
+                    .SetProperty(station => station.Name, name)
+                    .SetProperty(station => station.Class, stationClass));
+
+            return affectedRows == 0 ? StationUpdateResult.NotFound : StationUpdateResult.Updated;
+        }
+        catch (PostgresException ex) when (ex.SqlState == PostgresErrorCodes.UniqueViolation &&
+                                           ex.ConstraintName == "AK_Stations_Name")
+        {
+            return StationUpdateResult.NameConflict;
+        }
     }
 }

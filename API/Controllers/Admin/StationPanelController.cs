@@ -1,5 +1,6 @@
-using DB.Repositories;
+using System.ComponentModel.DataAnnotations;
 using Domain.DTO;
+using Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services;
@@ -50,15 +51,28 @@ public class StationPanelController : ControllerBase
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
-            throw;
+            return  BadRequest(e.Message);
         }
     }
 
     [HttpPut("stations/{id}")]
     public async Task<IActionResult> UpdateStationAsync(int id, [FromBody] StationDto stationDto)
     {
-        throw new Exception();
+        try
+        {
+            var result = await _stationService.UpdateStationAsync(id, stationDto);
+            return result switch
+            {
+                StationUpdateResult.Updated => Ok(),
+                StationUpdateResult.NotFound => NotFound("Станция с таким id не найдена"),
+                StationUpdateResult.NameConflict => Conflict("Станция с таким названием уже существует"),
+                _ => throw new InvalidOperationException($"Неизвестный результат обновления станции: {result}")
+            };
+        }
+        catch (ValidationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 
 }
